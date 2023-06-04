@@ -358,7 +358,6 @@ dart_code_metrics:
     - prefer-last
     - prefer-match-file-name
     - prefer-moving-to-variable
-    - prefer-static-class
     - prefer-trailing-comma
     # flutter specific rules: https://dcm.dev/docs/individuals/rules/#flutter-specific
     - always-remove-listener
