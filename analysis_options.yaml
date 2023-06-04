@@ -6,6 +6,8 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - build/**
+  plugins:
+    - dart_code_metrics
   language:
     strict-casts: true
     strict-inference: true
@@ -309,3 +311,66 @@ linter:
     use_to_and_as_if_applicable: true
     secure_pubspec_urls: true
     sort_pub_dependencies: true
+
+dart_code_metrics:
+  rules:
+    # common rules: https://dcm.dev/docs/individuals/rules/#common
+    - avoid-cascade-after-if-null
+    - avoid-collection-methods-with-unrelated-types
+    - avoid-double-slash-imports
+    - avoid-duplicate-exports
+    - avoid-dynamic
+    - avoid-global-state
+    - avoid-ignoring-return-values
+    - avoid-late-keyword
+    - avoid-missing-enum-constant-in-map
+    - avoid-nested-conditional-expressions
+    - avoid-non-ascii-symbols
+    - avoid-non-null-assertion
+    - avoid-passing-async-when-sync-expected
+    - avoid-redundant-async
+    - avoid-substring
+    - avoid-throw-in-catch-block
+    - avoid-top-level-members-in-tests # not sure about this one
+    - avoid-unnecessary-conditionals
+    - avoid-unnecessary-type-assertions
+    - avoid-unnecessary-type-casts
+    - avoid-unrelated-type-assertions
+    - avoid-unused-parameters
+    - binary-expression-operand-order # not sure about this one
+    - double-literal-format
+    - format-comment
+    - missing-test-assertion
+    - no-boolean-literal-compare
+    - no-empty-block
+    - no-equal-arguments # not sure about this one
+    - no-equal-then-else
+    - no-magic-number # not sure about this one
+    - no-object-declaration
+    - prefer-async-await
+    - prefer-commenting-analyzer-ignores
+    - prefer-conditional-expressions
+    - prefer-correct-test-file-name
+    - prefer-enums-by-name
+    - prefer-first
+    - prefer-immediate-return
+    - prefer-iterable-of
+    - prefer-last
+    - prefer-match-file-name
+    - prefer-moving-to-variable
+    - prefer-static-class
+    - prefer-trailing-comma
+    # flutter specific rules: https://dcm.dev/docs/individuals/rules/#flutter-specific
+    - always-remove-listener
+    - avoid-border-all
+    - avoid-returning-widgets
+    - avoid-shrink-wrap-in-lists
+    - avoid-unnecessary-setstate
+    - use-setstate-synchronously
+    - avoid-expanded-as-spacer
+    - avoid-wrapping-in-padding
+    - check-for-equals-in-render-object-setters
+    - consistent-update-render-object
+    - prefer-const-border-radius
+    - prefer-define-hero-tag
+    - prefer-using-list-view
