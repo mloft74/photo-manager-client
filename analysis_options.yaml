@@ -1,29 +1,311 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
+# Information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
-linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at
-  # https://dart-lang.github.io/linter/lints/index.html.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
-  rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+analyzer:
+  exclude:
+    - build/**
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # error rules: https://dart.dev/tools/linter-rules#error-rules
+    always_use_package_imports: warning
+    avoid_dynamic_calls: error
+    avoid_empty_else: error
+    avoid_print: warning
+    avoid_relative_lib_imports: warning
+    avoid_slow_async_io: warning
+    avoid_type_to_string: warning
+    avoid_types_as_parameter_names: warning
+    avoid_web_libraries_in_flutter: error
+    cancel_subscriptions: warning
+    close_sinks: warning
+    collection_methods_unrelated_type: error
+    comment_references: error
+    control_flow_in_finally: error
+    deprecated_member_use_from_same_package: warning
+    discarded_futures: warning
+    empty_statements: error
+    hash_and_equals: error
+    implicit_reopen: error
+    invalid_case_patterns: error
+    literal_only_boolean_expressions: warning
+    no_adjacent_strings_in_list: warning
+    no_duplicate_case_values: error
+    no_logic_in_create_state: error
+    # no_self_assignments: warning # not available in 3.10.3
+    prefer_void_to_null: error
+    test_types_in_equals: error
+    throw_in_finally: error
+    unnecessary_statements: error
+    unrelated_type_equality_checks: error
+    unsafe_html: error
+    use_build_context_synchronously: warning
+    use_key_in_widget_constructors: warning
+    valid_regexps: error
+    # style rules: https://dart.dev/tools/linter-rules#style-rules
+    always_declare_return_types: error
+    always_put_control_body_on_new_line: warning
+    always_put_required_named_parameters_first: warning
+    annotate_overrides: warning
+    avoid_bool_literals_in_conditional_expressions: warning
+    avoid_double_and_int_checks: error
+    avoid_equals_and_hash_code_on_mutable_classes: error
+    avoid_escaping_inner_quotes: error
+    avoid_field_initializers_in_const_classes: error
+    avoid_function_literals_in_foreach_calls: warning
+    avoid_implementing_value_types: error
+    avoid_init_to_null: warning
+    avoid_multiple_declarations_per_line: error
+    avoid_null_checks_in_equality_operators: error
+    avoid_positional_boolean_parameters: warning
+    avoid_private_typedef_functions: warning
+    avoid_renaming_method_parameters: error
+    avoid_return_types_on_setters: error
+    avoid_returning_null_for_void: error
+    avoid_returning_this: error
+    avoid_setters_without_getters: warning
+    avoid_shadowing_type_parameters: warning
+    avoid_single_cascade_in_expression_statements: error
+    avoid_types_on_closure_parameters: warning
+    avoid_unnecessary_containers: warning
+    avoid_unused_constructor_parameters: warning
+    avoid_void_async: error
+    await_only_futures: error
+    camel_case_extensions: warning
+    camel_case_types: warning
+    cascade_invocations: warning
+    cast_nullable_to_non_nullable: error
+    combinators_ordering: warning
+    conditional_uri_does_not_exist: error
+    constant_identifier_names: warning
+    curly_braces_in_flow_control_structures: warning
+    dangling_library_doc_comments: warning
+    deprecated_consistency: warning
+    directives_ordering: warning
+    empty_catches: error
+    empty_constructor_bodies: error
+    eol_at_end_of_file: warning
+    exhaustive_cases: error
+    file_names: warning
+    flutter_style_todos: info
+    implementation_imports: error
+    implicit_call_tearoffs: warning
+    leading_newlines_in_multiline_strings: warning
+    library_annotations: warning
+    library_names: warning
+    library_prefixes: warning
+    library_private_types_in_public_api: error
+    matching_super_parameters: warning
+    missing_whitespace_between_adjacent_strings: warning
+    no_default_cases: error
+    no_leading_underscores_for_library_prefixes: warning
+    no_leading_underscores_for_local_identifiers: warning
+    no_literal_bool_comparisons: warning
+    no_runtimeType_toString: warning
+    non_constant_identifier_names: warning
+    noop_primitive_operations: error
+    null_check_on_nullable_type_parameter: warning
+    null_closures: warning
+    omit_local_variable_types: warning
+    one_member_abstracts: warning
+    only_throw_errors: error
+    overridden_fields: warning
+    package_prefixed_library_names: warning
+    parameter_assignments: warning
+    prefer_adjacent_string_concatenation: warning
+    prefer_asserts_in_initializer_lists: warning
+    prefer_asserts_with_message: warning
+    prefer_collection_literals: warning
+    prefer_conditional_assignment: warning
+    prefer_const_constructors: warning
+    prefer_const_constructors_in_immutables: warning
+    prefer_const_declarations: warning
+    prefer_const_literals_to_create_immutables: warning
+    prefer_constructors_over_static_methods: warning
+    prefer_contains: warning
+    prefer_equal_for_default_values: warning
+    prefer_final_fields: warning
+    prefer_final_in_for_each: warning
+    prefer_final_locals: warning
+    prefer_for_elements_to_map_fromIterable: warning
+    prefer_function_declarations_over_variables: warning
+    prefer_generic_function_type_aliases: warning
+    prefer_if_elements_to_conditional_expressions: warning
+    prefer_if_null_operators: warning
+    prefer_initializing_formals: warning
+    prefer_inlined_adds: warning
+    prefer_interpolation_to_compose_strings: warning
+    prefer_is_empty: warning
+    prefer_is_not_empty: warning
+    prefer_is_not_operator: warning
+    prefer_iterable_whereType: warning
+    prefer_mixin: warning
+    prefer_null_aware_method_calls: warning
+    prefer_null_aware_operators: warning
+    prefer_single_quotes: warning
+    prefer_spread_collections: warning
+    prefer_typing_uninitialized_variables: warning
+    provide_deprecation_message: warning
+    recursive_getters: error
+    require_trailing_commas: warning
+    sized_box_for_whitespace: warning
+    sized_box_shrink_expand: warning
+    slash_for_doc_comments: warning
+    sort_child_properties_last: warning
+    tighten_type_of_initializing_formals: warning
+    type_annotate_public_apis: warning
+    type_init_formals: warning
+    type_literal_in_constant_pattern: warning
+    unawaited_futures: warning
+    unnecessary_brace_in_string_interps: warning
+    unnecessary_breaks: warning
+    unnecessary_const: warning
+    unnecessary_constructor_name: warning
+    unnecessary_getters_setters: warning
+    unnecessary_lambdas: warning
+    unnecessary_late: warning
+    unnecessary_library_directive: warning
+    unnecessary_new: error
+    unnecessary_null_aware_assignments: warning
+    unnecessary_null_aware_operator_on_extension_on_nullable: warning
+    unnecessary_null_checks: warning
+    unnecessary_null_in_if_null_operators: warning
+    unnecessary_nullable_for_final_variable_declarations: warning
+    unnecessary_overrides: warning
+    unnecessary_parenthesis: warning
+    unnecessary_raw_strings: warning
+    unnecessary_string_escapes: warning
+    unnecessary_string_interpolations: warning
+    unnecessary_this: warning
+    unnecessary_to_list_in_spreads: warning
+    unreachable_from_main: warning
+    use_colored_box: warning
+    use_decorated_box: warning
+    use_enums: warning
+    use_full_hex_values_for_flutter_colors: warning
+    use_function_type_syntax_for_parameters: warning
+    use_if_null_to_convert_nulls_to_bools: warning
+    use_is_even_rather_than_modulo: warning
+    use_late_for_private_fields_and_variables: warning
+    use_named_constants: warning
+    use_raw_strings: warning
+    use_rethrow_when_possible: warning
+    use_setters_to_change_properties: warning
+    use_string_buffers: warning
+    use_string_in_part_of_directives: warning
+    use_super_parameters: warning
+    use_test_throws_matchers: warning
+    use_to_and_as_if_applicable: warning
+    void_checks: warning
+    depend_on_referenced_packages: warning
+    package_names: warning
+    secure_pubspec_urls: warning
+    sort_pub_dependencies: warning
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+linter:
+  rules:
+    # error rules: https://dart.dev/tools/linter-rules#error-rules
+    always_use_package_imports: true
+    avoid_dynamic_calls: true
+    avoid_slow_async_io: true
+    avoid_type_to_string: true
+    cancel_subscriptions: true
+    close_sinks: true
+    collection_methods_unrelated_type: true
+    comment_references: true
+    deprecated_member_use_from_same_package: true
+    discarded_futures: true
+    implicit_reopen: true
+    invalid_case_patterns: true
+    literal_only_boolean_expressions: true
+    no_adjacent_strings_in_list: true
+    # no_self_assignments: true # not available in 3.10.3
+    test_types_in_equals: true
+    throw_in_finally: true
+    unnecessary_statements: true
+    unsafe_html: true
+    # style rules: https://dart.dev/tools/linter-rules#style-rules
+    always_declare_return_types: true
+    always_put_control_body_on_new_line: true
+    always_put_required_named_parameters_first: true
+    avoid_bool_literals_in_conditional_expressions: true
+    avoid_double_and_int_checks: true
+    avoid_equals_and_hash_code_on_mutable_classes: true
+    avoid_escaping_inner_quotes: true
+    avoid_field_initializers_in_const_classes: true
+    avoid_implementing_value_types: true
+    avoid_multiple_declarations_per_line: true
+    avoid_positional_boolean_parameters: true
+    avoid_private_typedef_functions: true
+    avoid_returning_this: true
+    avoid_setters_without_getters: true
+    avoid_types_on_closure_parameters: true
+    avoid_unused_constructor_parameters: true
+    avoid_void_async: true
+    cascade_invocations: true
+    cast_nullable_to_non_nullable: true
+    combinators_ordering: true
+    conditional_uri_does_not_exist: true
+    dangling_library_doc_comments: true
+    deprecated_consistency: true
+    directives_ordering: true
+    eol_at_end_of_file: true
+    flutter_style_todos: true
+    implicit_call_tearoffs: true
+    leading_newlines_in_multiline_strings: true
+    library_annotations: true
+    matching_super_parameters: true
+    missing_whitespace_between_adjacent_strings: true
+    no_default_cases: true
+    no_literal_bool_comparisons: true
+    no_runtimeType_toString: true
+    noop_primitive_operations: true
+    omit_local_variable_types: true
+    one_member_abstracts: true
+    only_throw_errors: true
+    parameter_assignments: true
+    prefer_asserts_in_initializer_lists: true
+    prefer_asserts_with_message: true
+    prefer_constructors_over_static_methods: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_if_elements_to_conditional_expressions: true
+    prefer_mixin: true
+    prefer_null_aware_method_calls: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    sized_box_shrink_expand: true
+    tighten_type_of_initializing_formals: true
+    type_annotate_public_apis: true
+    type_init_formals: true
+    type_literal_in_constant_pattern: true
+    unawaited_futures: true
+    unnecessary_breaks: true
+    unnecessary_lambdas: true
+    unnecessary_library_directive: true
+    unnecessary_null_aware_operator_on_extension_on_nullable: true
+    unnecessary_null_checks: true
+    unnecessary_parenthesis: true
+    unnecessary_raw_strings: true
+    unnecessary_to_list_in_spreads: true
+    unreachable_from_main: true
+    use_colored_box: true
+    use_decorated_box: true
+    use_enums: true
+    use_if_null_to_convert_nulls_to_bools: true
+    use_is_even_rather_than_modulo: true
+    use_late_for_private_fields_and_variables: true
+    use_named_constants: true
+    use_raw_strings: true
+    use_setters_to_change_properties: true
+    use_string_buffers: true
+    use_string_in_part_of_directives: true
+    use_super_parameters: true
+    use_test_throws_matchers: true
+    use_to_and_as_if_applicable: true
+    secure_pubspec_urls: true
+    sort_pub_dependencies: true
