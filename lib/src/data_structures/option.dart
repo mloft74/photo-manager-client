@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:photo_manager_client/src/data_structures/result.dart';
 
 part 'option.freezed.dart';
 
@@ -71,7 +72,15 @@ sealed class Option<T extends Object> with _$Option<T> {
         None() => defaultF(),
       };
 
-  // TODO(makayden): Do all result methods.
+  Result<T, E> okOr<E extends Object>(E err) => switch (this) {
+        Some(:final value) => Ok(value),
+        None() => Err(err),
+      };
+
+  Result<T, E> okOrElse<E extends Object>(E Function() errF) => switch (this) {
+        Some(:final value) => Ok(value),
+        None() => Err(errF()),
+      };
 
   Iterable<T> get iterable => switch (this) {
         Some(:final value) => [value],
@@ -138,11 +147,18 @@ extension ZippedOptionExtension<T extends Object, U extends Object>
       };
 }
 
-// TODO(makayden): Implement Result extension.
+extension OptionResultExtension<T extends Object, E extends Object>
+    on Option<Result<T, E>> {
+  Result<Option<T>, E> get transposed => switch (this) {
+        Some(value: Ok(:final value)) => Ok(Some(value)),
+        Some(value: Err(:final error)) => Err(error),
+        None() => const Ok(None()),
+      };
+}
 
 extension NestedOption<T extends Object> on Option<Option<T>> {
   Option<T> get flattened => switch (this) {
         Some(:final value) => value,
-        None _ => const None(),
+        None() => const None(),
       };
 }
