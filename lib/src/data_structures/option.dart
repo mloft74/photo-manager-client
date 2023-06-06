@@ -180,9 +180,7 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// You can imagine the [Option] of [T]
   /// being an iterable over one or zero elements.
   /// [where] lets you decide which elements to keep.
-  Option<T> where(
-    bool Function(T value) predicate,
-  ) {
+  Option<T> where(bool Function(T value) predicate) {
     if (this case Some(:final value)) {
       if (predicate(value)) {
         return Some(value);
