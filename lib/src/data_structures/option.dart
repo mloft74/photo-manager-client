@@ -23,8 +23,7 @@ sealed class Option<T extends Object> with _$Option<T> {
   const factory Option.none() = None;
 
   /// Converts a nullable [T] to an [Option] of [T].
-  factory Option.from(T? value) =>
-      value != null ? Option.some(value) : const Option.none();
+  factory Option.from(T? value) => value != null ? Some(value) : None<T>();
 
   /// Returns `true` if the option is a [Some] value.
   bool get isSome => switch (this) {
@@ -90,8 +89,8 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// Maps an [Option] of [T] to [Option] of [U] by applying
   /// a function to a contained value (if [Some]) or return [None] (if [None]).
   Option<U> map<U extends Object>(U Function(T value) f) => switch (this) {
-        Some(:final value) => Option.some(f(value)),
-        None() => const None(),
+        Some(:final value) => Some(f(value)),
+        None() => None<U>(),
       };
 
   /// Calls the provided closure with a reference
@@ -156,7 +155,7 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// which is lazily evaluated.
   Option<U> and<U extends Object>(Option<U> optb) => switch (this) {
         Some() => optb,
-        None() => const None(),
+        None() => None<U>(),
       };
 
   /// Returns [None] if the option is [None],
@@ -168,7 +167,7 @@ sealed class Option<T extends Object> with _$Option<T> {
   Option<U> andThen<U extends Object>(Option<U> Function(T value) f) =>
       switch (this) {
         Some(:final value) => f(value),
-        None() => const None(),
+        None() => None<U>(),
       };
 
   /// Returns [None] if the option is [None],
@@ -186,7 +185,7 @@ sealed class Option<T extends Object> with _$Option<T> {
         return Some(value);
       }
     }
-    return const None();
+    return None<T>();
   }
 
   /// Returns the option if it contains a value,
@@ -210,9 +209,9 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// Returns [Some] if exactly one of this or [optb] is [Some],
   /// otherwise returns [None].
   Option<T> xor(Option<T> optb) => switch ((this, optb)) {
-        (Some(:final value), None()) => Option.some(value),
-        (None(), Some(:final value)) => Option.some(value),
-        _ => const None(),
+        (Some(:final value), None()) => Some(value),
+        (None(), Some(:final value)) => Some(value),
+        _ => None<T>(),
       };
 
   /// Zips this with another [Option].
@@ -220,11 +219,15 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// If this is [Some] and [other] is [Some],
   /// the method returns [Some].
   /// Otherwise, [None] is returned.
-  Option<(T, U)> zip<U extends Object>(Option<U> other) =>
-      switch ((this, other)) {
-        (Some(value: final a), Some(value: final b)) => Option.some((a, b)),
-        _ => const None(),
-      };
+  Option<(T, U)> zip<U extends Object>(Option<U> other) {
+    return switch ((this, other)) {
+      (Some(value: final a), Some(value: final b)) => Some((a, b)),
+      _ =>
+        // False-positive; this actually can't be const.
+        // ignore: prefer_const_constructors
+        None<(T, U)>(),
+    };
+  }
 
   /// Zips this with another [Option] using [f].
   ///
@@ -236,8 +239,8 @@ sealed class Option<T extends Object> with _$Option<T> {
     R Function(T a, U b) f,
   ) =>
       switch ((this, other)) {
-        (Some(value: final a), Some(value: final b)) => Option.some(f(a, b)),
-        _ => const None(),
+        (Some(value: final a), Some(value: final b)) => Some(f(a, b)),
+        _ => None<R>(),
       };
 }
 
@@ -248,8 +251,8 @@ extension ZippedOptionExtension<T extends Object, U extends Object>
   /// If this is [Some] this method returns ([Some], [Some]).
   /// Otherwise, ([None], [None]) is returned.
   (Option<T>, Option<U>) get unzipped => switch (this) {
-        Some(value: (final a, final b)) => (Option.some(a), Option.some(b)),
-        None() => (const None(), const None()),
+        Some(value: (final a, final b)) => (Some(a), Some(b)),
+        None() => (None<T>(), None<U>()),
       };
 }
 
@@ -263,7 +266,7 @@ extension OptionResultExtension<T extends Object, E extends Object>
   Result<Option<T>, E> get transposed => switch (this) {
         Some(value: Ok(:final value)) => Ok(Some(value)),
         Some(value: Err(:final error)) => Err(error),
-        None() => const Ok(None()),
+        None() => Ok(None<T>()),
       };
 }
 
@@ -273,6 +276,6 @@ extension NestedOptionExtension<T extends Object> on Option<Option<T>> {
   /// Flattening only removes one level of nesting at a time.
   Option<T> get flattened => switch (this) {
         Some(:final value) => value,
-        None() => const None(),
+        None() => None<T>(),
       };
 }
