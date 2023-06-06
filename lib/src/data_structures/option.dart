@@ -44,6 +44,11 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   /// Returns the contained [Some] value.
   ///
+  /// Because this function can throw, its use is generally discouraged.
+  /// Instead, prefer to use pattern matching
+  /// and handle the [None] case explicitly,
+  /// or call [unwrapOr] or [unwrapOrElse]
+  ///
   /// Throws a [StateError] if the value is a [None]
   /// with a custom error message provided by [msg].
   T expect(String msg) => switch (this) {
