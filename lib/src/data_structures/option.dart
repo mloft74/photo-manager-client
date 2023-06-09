@@ -1,7 +1,5 @@
-/// The documenation for this library is taken
+/// The documentation for this library is taken
 /// from https://doc.rust-lang.org/std/option/enum.Option.html.
-/// The library author claims no copyright
-/// over the documentation in this library.
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -12,7 +10,7 @@ part 'option.freezed.dart';
 /// The [Option] type.
 ///
 /// See https://doc.rust-lang.org/std/option/index.html for more.
-@Freezed(map: FreezedMapOptions.none)
+@freezed
 sealed class Option<T extends Object> with _$Option<T> {
   const Option._();
 

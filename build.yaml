@@ -4,6 +4,10 @@ targets:
       freezed:
         options:
           when:
+            when: false
             when_or_null: false
             maybe_when: false
-            when: false
+          map:
+            map: false
+            map_or_null: false
+            maybe_map: false

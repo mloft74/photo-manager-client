@@ -1,7 +1,5 @@
-/// The documenation for this library is taken
+/// The documentation for this library is taken
 /// from https://doc.rust-lang.org/std/result/enum.Result.html.
-/// The library author claims no copyright
-/// over the documentation in this library.
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -12,7 +10,7 @@ part 'result.freezed.dart';
 /// [Result] is a type that represents either success ([Ok]) or failure ([Err]).
 ///
 /// See https://doc.rust-lang.org/std/result/index.html for more.
-@Freezed(map: FreezedMapOptions.none)
+@freezed
 sealed class Result<T extends Object, E extends Object> with _$Result {
   const Result._();
 
