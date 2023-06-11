@@ -27,7 +27,19 @@ class Home extends StatelessWidget {
           ),
         ],
       ),
-      body: const Placeholder(),
+      body: GridView.builder(
+        itemCount: 360,
+        padding: const EdgeInsets.all(8.0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+        ),
+        itemBuilder: (context, index) {
+          final color = HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5);
+          return ColoredBox(color: color.toColor());
+        },
+      ),
     );
   }
 }
