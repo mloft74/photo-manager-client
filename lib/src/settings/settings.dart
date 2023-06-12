@@ -7,10 +7,7 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const BackButton(),
         title: const Text('Settings'),
       ),
       body: const SafeArea(child: Placeholder()),

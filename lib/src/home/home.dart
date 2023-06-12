@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 
 class Home extends StatelessWidget {
@@ -36,8 +37,23 @@ class Home extends StatelessWidget {
           crossAxisSpacing: 8.0,
         ),
         itemBuilder: (context, index) {
-          final color = HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5);
-          return ColoredBox(color: color.toColor());
+          final color =
+              HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5).toColor();
+          return InkWell(
+            onTap: () {
+              unawaited(
+                Navigator.push<void>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ManagePhoto(color: color),
+                  ),
+                ),
+              );
+            },
+            child: ColoredBox(
+              color: color,
+            ),
+          );
         },
       ),
     );
