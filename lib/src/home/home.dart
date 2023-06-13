@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
+import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -21,6 +22,19 @@ class Home extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const Settings(),
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              unawaited(
+                Navigator.push<void>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UploadPhoto(),
                   ),
                 ),
               );
