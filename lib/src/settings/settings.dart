@@ -33,7 +33,7 @@ class _SettingsState extends State<Settings> {
               onPressed: () {
                 final valid = _formKey.currentState.option
                     .mapOr(or: false, map: (value) => value.validate());
-                debugPrint('valid: $valid');
+                debugPrint(valid ? _uriTextController.text : 'invalid');
               },
               child: const Text('Save'),
             ),
