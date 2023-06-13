@@ -7,6 +7,10 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 
 part 'option.freezed.dart';
 
+extension NullableTExtension<T extends Object> on T? {
+  Option<T> get option => Option.from(this);
+}
+
 /// The [Option] type.
 ///
 /// See https://doc.rust-lang.org/std/option/index.html for more.
