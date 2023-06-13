@@ -65,6 +65,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   void dispose() {
+    _uriTextController.dispose();
     super.dispose();
   }
 }
