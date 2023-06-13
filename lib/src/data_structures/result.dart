@@ -28,8 +28,8 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
 
   /// Returns `true` if the result is [Ok]
   /// and the value inside of it matches a predicate.
-  bool isOkAnd(bool Function(T value) f) => switch (this) {
-        Ok(:final value) => f(value),
+  bool isOkAnd(bool Function(T value) fn) => switch (this) {
+        Ok(:final value) => fn(value),
         Err() => false,
       };
 
@@ -38,9 +38,9 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
 
   /// Returns `true` if the result is [Err]
   /// and the value inside of it matches a predicate.
-  bool isErrAnd(bool Function(E error) f) => switch (this) {
+  bool isErrAnd(bool Function(E error) fn) => switch (this) {
         Ok() => false,
-        Err(:final error) => f(error),
+        Err(:final error) => fn(error),
       };
 
   /// Converts from [Result] of [T] and [E] to [Option] of [T].
@@ -60,8 +60,8 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// leaving an [Err] value untouched.
   ///
   /// This function can be used to compose the results of two functions.
-  Result<U, E> map<U extends Object>(U Function(T value) f) => switch (this) {
-        Ok(:final value) => Ok(f(value)),
+  Result<U, E> map<U extends Object>(U Function(T value) fn) => switch (this) {
+        Ok(:final value) => Ok(fn(value)),
         Err(:final error) => Err(error),
       };
 
@@ -72,25 +72,28 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// if you are passing the result of a function call,
   /// it is recommended to use [mapOrElse],
   /// which is lazily evaluated.
-  U mapOr<U extends Object>(U defaultValue, U Function(T value) f) =>
+  U mapOr<U extends Object>({
+    required U or,
+    required U Function(T value) map,
+  }) =>
       switch (this) {
-        Ok(:final value) => f(value),
-        Err() => defaultValue,
+        Ok(:final value) => map(value),
+        Err() => or,
       };
 
   /// Maps a [Result] of [T] and [E] to [U]
-  /// by applying fallback function [defaultF] to a contained [Err] value,
-  /// or function [f] to a contained [Ok] value.
+  /// by applying fallback function [orElse] to a contained [Err] value,
+  /// or function [map] to a contained [Ok] value.
   ///
   /// This function can be used to unpack a successful
   /// result while handling an error.
   U mapOrElse<U extends Object>(
-    U Function(E error) defaultF,
-    U Function(T value) f,
+    U Function(E error) orElse,
+    U Function(T value) map,
   ) =>
       switch (this) {
-        Ok(:final value) => f(value),
-        Err(:final error) => defaultF(error),
+        Ok(:final value) => map(value),
+        Err(:final error) => orElse(error),
       };
 
   /// Maps a [Result] of [T] and [E] to [Result] of [T] and [F]
@@ -99,23 +102,23 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// This function can be used to pass through a successful
   /// result while handling an error.
-  Result<T, F> mapErr<F extends Object>(F Function(E error) f) =>
+  Result<T, F> mapErr<F extends Object>(F Function(E error) fn) =>
       switch (this) {
         Ok(:final value) => Ok(value),
-        Err(:final error) => Err(f(error)),
+        Err(:final error) => Err(fn(error)),
       };
 
   /// Calls the provided closure with a reference to the contained value (if [Ok]).
-  void inspect(void Function(T value) f) {
+  void inspect(void Function(T value) fn) {
     if (this case Ok(:final value)) {
-      f(value);
+      fn(value);
     }
   }
 
   /// Calls the provided closure with a reference to the contained error (if [Err]).
-  void inspectErr(void Function(E error) f) {
+  void inspectErr(void Function(E error) fn) {
     if (this case Err(:final error)) {
-      f(error);
+      fn(error);
     }
   }
 
@@ -175,26 +178,26 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
         Err(:final error) => error,
       };
 
-  /// Returns [res] if the result is [Ok],
+  /// Returns [other] if the result is [Ok],
   /// otherwise returns the [Err] value of this.
   ///
   /// Arguments passed to and are eagerly evaluated;
   /// if you are passing the result of a function call,
   /// it is recommended to use [andThen],
   /// which is lazily evaluated.
-  Result<U, E> and<U extends Object>(Result<U, E> res) => switch (this) {
-        Ok() => res,
+  Result<U, E> and<U extends Object>(Result<U, E> other) => switch (this) {
+        Ok() => other,
         Err(:final error) => Err(error),
       };
 
-  /// Calls [f] if the result is [Ok], otherwise returns the [Err] value of this.
+  /// Calls [fn] if the result is [Ok], otherwise returns the [Err] value of this.
   ///
   /// This function can be used for control flow based on [Result] values.
   ///
   /// Often used to chain fallible operations that may return [Err].
-  Result<U, E> andThen<U extends Object>(Result<U, E> Function(T value) f) =>
+  Result<U, E> andThen<U extends Object>(Result<U, E> Function(T value) fn) =>
       switch (this) {
-        Ok(:final value) => f(value),
+        Ok(:final value) => fn(value),
         Err(:final error) => Err(error),
       };
 
@@ -210,14 +213,14 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
         Err() => res,
       };
 
-  /// Calls [f] if the result is [Err],
+  /// Calls [fn] if the result is [Err],
   /// otherwise returns the [Ok] value of this.
   ///
   /// This function can be used for control flow based on result values.
-  Result<T, F> orElse<F extends Object>(Result<T, F> Function(E error) f) =>
+  Result<T, F> orElse<F extends Object>(Result<T, F> Function(E error) fn) =>
       switch (this) {
         Ok(:final value) => Ok(value),
-        Err(:final error) => f(error),
+        Err(:final error) => fn(error),
       };
 
   /// Returns the contained [Ok] value or a provided default.
@@ -232,9 +235,9 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
       };
 
   /// Returns the contained [Ok] value or computes it from a closure.
-  T unwrapOrElse(T Function(E error) f) => switch (this) {
+  T unwrapOrElse(T Function(E error) fn) => switch (this) {
         Ok(:final value) => value,
-        Err(:final error) => f(error),
+        Err(:final error) => fn(error),
       };
 }
 

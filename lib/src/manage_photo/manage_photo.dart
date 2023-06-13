@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/widgets/bottom_app_bar_title.dart';
 
 class ManagePhoto extends StatelessWidget {
   final Color color;
@@ -10,12 +11,18 @@ class ManagePhoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const BackButton(),
-        title: const Text('Manage Photo'),
+      bottomNavigationBar: const BottomAppBar(
+        child: Row(
+          children: [
+            BackButton(),
+            BottomAppBarTitle('Manage Photo'),
+          ],
+        ),
       ),
-      body: Placeholder(
-        color: color,
+      body: SafeArea(
+        child: Placeholder(
+          color: color,
+        ),
       ),
     );
   }

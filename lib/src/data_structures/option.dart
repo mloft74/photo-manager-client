@@ -27,6 +27,12 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// Converts a nullable [T] to an [Option] of [T].
   factory Option.from(T? value) => value != null ? Some(value) : None<T>();
 
+  /// Converts an [Option] of [T] to a nullable [T].
+  T? get nullable => switch (this) {
+        Some(:final value) => value,
+        None() => null,
+      };
+
   /// Returns `true` if the option is a [Some] value.
   bool get isSome => switch (this) {
         Some() => true,
@@ -35,8 +41,8 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   /// Returns `true` if the option is a [Some]
   /// and the value inside of it matches a predicate.
-  bool isSomeAnd(bool Function(T value) f) => switch (this) {
-        Some(:final value) => f(value),
+  bool isSomeAnd(bool Function(T value) fn) => switch (this) {
+        Some(:final value) => fn(value),
         None() => false,
       };
 
@@ -83,23 +89,23 @@ sealed class Option<T extends Object> with _$Option<T> {
       };
 
   /// Returns the contained [Some] value or computes it from a closure.
-  T unwrapOrElse(T Function() f) => switch (this) {
+  T unwrapOrElse(T Function() fn) => switch (this) {
         Some(:final value) => value,
-        None() => f(),
+        None() => fn(),
       };
 
   /// Maps an [Option] of [T] to [Option] of [U] by applying
   /// a function to a contained value (if [Some]) or return [None] (if [None]).
-  Option<U> map<U extends Object>(U Function(T value) f) => switch (this) {
-        Some(:final value) => Some(f(value)),
+  Option<U> map<U extends Object>(U Function(T value) fn) => switch (this) {
+        Some(:final value) => Some(fn(value)),
         None() => None<U>(),
       };
 
   /// Calls the provided closure with a reference
   /// to the contained value (if [Some]).
-  void inspect(void Function(T value) f) {
+  void inspect(void Function(T value) fn) {
     if (this case Some(:final value)) {
-      f(value);
+      fn(value);
     }
   }
 
@@ -110,18 +116,24 @@ sealed class Option<T extends Object> with _$Option<T> {
   /// if you are passing the result of a function call,
   /// it is recommended to use [mapOrElse],
   /// which is lazily evaluated.
-  U mapOr<U extends Object>(U defaultValue, U Function(T value) f) =>
+  U mapOr<U extends Object>({
+    required U or,
+    required U Function(T value) map,
+  }) =>
       switch (this) {
-        Some(:final value) => f(value),
-        None() => defaultValue,
+        Some(:final value) => map(value),
+        None() => or,
       };
 
   /// Computes a default function result (if [None]),
   /// or applies a different function to the contained value (if any).
-  U mapOrElse<U extends Object>(U Function() defaultF, U Function(T value) f) =>
+  U mapOrElse<U extends Object>({
+    required U Function() orElse,
+    required U Function(T value) map,
+  }) =>
       switch (this) {
-        Some(:final value) => f(value),
-        None() => defaultF(),
+        Some(:final value) => map(value),
+        None() => orElse(),
       };
 
   /// Transforms the [Option] of [T] into a [Result] of [T] and [E],
@@ -137,10 +149,10 @@ sealed class Option<T extends Object> with _$Option<T> {
       };
 
   /// Transforms the [Option] of [T] into a [Result] of [T] and [E],
-  /// mapping [Some] to [Ok] and [None] to [Err] with the result of [errF].
-  Result<T, E> okOrElse<E extends Object>(E Function() errF) => switch (this) {
+  /// mapping [Some] to [Ok] and [None] to [Err] with the result of [errFn].
+  Result<T, E> okOrElse<E extends Object>(E Function() errFn) => switch (this) {
         Some(:final value) => Ok(value),
-        None() => Err(errF()),
+        None() => Err(errFn()),
       };
 
   /// Returns an [Iterable] over the possibly contained value.
@@ -149,26 +161,26 @@ sealed class Option<T extends Object> with _$Option<T> {
         None() => [],
       };
 
-  /// Returns [None] if the option is [None], otherwise returns [optb].
+  /// Returns [None] if the option is [None], otherwise returns [other].
   ///
   /// Arguments passed to [and] are eagerly evaluated;
   /// if you are passing the result of a function call,
   /// it is recommended to use [andThen],
   /// which is lazily evaluated.
-  Option<U> and<U extends Object>(Option<U> optb) => switch (this) {
-        Some() => optb,
+  Option<U> and<U extends Object>(Option<U> other) => switch (this) {
+        Some() => other,
         None() => None<U>(),
       };
 
   /// Returns [None] if the option is [None],
-  /// otherwise calls [f] with the wrapped value and returns the result.
+  /// otherwise calls [fn] with the wrapped value and returns the result.
   ///
   /// Some languages call this operation flatmap.
   ///
   /// Often used to chain fallible operations that may return [None].
-  Option<U> andThen<U extends Object>(Option<U> Function(T value) f) =>
+  Option<U> andThen<U extends Object>(Option<U> Function(T value) fn) =>
       switch (this) {
-        Some(:final value) => f(value),
+        Some(:final value) => fn(value),
         None() => None<U>(),
       };
 
@@ -191,26 +203,26 @@ sealed class Option<T extends Object> with _$Option<T> {
   }
 
   /// Returns the option if it contains a value,
-  /// otherwise returns [optb].
+  /// otherwise returns [other].
   ///
   /// Arguments passed to [or] are eagerly evaluated;
   /// if you are passing the result of a function call,
   /// it is recommended to use [orElse],
   /// which is lazily evaluated.
-  Option<T> or(Option<T> optb) => switch (this) {
+  Option<T> or(Option<T> other) => switch (this) {
         Some(:final value) => Some(value),
-        None() => optb,
+        None() => other,
       };
 
-  /// Returns the option if it contains a value, otherwise calls [f] and returns the result.
-  Option<T> orElse(Option<T> Function() f) => switch (this) {
+  /// Returns the option if it contains a value, otherwise calls [fn] and returns the result.
+  Option<T> orElse(Option<T> Function() fn) => switch (this) {
         Some(:final value) => Some(value),
-        None() => f(),
+        None() => fn(),
       };
 
-  /// Returns [Some] if exactly one of this or [optb] is [Some],
+  /// Returns [Some] if exactly one of this or [other] is [Some],
   /// otherwise returns [None].
-  Option<T> xor(Option<T> optb) => switch ((this, optb)) {
+  Option<T> xor(Option<T> other) => switch ((this, other)) {
         (Some(:final value), None()) => Some(value),
         (None(), Some(:final value)) => Some(value),
         _ => None<T>(),
@@ -231,17 +243,17 @@ sealed class Option<T extends Object> with _$Option<T> {
     };
   }
 
-  /// Zips this with another [Option] using [f].
+  /// Zips this with another [Option] using [fn].
   ///
   /// If this is [Some] and [other] is [Some],
   /// the method returns [Some].
   /// Otherwise, [None] is returned.
   Option<R> zipWith<U extends Object, R extends Object>(
     Option<U> other,
-    R Function(T a, U b) f,
+    R Function(T a, U b) fn,
   ) =>
       switch ((this, other)) {
-        (Some(value: final a), Some(value: final b)) => Some(f(a, b)),
+        (Some(value: final a), Some(value: final b)) => Some(fn(a, b)),
         _ => None<R>(),
       };
 }
