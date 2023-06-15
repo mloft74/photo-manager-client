@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/widgets/bottom_app_bar_title.dart';
 
 class Settings extends StatefulWidget {
@@ -34,7 +37,14 @@ class _SettingsState extends State<Settings> {
               trailing: const Icon(Icons.arrow_forward),
               subtitle: const Text('Current server: TODO'),
               onTap: () {
-                debugPrint('tapped');
+                unawaited(
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ServerList(),
+                    ),
+                  ),
+                );
               },
             ),
             FilledButton(
