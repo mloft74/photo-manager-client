@@ -29,6 +29,14 @@ class _SettingsState extends State<Settings> {
           padding: const EdgeInsets.all(16.0),
           reverse: true,
           children: [
+            ListTile(
+              title: const Text('Servers'),
+              trailing: const Icon(Icons.arrow_forward),
+              subtitle: const Text('Current server: TODO'),
+              onTap: () {
+                debugPrint('tapped');
+              },
+            ),
             FilledButton(
               onPressed: () {
                 final valid = _formKey.currentState.option
