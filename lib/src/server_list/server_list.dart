@@ -14,9 +14,17 @@ class ServerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PhotoManagerScaffold(
-      bottomAppBar: const PhotoManagerBottomAppBar(
-        leading: BackButton(),
+      bottomAppBar: PhotoManagerBottomAppBar(
+        leading: const BackButton(),
         titleText: 'Settings',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              debugPrint('add server');
+            },
+          ),
+        ],
       ),
       child: ListView.builder(
         padding: const EdgeInsets.all(16.0),
