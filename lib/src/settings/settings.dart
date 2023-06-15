@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/server_list/server_list.dart';
-import 'package:photo_manager_client/src/widgets/bottom_app_bar_title.dart';
+import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
+import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -18,65 +19,59 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: const BottomAppBar(
-        child: Row(
-          children: [
-            BackButton(),
-            BottomAppBarTitle('Settings'),
-          ],
-        ),
+    return PhotoManagerScaffold(
+      bottomAppBar: const PhotoManagerBottomAppBar(
+        leading: BackButton(),
+        titleText: 'Settings',
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          reverse: true,
-          children: [
-            ListTile(
-              title: const Text('Servers'),
-              trailing: const Icon(Icons.arrow_forward),
-              subtitle: const Text('Current server: TODO'),
-              onTap: () {
-                unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ServerList(),
-                    ),
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        reverse: true,
+        children: [
+          ListTile(
+            title: const Text('Servers'),
+            trailing: const Icon(Icons.arrow_forward),
+            subtitle: const Text('Current server: TODO'),
+            onTap: () {
+              unawaited(
+                Navigator.push<void>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ServerList(),
                   ),
-                );
-              },
-            ),
-            FilledButton(
-              onPressed: () {
-                final valid = _formKey.currentState.option
-                    .mapOr(or: false, map: (value) => value.validate());
-                debugPrint(valid ? _uriTextController.text : 'invalid');
-              },
-              child: const Text('Save'),
-            ),
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                controller: _uriTextController,
-                decoration: const InputDecoration(
-                  helperText: '',
-                  hintText: 'Server uri',
                 ),
-                validator: (value) {
-                  debugPrint('value: $value');
-                  return value.option
-                      .andThen((value) => Uri.tryParse(value).option)
-                      .mapOrElse(
-                        orElse: () => const Option.some('Invalid URI'),
-                        map: (value) => const Option<String>.none(),
-                      )
-                      .nullable;
-                },
+              );
+            },
+          ),
+          FilledButton(
+            onPressed: () {
+              final valid = _formKey.currentState.option
+                  .mapOr(or: false, map: (value) => value.validate());
+              debugPrint(valid ? _uriTextController.text : 'invalid');
+            },
+            child: const Text('Save'),
+          ),
+          Form(
+            key: _formKey,
+            child: TextFormField(
+              controller: _uriTextController,
+              decoration: const InputDecoration(
+                helperText: '',
+                hintText: 'Server uri',
               ),
+              validator: (value) {
+                debugPrint('value: $value');
+                return value.option
+                    .andThen((value) => Uri.tryParse(value).option)
+                    .mapOrElse(
+                      orElse: () => const Option.some('Invalid URI'),
+                      map: (value) => const Option<String>.none(),
+                    )
+                    .nullable;
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
