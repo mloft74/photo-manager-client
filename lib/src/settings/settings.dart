@@ -1,21 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends StatelessWidget {
   const Settings({super.key});
-
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  final _formKey = GlobalKey<FormState>();
-  final _uriTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,42 +34,8 @@ class _SettingsState extends State<Settings> {
               );
             },
           ),
-          FilledButton(
-            onPressed: () {
-              final valid = _formKey.currentState.option
-                  .mapOr(or: false, map: (value) => value.validate());
-              debugPrint(valid ? _uriTextController.text : 'invalid');
-            },
-            child: const Text('Save'),
-          ),
-          Form(
-            key: _formKey,
-            child: TextFormField(
-              controller: _uriTextController,
-              decoration: const InputDecoration(
-                helperText: '',
-                hintText: 'Server uri',
-              ),
-              validator: (value) {
-                debugPrint('value: $value');
-                return value.option
-                    .andThen((value) => Uri.tryParse(value).option)
-                    .mapOrElse(
-                      orElse: () => const Option.some('Invalid URI'),
-                      map: (value) => const Option<String>.none(),
-                    )
-                    .nullable;
-              },
-            ),
-          ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _uriTextController.dispose();
-    super.dispose();
   }
 }

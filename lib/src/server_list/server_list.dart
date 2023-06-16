@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/add_server/add_server.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -13,15 +17,20 @@ class ServerList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedIndex = Random().nextInt(_fakeServers.length);
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
         leading: const BackButton(),
-        titleText: 'Settings',
+        titleText: 'Servers',
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              debugPrint('add server');
+              unawaited(
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute(builder: (context) => const AddServer()),
+                ),
+              );
             },
           ),
         ],
@@ -34,6 +43,7 @@ class ServerList extends StatelessWidget {
           final item = _fakeServers[index];
           return ListTile(
             title: Text(item),
+            selected: index == selectedIndex,
             onTap: () {
               debugPrint('set selected server');
             },
