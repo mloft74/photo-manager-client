@@ -3,6 +3,11 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
+enum _RemoveServerOption {
+  remove,
+  cancel,
+}
+
 class EditServer extends StatefulWidget {
   const EditServer({super.key});
 
@@ -31,8 +36,39 @@ class _EditServerState extends State<EditServer> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              debugPrint('delete server');
+            onPressed: () async {
+              final decision = await showDialog<_RemoveServerOption>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Remove server?'),
+                    content: const Text(
+                      'This will remove this server as an option for managing photos',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(
+                            context,
+                            _RemoveServerOption.cancel,
+                          );
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(
+                            context,
+                            _RemoveServerOption.remove,
+                          );
+                        },
+                        child: const Text('Remove'),
+                      ),
+                    ],
+                  );
+                },
+              );
+              debugPrint('decision: $decision');
             },
           )
         ],
@@ -66,8 +102,8 @@ class _EditServerState extends State<EditServer> {
                 return value.option
                     .andThen((value) => Uri.tryParse(value).option)
                     .mapOrElse(
-                      orElse: () => const Option.some('Invalid URI'),
-                      map: (value) => const Option<String>.none(),
+                      orElse: () => const Some('Invalid URI'),
+                      map: (value) => const None<String>(),
                     )
                     .nullable;
               },

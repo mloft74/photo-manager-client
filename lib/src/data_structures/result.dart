@@ -45,14 +45,14 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
 
   /// Converts from [Result] of [T] and [E] to [Option] of [T].
   Option<T> get ok => switch (this) {
-        Ok(:final value) => Option.some(value),
+        Ok(:final value) => Some(value),
         Err() => None<T>(),
       };
 
   /// Converts from [Result] of [T] and [E] to [Option] of [E].
   Option<E> get err => switch (this) {
         Ok() => None<E>(),
-        Err(:final error) => Option.some(error),
+        Err(:final error) => Some(error),
       };
 
   /// Maps a [Result] of [T] and [E] to [Result] of [U] and [E]
@@ -249,9 +249,9 @@ extension ResultOptionExtension<T extends Object, E extends Object>
   /// [Ok] with [Some] and [Err] will be
   /// mapped to [Some] with [Ok] and [Some] with [Err].
   Option<Result<T, E>> get transposed => switch (this) {
-        Ok(value: Some(:final value)) => Option.some(Ok(value)),
+        Ok(value: Some(:final value)) => Some(Ok(value)),
         Ok(value: None()) => None<Result<T, E>>(),
-        Err(:final error) => Option.some(Err(error)),
+        Err(:final error) => Some(Err(error)),
       };
 }
 

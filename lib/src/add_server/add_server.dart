@@ -13,10 +13,12 @@ class AddServer extends StatefulWidget {
 class _AddServerState extends State<AddServer> {
   final _formKey = GlobalKey<FormState>();
   final _uriTextController = TextEditingController();
+  final _nameTextController = TextEditingController();
 
   @override
   void dispose() {
     _uriTextController.dispose();
+    _nameTextController.dispose();
     super.dispose();
   }
 
@@ -52,7 +54,26 @@ class _AddServerState extends State<AddServer> {
                 return value.option
                     .andThen((value) => Uri.tryParse(value).option)
                     .mapOrElse(
-                      orElse: () => const Option.some('Invalid URI'),
+                      orElse: () => const Some('Invalid URI'),
+                      map: (value) => const None<String>(),
+                    )
+                    .nullable;
+              },
+            ),
+            TextFormField(
+              controller: _nameTextController,
+              decoration: const InputDecoration(
+                helperText: '',
+                hintText: 'Server name',
+              ),
+              validator: (value) {
+                return value.option
+                    .andThen(
+                      (value) =>
+                          value.isEmpty ? const None<String>() : Some(value),
+                    )
+                    .mapOrElse(
+                      orElse: () => const Some('Please provide a name'),
                       map: (value) => const Option<String>.none(),
                     )
                     .nullable;

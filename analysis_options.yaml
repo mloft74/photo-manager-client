@@ -13,6 +13,8 @@ analyzer:
     strict-inference: true
     strict-raw-types: true
   errors:
+    # diagnostics rules: https://dart.dev/tools/diagnostic-messages#diagnostics
+    unused_element: warning
     # error rules: https://dart.dev/tools/linter-rules#error-rules
     always_use_package_imports: warning
     avoid_dynamic_calls: error
