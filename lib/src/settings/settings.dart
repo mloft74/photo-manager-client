@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -16,7 +17,7 @@ class Settings extends StatelessWidget {
         titleText: 'Settings',
       ),
       child: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: edgeInsetsForScrollingView,
         reverse: true,
         children: [
           ListTile(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
@@ -52,7 +53,7 @@ class Home extends StatelessWidget {
         },
         child: GridView.builder(
           itemCount: 360,
-          padding: const EdgeInsets.all(8.0),
+          padding: edgeInsetsForScrollingView,
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 72.0,
             mainAxisSpacing: 8.0,

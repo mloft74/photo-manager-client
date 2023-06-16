@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/manage_server/widgets/manage_server/models/manage_server_data.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
@@ -37,7 +38,7 @@ class _ManageServerState extends State<ManageServer> {
       child: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: edgeInsetsForScrollingView,
           reverse: true,
           children: [
             FilledButton(

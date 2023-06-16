@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/manage_server/add_server.dart';
 import 'package:photo_manager_client/src/manage_server/edit_server.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
@@ -37,7 +38,7 @@ class ServerList extends StatelessWidget {
         ],
       ),
       child: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
+        padding: edgeInsetsForScrollingView,
         reverse: true,
         itemCount: _fakeServers.length,
         itemBuilder: (context, index) {

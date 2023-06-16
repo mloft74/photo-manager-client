@@ -9,6 +9,13 @@ class AddServer extends StatelessWidget {
   Widget build(BuildContext context) {
     return ManageServer(
       onSave: (data) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'add | name: ${data.serverName}, uri: ${data.serverUri}',
+            ),
+          ),
+        );
         debugPrint('add | name: ${data.serverName}, uri: ${data.serverUri}');
       },
       bottomAppBar: const PhotoManagerBottomAppBar(
