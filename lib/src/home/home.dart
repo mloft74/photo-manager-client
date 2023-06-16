@@ -44,33 +44,40 @@ class Home extends StatelessWidget {
           ),
         ],
       ),
-      child: GridView.builder(
-        itemCount: 360,
-        padding: const EdgeInsets.all(8.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-        ),
-        itemBuilder: (context, index) {
-          final color =
-              HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5).toColor();
-          return InkWell(
-            onTap: () {
-              unawaited(
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ManagePhoto(color: color),
-                  ),
-                ),
-              );
-            },
-            child: ColoredBox(
-              color: color,
-            ),
-          );
+      child: RefreshIndicator(
+        onRefresh: () async {
+          debugPrint('started refresh');
+          await Future<void>.delayed(const Duration(seconds: 1));
+          debugPrint('ended refresh');
         },
+        child: GridView.builder(
+          itemCount: 360,
+          padding: const EdgeInsets.all(8.0),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
+          ),
+          itemBuilder: (context, index) {
+            final color =
+                HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5).toColor();
+            return InkWell(
+              onTap: () {
+                unawaited(
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManagePhoto(color: color),
+                    ),
+                  ),
+                );
+              },
+              child: ColoredBox(
+                color: color,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
