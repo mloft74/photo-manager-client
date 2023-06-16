@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/add_server/add_server.dart';
+import 'package:photo_manager_client/src/edit_server/edit_server.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -50,7 +51,14 @@ class ServerList extends StatelessWidget {
             trailing: IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {
-                debugPrint('edit server');
+                unawaited(
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditServer(),
+                    ),
+                  ),
+                );
               },
             ),
           );
