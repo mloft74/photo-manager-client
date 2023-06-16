@@ -20,9 +20,6 @@ class Settings extends StatelessWidget {
         reverse: true,
         children: [
           ListTile(
-            title: const Text('Servers'),
-            trailing: const Icon(Icons.arrow_forward),
-            subtitle: const Text('Current server: TODO'),
             onTap: () {
               unawaited(
                 Navigator.push<void>(
@@ -33,6 +30,9 @@ class Settings extends StatelessWidget {
                 ),
               );
             },
+            title: const Text('Servers'),
+            subtitle: const Text('Current server: TODO'),
+            trailing: const Icon(Icons.arrow_forward),
           ),
         ],
       ),

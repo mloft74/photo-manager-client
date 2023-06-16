@@ -25,7 +25,6 @@ class ServerList extends StatelessWidget {
         titleText: 'Servers',
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
             onPressed: () {
               unawaited(
                 Navigator.of(context).push<void>(
@@ -33,6 +32,7 @@ class ServerList extends StatelessWidget {
                 ),
               );
             },
+            icon: const Icon(Icons.add),
           ),
         ],
       ),
@@ -43,13 +43,12 @@ class ServerList extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = _fakeServers[index];
           return ListTile(
-            title: Text(item),
             selected: index == selectedIndex,
             onTap: () {
               debugPrint('set selected server');
             },
+            title: Text(item),
             trailing: IconButton(
-              icon: const Icon(Icons.edit),
               onPressed: () {
                 unawaited(
                   Navigator.push<void>(
@@ -60,6 +59,7 @@ class ServerList extends StatelessWidget {
                   ),
                 );
               },
+              icon: const Icon(Icons.edit),
             ),
           );
         },

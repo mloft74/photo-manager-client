@@ -17,7 +17,6 @@ class Home extends StatelessWidget {
         titleText: 'Home',
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
             onPressed: () {
               unawaited(
                 Navigator.push<void>(
@@ -28,9 +27,9 @@ class Home extends StatelessWidget {
                 ),
               );
             },
+            icon: const Icon(Icons.settings),
           ),
           IconButton(
-            icon: const Icon(Icons.add),
             onPressed: () {
               unawaited(
                 Navigator.push<void>(
@@ -41,6 +40,7 @@ class Home extends StatelessWidget {
                 ),
               );
             },
+            icon: const Icon(Icons.add),
           ),
         ],
       ),

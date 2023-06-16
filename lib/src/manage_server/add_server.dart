@@ -8,13 +8,13 @@ class AddServer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ManageServer(
+      onSave: (data) {
+        debugPrint('add | name: ${data.serverName}, uri: ${data.serverUri}');
+      },
       bottomAppBar: const PhotoManagerBottomAppBar(
         leading: BackButton(),
         titleText: 'Add Server',
       ),
-      onSave: (data) {
-        debugPrint('add | name: ${data.serverName}, uri: ${data.serverUri}');
-      },
     );
   }
 }

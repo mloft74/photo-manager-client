@@ -13,12 +13,14 @@ class EditServer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ManageServer(
+      onSave: (data) {
+        debugPrint('edit | name: ${data.serverName}, uri: ${data.serverUri}');
+      },
       bottomAppBar: PhotoManagerBottomAppBar(
         leading: const BackButton(),
         titleText: 'Edit Server',
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
             onPressed: () async {
               final decision = await showDialog<_RemoveServerOption>(
                 context: context,
@@ -53,12 +55,10 @@ class EditServer extends StatelessWidget {
               );
               debugPrint('decision: $decision');
             },
+            icon: const Icon(Icons.delete),
           ),
         ],
       ),
-      onSave: (data) {
-        debugPrint('edit | name: ${data.serverName}, uri: ${data.serverUri}');
-      },
     );
   }
 }
