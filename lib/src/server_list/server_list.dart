@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager_client/src/add_server/add_server.dart';
-import 'package:photo_manager_client/src/edit_server/edit_server.dart';
+import 'package:photo_manager_client/src/manage_server/add_server.dart';
+import 'package:photo_manager_client/src/manage_server/edit_server.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 

@@ -7,8 +7,12 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 
 part 'option.freezed.dart';
 
-extension NullableTExtension<T extends Object> on T? {
+extension NullableTToOptionExtension<T extends Object> on T? {
   Option<T> get option => Option.from(this);
+}
+
+extension StringToOptionExtension on String {
+  Option<String> get isNotEmptyOption => isNotEmpty ? Some(this) : const None();
 }
 
 /// The [Option] type.

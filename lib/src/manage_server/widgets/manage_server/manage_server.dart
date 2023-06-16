@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/manage_server/widgets/manage_server/models/manage_server_data.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-class AddServer extends StatefulWidget {
-  const AddServer({super.key});
+class ManageServer extends StatefulWidget {
+  final PhotoManagerBottomAppBar bottomAppBar;
+  final void Function(ManageServerData data) onSave;
+
+  const ManageServer({
+    required this.bottomAppBar,
+    required this.onSave,
+    super.key,
+  });
 
   @override
-  State<AddServer> createState() => _AddServerState();
+  State<ManageServer> createState() => _ManageServerState();
 }
 
-class _AddServerState extends State<AddServer> {
+class _ManageServerState extends State<ManageServer> {
   final _formKey = GlobalKey<FormState>();
   final _uriTextController = TextEditingController();
   final _nameTextController = TextEditingController();
@@ -25,10 +33,7 @@ class _AddServerState extends State<AddServer> {
   @override
   Widget build(BuildContext context) {
     return PhotoManagerScaffold(
-      bottomAppBar: const PhotoManagerBottomAppBar(
-        leading: BackButton(),
-        titleText: 'Add Server',
-      ),
+      bottomAppBar: widget.bottomAppBar,
       child: Form(
         key: _formKey,
         child: ListView(
@@ -39,7 +44,15 @@ class _AddServerState extends State<AddServer> {
               onPressed: () {
                 final valid = _formKey.currentState.option
                     .mapOr(or: false, map: (value) => value.validate());
-                debugPrint(valid ? _uriTextController.text : 'invalid');
+                if (!valid) {
+                  return;
+                }
+
+                final name = _nameTextController.text;
+                final uri = Uri.parse(_uriTextController.text);
+                widget.onSave(
+                  ManageServerData(serverName: name, serverUri: uri),
+                );
               },
               child: const Text('Save'),
             ),
@@ -50,8 +63,8 @@ class _AddServerState extends State<AddServer> {
                 hintText: 'Server uri',
               ),
               validator: (value) {
-                debugPrint('value: $value');
                 return value.option
+                    .andThen((value) => value.isNotEmptyOption)
                     .andThen((value) => Uri.tryParse(value).option)
                     .mapOrElse(
                       orElse: () => const Some('Invalid URI'),
@@ -68,10 +81,7 @@ class _AddServerState extends State<AddServer> {
               ),
               validator: (value) {
                 return value.option
-                    .andThen(
-                      (value) =>
-                          value.isEmpty ? const None<String>() : Some(value),
-                    )
+                    .andThen((value) => value.isNotEmptyOption)
                     .mapOrElse(
                       orElse: () => const Some('Please provide a name'),
                       map: (value) => const Option<String>.none(),
