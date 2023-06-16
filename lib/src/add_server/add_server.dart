@@ -27,21 +27,21 @@ class _AddServerState extends State<AddServer> {
         leading: BackButton(),
         titleText: 'Add Server',
       ),
-      child: ListView(
-        padding: const EdgeInsets.all(16.0),
-        reverse: true,
-        children: [
-          FilledButton(
-            onPressed: () {
-              final valid = _formKey.currentState.option
-                  .mapOr(or: false, map: (value) => value.validate());
-              debugPrint(valid ? _uriTextController.text : 'invalid');
-            },
-            child: const Text('Save'),
-          ),
-          Form(
-            key: _formKey,
-            child: TextFormField(
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          reverse: true,
+          children: [
+            FilledButton(
+              onPressed: () {
+                final valid = _formKey.currentState.option
+                    .mapOr(or: false, map: (value) => value.validate());
+                debugPrint(valid ? _uriTextController.text : 'invalid');
+              },
+              child: const Text('Save'),
+            ),
+            TextFormField(
               controller: _uriTextController,
               decoration: const InputDecoration(
                 helperText: '',
@@ -58,8 +58,8 @@ class _AddServerState extends State<AddServer> {
                     .nullable;
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
