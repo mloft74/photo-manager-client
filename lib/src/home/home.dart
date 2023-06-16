@@ -53,8 +53,8 @@ class Home extends StatelessWidget {
         child: GridView.builder(
           itemCount: 360,
           padding: const EdgeInsets.all(8.0),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 72.0,
             mainAxisSpacing: 8.0,
             crossAxisSpacing: 8.0,
           ),
