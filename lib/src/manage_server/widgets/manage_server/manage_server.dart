@@ -42,19 +42,21 @@ class _ManageServerState extends State<ManageServer> {
           children: [
             FilledButton(
               onPressed: () {
-                final valid = _formKey.currentState.option
-                    .mapOr(or: false, map: (value) => value.validate());
-                if (!valid) {
-                  return;
+                final data = _validateForm();
+                if (data case Some(:final value)) {
+                  widget.onSave(value);
                 }
-
-                final name = _nameTextController.text;
-                final uri = Uri.parse(_uriTextController.text);
-                widget.onSave(
-                  ManageServerData(serverName: name, serverUri: uri),
-                );
               },
               child: const Text('Save'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final data = _validateForm();
+                if (data case Some()) {
+                  debugPrint('test connection');
+                }
+              },
+              child: const Text('Test connection'),
             ),
             TextFormField(
               controller: _uriTextController,
@@ -92,6 +94,20 @@ class _ManageServerState extends State<ManageServer> {
           ],
         ),
       ),
+    );
+  }
+
+  Option<ManageServerData> _validateForm() {
+    final valid = _formKey.currentState.option
+        .mapOr(or: false, map: (value) => value.validate());
+    if (!valid) {
+      return const None();
+    }
+
+    final name = _nameTextController.text;
+    final uri = Uri.parse(_uriTextController.text);
+    return Some(
+      ManageServerData(serverName: name, serverUri: uri),
     );
   }
 }
