@@ -38,7 +38,7 @@ class _ManageServerState extends State<ManageServer> {
       child: Form(
         key: _formKey,
         child: ListView(
-          padding: edgeInsetsForScrollingView,
+          padding: edgeInsetsForRoutePadding,
           reverse: true,
           children: [
             FilledButton(

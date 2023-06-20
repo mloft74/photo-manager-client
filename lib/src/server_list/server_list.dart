@@ -38,7 +38,7 @@ class ServerList extends StatelessWidget {
         ],
       ),
       child: ListView.builder(
-        padding: edgeInsetsForScrollingView,
+        padding: edgeInsetsForRoutePadding,
         reverse: true,
         itemCount: _fakeServers.length,
         itemBuilder: (context, index) {

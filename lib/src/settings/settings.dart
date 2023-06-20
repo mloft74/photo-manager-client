@@ -17,7 +17,7 @@ class Settings extends StatelessWidget {
         titleText: 'Settings',
       ),
       child: ListView(
-        padding: edgeInsetsForScrollingView,
+        padding: edgeInsetsForRoutePadding,
         reverse: true,
         children: [
           ListTile(
