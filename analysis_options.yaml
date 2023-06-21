@@ -5,7 +5,9 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    - build/**
+    - 'build/**'
+    - '**.g.dart'
+    - '**.freezed.dart'
   plugins:
     - custom_lint
   language:
