@@ -21,38 +21,35 @@ class _AddServerState extends ConsumerState<AddServer> {
   @override
   Widget build(BuildContext context) {
     _server.inspect(
-      (value) {
-        ref.listen(addServerProvider(value), (previous, next) {
+      (server) {
+        ref.listen(addServerProvider(server), (previous, next) {
           switch (next) {
             case AsyncError(:final error, :final stackTrace):
               log('$error', stackTrace: stackTrace, name: 'add_server');
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error saving server: $error')),
+                SnackBar(content: Text('Error saving ${server.name}: $error')),
               );
               setState(() {
                 _server = const None();
               });
             case AsyncData():
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Server ${value.name} saved')),
+                SnackBar(content: Text('${server.name} saved')),
               );
               setState(() {
                 _server = const None();
               });
-            case _:
-              log('loading', name: 'add_server');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Server ${value.name} saved')),
-              );
           }
         });
       },
     );
     return ManageServer(
       onSave: (data) {
-        log(
-          'name: ${data.uri}, uri: ${data.uri}',
-          name: 'add_server',
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Saving ${data.name}'),
+            duration: const Duration(seconds: 1),
+          ),
         );
         setState(() {
           _server = Some(data);
