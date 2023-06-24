@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
-import 'package:photo_manager_client/src/persistence/server/save_server_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/save_server_provider.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -52,14 +52,19 @@ class _ManageServerState extends ConsumerState<ManageServer> {
             case AsyncError(:final error, :final stackTrace):
               log('$error', stackTrace: stackTrace, name: 'add_server');
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error saving ${server.name}: $error')),
+                SnackBar(
+                  content: Text('Error saving ${server.name}: $error'),
+                ),
               );
               setState(() {
                 _serverToSave = const None();
               });
             case AsyncData():
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${server.name} saved')),
+                SnackBar(
+                  content: Text('${server.name} saved'),
+                  duration: const Duration(seconds: 2),
+                ),
               );
               setState(() {
                 _serverToSave = const None();

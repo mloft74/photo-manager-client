@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
-import 'package:photo_manager_client/src/persistence/server/servers_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/servers_provider.dart';
+import 'package:photo_manager_client/src/server_list/widgets/server_list_item.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -56,28 +57,9 @@ class ServerList extends ConsumerWidget {
                 itemCount: servers.length,
                 itemBuilder: (context, index) {
                   final item = servers[index];
-                  return ListTile(
-                    onTap: () {
-                      log(
-                        'set selected server: ${item.name}',
-                        name: 'server_list',
-                      );
-                    },
-                    title: Text(item.name),
-                    subtitle: Text('${item.uri}'),
-                    trailing: IconButton(
-                      onPressed: () {
-                        unawaited(
-                          Navigator.push<void>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ManageServer(server: item),
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.edit),
-                    ),
+                  return ServerListItem(
+                    server: item,
+                    key: ValueKey(item),
                   );
                 },
               );

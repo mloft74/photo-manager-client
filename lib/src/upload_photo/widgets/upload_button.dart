@@ -20,7 +20,10 @@ class UploadButton extends ConsumerWidget {
           .andThen(
             (value) => Some(() {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Name: ${value.name}')),
+                SnackBar(
+                  content: Text('Name: ${value.name}'),
+                  duration: const Duration(seconds: 2),
+                ),
               );
             }),
           )
