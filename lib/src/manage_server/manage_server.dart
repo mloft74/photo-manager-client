@@ -1,30 +1,40 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/persistence/server/save_server_provider.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-class ManageServer extends StatefulWidget {
-  final PhotoManagerBottomAppBar bottomAppBar;
-  final void Function(Server data) onSave;
+class ManageServer extends ConsumerStatefulWidget {
+  final Server? server;
 
   const ManageServer({
-    required this.bottomAppBar,
-    required this.onSave,
+    this.server,
     super.key,
   });
 
   @override
-  State<ManageServer> createState() => _ManageServerState();
+  ConsumerState<ManageServer> createState() => _ManageServerState();
 }
 
-class _ManageServerState extends State<ManageServer> {
+class _ManageServerState extends ConsumerState<ManageServer> {
   final _formKey = GlobalKey<FormState>();
-  final _uriTextController = TextEditingController();
-  final _nameTextController = TextEditingController();
+  late final TextEditingController _uriTextController;
+  late final TextEditingController _nameTextController;
+
+  Option<Server> _serverToSave = const None<Server>();
+
+  @override
+  void initState() {
+    super.initState();
+    _uriTextController =
+        TextEditingController(text: widget.server?.uri.toString());
+    _nameTextController = TextEditingController(text: widget.server?.name);
+  }
 
   @override
   void dispose() {
@@ -35,8 +45,35 @@ class _ManageServerState extends State<ManageServer> {
 
   @override
   Widget build(BuildContext context) {
+    _serverToSave.inspect(
+      (server) {
+        ref.listen(saveServerProvider(server), (previous, next) {
+          switch (next) {
+            case AsyncError(:final error, :final stackTrace):
+              log('$error', stackTrace: stackTrace, name: 'add_server');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error saving ${server.name}: $error')),
+              );
+              setState(() {
+                _serverToSave = const None();
+              });
+            case AsyncData():
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${server.name} saved')),
+              );
+              setState(() {
+                _serverToSave = const None();
+              });
+          }
+        });
+      },
+    );
+
     return PhotoManagerScaffold(
-      bottomAppBar: widget.bottomAppBar,
+      bottomAppBar: const PhotoManagerBottomAppBar(
+        leading: BackButton(),
+        titleText: 'Manage Server',
+      ),
       child: Form(
         key: _formKey,
         child: ListView(
@@ -47,7 +84,7 @@ class _ManageServerState extends State<ManageServer> {
               onPressed: () {
                 final data = _validateForm();
                 if (data case Some(:final value)) {
-                  widget.onSave(value);
+                  _onSave(value);
                 }
               },
               child: const Text('Save'),
@@ -79,6 +116,7 @@ class _ManageServerState extends State<ManageServer> {
               },
             ),
             TextFormField(
+              enabled: widget.server == null,
               controller: _nameTextController,
               decoration: const InputDecoration(
                 helperText: '',
@@ -112,5 +150,17 @@ class _ManageServerState extends State<ManageServer> {
     return Some(
       Server(name: name, uri: uri),
     );
+  }
+
+  void _onSave(Server server) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Saving ${server.name}'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+    setState(() {
+      _serverToSave = Some(server);
+    });
   }
 }

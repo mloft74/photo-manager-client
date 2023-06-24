@@ -4,8 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
-import 'package:photo_manager_client/src/manage_server/add_server.dart';
-import 'package:photo_manager_client/src/manage_server/edit_server.dart';
+import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/servers_provider.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -25,7 +24,7 @@ class ServerList extends ConsumerWidget {
             onPressed: () {
               unawaited(
                 Navigator.of(context).push<void>(
-                  MaterialPageRoute(builder: (context) => const AddServer()),
+                  MaterialPageRoute(builder: (context) => const ManageServer()),
                 ),
               );
             },
@@ -72,7 +71,7 @@ class ServerList extends ConsumerWidget {
                           Navigator.push<void>(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const EditServer(),
+                              builder: (context) => ManageServer(server: item),
                             ),
                           ),
                         );
