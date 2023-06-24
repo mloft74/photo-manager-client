@@ -297,3 +297,7 @@ extension NestedOptionExtension<T extends Object> on Option<Option<T>> {
         None() => None<T>(),
       };
 }
+
+extension IterableOptionExtension<T extends Object> on Iterable<Option<T>> {
+  Iterable<T> whereSome() => whereType<Some<T>>().map((e) => e.value);
+}

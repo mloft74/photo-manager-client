@@ -1,14 +1,14 @@
 import 'package:isar/isar.dart';
 
-part 'server.g.dart';
+part 'server_db.g.dart';
 
 @collection
-class Server {
+class ServerDB {
   Id id = Isar.autoIncrement;
 
   @Index(unique: true, replace: true)
   String name;
   String uri;
 
-  Server({required this.name, required this.uri});
+  ServerDB({required this.name, required this.uri});
 }

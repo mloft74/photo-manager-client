@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
-import 'package:photo_manager_client/src/manage_server/widgets/manage_server/models/manage_server_data.dart';
+import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
 class ManageServer extends StatefulWidget {
   final PhotoManagerBottomAppBar bottomAppBar;
-  final void Function(ManageServerData data) onSave;
+  final void Function(Server data) onSave;
 
   const ManageServer({
     required this.bottomAppBar,
@@ -100,7 +100,7 @@ class _ManageServerState extends State<ManageServer> {
     );
   }
 
-  Option<ManageServerData> _validateForm() {
+  Option<Server> _validateForm() {
     final valid = _formKey.currentState.option
         .mapOr(or: false, map: (value) => value.validate());
     if (!valid) {
@@ -110,7 +110,7 @@ class _ManageServerState extends State<ManageServer> {
     final name = _nameTextController.text;
     final uri = Uri.parse(_uriTextController.text);
     return Some(
-      ManageServerData(serverName: name, serverUri: uri),
+      Server(name: name, uri: uri),
     );
   }
 }

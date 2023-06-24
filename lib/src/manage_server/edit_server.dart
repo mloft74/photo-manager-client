@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager_client/src/manage_server/widgets/manage_server/manage_server.dart';
+import 'package:photo_manager_client/src/manage_server/widgets/manage_server.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 
 enum _RemoveServerOption {
@@ -17,7 +17,7 @@ class EditServer extends StatelessWidget {
     return ManageServer(
       onSave: (data) {
         log(
-          'name: ${data.serverName}, uri: ${data.serverUri}',
+          'name: ${data.name}, uri: ${data.uri}',
           name: 'edit_server',
         );
       },
