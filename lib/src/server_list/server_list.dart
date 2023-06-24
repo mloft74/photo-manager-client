@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
@@ -46,7 +47,7 @@ class ServerList extends StatelessWidget {
           return ListTile(
             selected: index == selectedIndex,
             onTap: () {
-              debugPrint('set selected server');
+              log('set selected server', name: 'server_list');
             },
             title: Text(item),
             trailing: IconButton(

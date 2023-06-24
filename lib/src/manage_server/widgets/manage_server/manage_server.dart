@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -54,7 +56,7 @@ class _ManageServerState extends State<ManageServer> {
               onPressed: () {
                 final data = _validateForm();
                 if (data case Some()) {
-                  debugPrint('test connection');
+                  log('test connection', name: 'manage_server');
                 }
               },
               child: const Text('Test connection'),

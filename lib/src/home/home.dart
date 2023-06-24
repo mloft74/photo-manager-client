@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
@@ -47,9 +48,9 @@ class Home extends StatelessWidget {
       ),
       child: RefreshIndicator(
         onRefresh: () async {
-          debugPrint('started refresh');
+          log('started refresh', name: 'home');
           await Future<void>.delayed(const Duration(seconds: 1));
-          debugPrint('ended refresh');
+          log('ended refresh', name: 'home');
         },
         child: GridView.builder(
           itemCount: 360,
