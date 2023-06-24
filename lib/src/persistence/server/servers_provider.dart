@@ -10,7 +10,7 @@ part 'servers_provider.g.dart';
 @riverpod
 Stream<Iterable<Server>> servers(ServersRef ref) {
   final isar = ref.watch(isarProvider);
-  return isar.serverDBs.where().watch().map(
+  return isar.serverDBs.where().watch(fireImmediately: true).map(
         (event) => event
             .map(
               (e) => Uri.tryParse(e.uri).option.andThen(
