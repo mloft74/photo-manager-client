@@ -12,11 +12,12 @@ class SelectedServerDB {
 
   final server = IsarLink<ServerDB>();
 
-  Option<ServerDB> toDB() {
+  Future<Option<ServerDB>> toDBAsync() async {
+    await server.load();
     return server.value.option;
   }
 
-  Option<Server> toDomain() {
-    return toDB().andThen((value) => value.toDomain());
+  Future<Option<Server>> toDomainAsync() async {
+    return (await toDBAsync()).andThen((value) => value.toDomain());
   }
 }

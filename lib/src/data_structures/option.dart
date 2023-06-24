@@ -189,6 +189,14 @@ sealed class Option<T extends Object> with _$Option<T> {
         None() => None<U>(),
       };
 
+  Future<Option<U>> andThenAsync<U extends Object>(
+    Future<Option<U>> Function(T value) fn,
+  ) async =>
+      switch (this) {
+        Some(:final value) => await fn(value),
+        None() => None<U>(),
+      };
+
   /// Returns [None] if the option is [None],
   /// otherwise calls [predicate] with the wrapped value and returns:
   /// - [Some] if [predicate] returns `true`, and

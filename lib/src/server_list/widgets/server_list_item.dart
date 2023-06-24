@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/remove_server_provider.dart';
+import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class ServerListItem extends ConsumerStatefulWidget {
   final Server server;
@@ -42,66 +44,85 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
       });
     }
 
+    final currentServer = ref.watch(currentServerProvider);
+
     return _removingServer
         ? const SizedBox.shrink()
-        : Dismissible(
-            key: ValueKey(server),
-            background: ColoredBox(
-              color: Theme.of(context).colorScheme.error,
-            ),
-            confirmDismiss: (direction) async => await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text('Delete ${server.name}?'),
-                content: const Text('This will permanently delete this server'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                    },
-                    child: const Text('Delete'),
-                  ),
-                ],
-              ),
-            ),
-            onDismissed: (direction) {
+        : AsyncValueBuilder(
+            asyncValue: currentServer,
+            builder: (context, value) {
+              final selected = value.isSomeAnd((value) => value == server);
               log(
-                'swiped ${server.name} ${direction.name}',
-                name: 'server_list',
+                'selected: $selected, isSome: ${value.isSome}',
+                name: 'server_list_item',
               );
-              setState(() {
-                _removingServer = true;
-              });
-            },
-            child: ListTile(
-              onTap: () {
-                log(
-                  'set selected server: ${server.name}',
-                  name: 'server_list',
-                );
-              },
-              title: Text(server.name),
-              subtitle: Text('${server.uri}'),
-              trailing: IconButton(
-                onPressed: () {
-                  unawaited(
-                    Navigator.push<void>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ManageServer(server: server),
+              return Dismissible(
+                key: ValueKey(server),
+                background: ColoredBox(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                confirmDismiss: (direction) async => await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Delete ${server.name}?'),
+                    content:
+                        const Text('This will permanently delete this server'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: const Text('Cancel'),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  ),
+                ),
+                onDismissed: (direction) {
+                  log(
+                    'swiped ${server.name} ${direction.name}',
+                    name: 'server_list',
                   );
+                  setState(() {
+                    _removingServer = true;
+                  });
                 },
-                icon: const Icon(Icons.edit),
-              ),
-            ),
+                child: ListTile(
+                  selected: selected,
+                  onTap: () {
+                    log(
+                      'set selected server: ${server.name}',
+                      name: 'server_list',
+                    );
+                    unawaited(
+                      ref
+                          .read(currentServerProvider.notifier)
+                          .updateCurrent(server),
+                    );
+                  },
+                  title: Text(server.name),
+                  subtitle: Text('${server.uri}'),
+                  trailing: IconButton(
+                    onPressed: () {
+                      unawaited(
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ManageServer(server: server),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                ),
+              );
+            },
           );
   }
 }
