@@ -1,8 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
-import 'package:photo_manager_client/src/server_list/server_list.dart';
+import 'package:photo_manager_client/src/settings/widgets/server_settings.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -19,22 +17,8 @@ class Settings extends StatelessWidget {
       child: ListView(
         padding: edgeInsetsForRoutePadding,
         reverse: true,
-        children: [
-          ListTile(
-            onTap: () {
-              unawaited(
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ServerList(),
-                  ),
-                ),
-              );
-            },
-            title: const Text('Servers'),
-            subtitle: const Text('Current server: TODO'),
-            trailing: const Icon(Icons.arrow_forward),
-          ),
+        children: const [
+          ServerSettings(),
         ],
       ),
     );
