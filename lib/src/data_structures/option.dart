@@ -4,6 +4,7 @@ library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'option.freezed.dart';
 
@@ -300,4 +301,8 @@ extension NestedOptionExtension<T extends Object> on Option<Option<T>> {
 
 extension IterableOptionExtension<T extends Object> on Iterable<Option<T>> {
   Iterable<T> whereSome() => whereType<Some<T>>().map((e) => e.value);
+}
+
+extension StreamOptionExtension<T extends Object> on Stream<Option<T>> {
+  Stream<T> whereSome() => whereType<Some<T>>().map((e) => e.value);
 }

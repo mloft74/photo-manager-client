@@ -2,18 +2,22 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
+import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-class Home extends StatelessWidget {
+class Home extends ConsumerWidget {
   const Home({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
         titleText: 'Home',
@@ -46,40 +50,54 @@ class Home extends StatelessWidget {
           ),
         ],
       ),
-      child: RefreshIndicator(
-        onRefresh: () async {
-          log('started refresh', name: 'home');
-          await Future<void>.delayed(const Duration(seconds: 1));
-          log('ended refresh', name: 'home');
-        },
-        child: GridView.builder(
-          itemCount: 360,
-          padding: edgeInsetsForRoutePadding,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 72.0,
-            mainAxisSpacing: 8.0,
-            crossAxisSpacing: 8.0,
-          ),
-          itemBuilder: (context, index) {
-            final color =
-                HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5).toColor();
-            return InkWell(
-              onTap: () {
-                unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ManagePhoto(color: color),
-                    ),
-                  ),
-                );
-              },
-              child: ColoredBox(
-                color: color,
+      child: AsyncValueBuilder(
+        asyncValue: ref.watch(currentServerProvider),
+        builder: (context, value) {
+          return switch (value) {
+            None() => Center(
+                child: Text(
+                  'No server is selected',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
-            );
-          },
-        ),
+            Some() => RefreshIndicator(
+                onRefresh: () async {
+                  log('started refresh', name: 'home');
+                  await Future<void>.delayed(const Duration(seconds: 1));
+                  log('ended refresh', name: 'home');
+                },
+                child: GridView.builder(
+                  itemCount: 360,
+                  padding: edgeInsetsForRoutePadding,
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 72.0,
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
+                  ),
+                  itemBuilder: (context, index) {
+                    final color =
+                        HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5)
+                            .toColor();
+                    return InkWell(
+                      onTap: () {
+                        unawaited(
+                          Navigator.push<void>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ManagePhoto(color: color),
+                            ),
+                          ),
+                        );
+                      },
+                      child: ColoredBox(
+                        color: color,
+                      ),
+                    );
+                  },
+                ),
+              )
+          };
+        },
       ),
     );
   }
