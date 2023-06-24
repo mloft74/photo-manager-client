@@ -1,4 +1,6 @@
 import 'package:isar/isar.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/domain/server.dart';
 
 part 'server_db.g.dart';
 
@@ -11,4 +13,10 @@ class ServerDB {
   String uri;
 
   ServerDB({required this.name, required this.uri});
+
+  Option<Server> toDomain() {
+    return Uri.tryParse(uri)
+        .option
+        .andThen((uri) => Some(Server(name: name, uri: uri)));
+  }
 }
