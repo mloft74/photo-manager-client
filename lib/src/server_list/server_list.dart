@@ -37,6 +37,34 @@ class ServerList extends ConsumerWidget {
         asyncValue: servers,
         builder: (context, value) {
           final servers = value.toList();
+          if (servers.isEmpty) {
+            return ListView(
+              reverse: true,
+              padding: edgeInsetsForRoutePadding,
+              children: [
+                FilledButton(
+                  onPressed: () {
+                    unawaited(
+                      Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ManageServer(),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Add server'),
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  "You don't have any servers",
+                  style: Theme.of(context).textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            );
+          }
+
           return ListView.builder(
             padding: edgeInsetsForRoutePadding,
             reverse: true,

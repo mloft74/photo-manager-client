@@ -6,6 +6,7 @@ import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/save_server_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/update_current_server_provider.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -27,6 +28,7 @@ class _ManageServerState extends ConsumerState<ManageServer> {
   late final TextEditingController _nameTextController;
 
   Option<Server> _serverToSave = const None<Server>();
+  Option<Server> _serverToSelect = const None<Server>();
 
   @override
   void initState() {
@@ -72,7 +74,45 @@ class _ManageServerState extends ConsumerState<ManageServer> {
               );
               setState(() {
                 _serverToSave = const None();
+                _serverToSelect = Some(server);
               });
+          }
+        });
+      },
+    );
+
+    _serverToSelect.inspect(
+      (server) {
+        ref.listen(updateCurrentServerProvider(server), (previous, next) {
+          switch (next) {
+            case AsyncError(:final error, :final stackTrace):
+              log(
+                'error setting current server: $error',
+                stackTrace: stackTrace,
+                name: 'manage_server',
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('Error setting ${server.name} as current: $error'),
+                ),
+              );
+              setState(() {
+                _serverToSelect = const None();
+              });
+            case AsyncData():
+              log(
+                'updated current to ${server.name}',
+                name: 'manage_server',
+              );
+              WidgetsBinding.instance.addPostFrameCallback(
+                (timeStamp) {
+                  if (!mounted) {
+                    return;
+                  }
+                  Navigator.pop(context);
+                },
+              );
           }
         });
       },

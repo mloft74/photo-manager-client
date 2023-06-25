@@ -7,6 +7,7 @@ import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
+import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
@@ -18,6 +19,7 @@ class Home extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentServer = ref.watch(currentServerProvider);
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
         titleText: 'Home',
@@ -35,30 +37,50 @@ class Home extends ConsumerWidget {
             },
             icon: const Icon(Icons.settings),
           ),
-          IconButton(
-            onPressed: () {
-              unawaited(
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const UploadPhoto(),
+          if (currentServer case AsyncData(value: Some()))
+            IconButton(
+              onPressed: () {
+                unawaited(
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UploadPhoto(),
+                    ),
                   ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.add),
-          ),
+                );
+              },
+              icon: const Icon(Icons.add),
+            ),
         ],
       ),
       child: AsyncValueBuilder(
-        asyncValue: ref.watch(currentServerProvider),
+        asyncValue: currentServer,
         builder: (context, value) {
           return switch (value) {
-            None() => Center(
-                child: Text(
-                  'No server is selected',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+            None() => ListView(
+                reverse: true,
+                padding: edgeInsetsForRoutePadding,
+                children: [
+                  FilledButton(
+                    onPressed: () {
+                      unawaited(
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ServerList(),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Select server'),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Text(
+                    'No server is selected',
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             Some() => RefreshIndicator(
                 onRefresh: () async {
