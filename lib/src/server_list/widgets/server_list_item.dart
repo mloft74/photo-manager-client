@@ -7,6 +7,7 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/remove_server_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/update_current_server_provider.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class ServerListItem extends ConsumerStatefulWidget {
