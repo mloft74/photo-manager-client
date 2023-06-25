@@ -68,7 +68,10 @@ class _ManageServerState extends ConsumerState<ManageServer> {
               onPressed: () {
                 final data = _validateForm();
                 if (data case Some()) {
-                  log('test connection', name: 'manage_server');
+                  log(
+                    'test connection',
+                    name: 'ManageServer | test connection',
+                  );
                 }
               },
               child: const Text('Test connection'),
@@ -150,7 +153,7 @@ class _ManageServerState extends ConsumerState<ManageServer> {
       log(
         'error saving server: $ex',
         stackTrace: st,
-        name: 'manage_server',
+        name: 'ManageServer | _onSave',
       );
       scaffoldMessenger.showSnackBar(
         SnackBar(

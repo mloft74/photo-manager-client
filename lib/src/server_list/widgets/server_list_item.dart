@@ -74,7 +74,7 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                     log(
                       'error removing server: $ex',
                       stackTrace: st,
-                      name: 'server_list_item',
+                      name: 'ServerListItem | onDismissed',
                     );
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
@@ -86,7 +86,21 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                 child: ListTile(
                   selected: selected,
                   onTap: () async {
-                    await ref.read(updateCurrentServerProvider)(server);
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+                    try {
+                      await ref.read(updateCurrentServerProvider)(server);
+                    } catch (ex, st) {
+                      log(
+                        'error selecting server: $ex',
+                        stackTrace: st,
+                        name: 'ServerListItem | select server',
+                      );
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text('Error selecting ${server.name}: $ex'),
+                        ),
+                      );
+                    }
                   },
                   title: Text(server.name),
                   subtitle: Text('${server.uri}'),

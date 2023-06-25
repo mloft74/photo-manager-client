@@ -34,7 +34,7 @@ class AsyncValueBuilder<T> extends StatelessWidget {
 
             final errorStr = '$error';
             final theme = Theme.of(context);
-            log(errorStr, stackTrace: stackTrace, name: 'async_value_loader');
+            log(errorStr, stackTrace: stackTrace, name: 'AsyncValueLoader');
             return Center(
               child: Text(
                 errorStr,

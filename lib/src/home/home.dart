@@ -84,9 +84,9 @@ class Home extends ConsumerWidget {
               ),
             Some() => RefreshIndicator(
                 onRefresh: () async {
-                  log('started refresh', name: 'home');
+                  log('started refresh', name: 'Home | onRefresh');
                   await Future<void>.delayed(const Duration(seconds: 1));
-                  log('ended refresh', name: 'home');
+                  log('ended refresh', name: 'Home | onRefresh');
                 },
                 child: GridView.builder(
                   itemCount: 360,

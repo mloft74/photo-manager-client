@@ -14,9 +14,10 @@ Future<void> main() async {
 
   PlatformDispatcher.instance.onError = (exception, stackTrace) {
     log(
-      'Error caught by PlatformDispactcher',
+      'Error caught by PlatformDispatcher',
       error: exception,
       stackTrace: stackTrace,
+      name: 'PlatformDispatcher',
     );
     return true;
   };
