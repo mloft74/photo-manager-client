@@ -50,7 +50,11 @@ class _ManageServerState extends ConsumerState<ManageServer> {
         ref.listen(saveServerProvider(server), (previous, next) {
           switch (next) {
             case AsyncError(:final error, :final stackTrace):
-              log('$error', stackTrace: stackTrace, name: 'add_server');
+              log(
+                'error saving ${server.name}: $error',
+                stackTrace: stackTrace,
+                name: 'add_server',
+              );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Error saving ${server.name}: $error'),

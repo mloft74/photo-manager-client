@@ -22,18 +22,53 @@ class ServerListItem extends ConsumerStatefulWidget {
 
 class _ServerListItemState extends ConsumerState<ServerListItem> {
   var _removingServer = false;
+  var _updatingCurrent = false;
 
   @override
   Widget build(BuildContext context) {
     final server = widget.server;
 
+    if (_updatingCurrent) {
+      ref.listen(updateCurrentServerProvider(server), (previous, next) {
+        switch (next) {
+          case AsyncError(:final error, :final stackTrace):
+            log(
+              'error setting current server: $error',
+              stackTrace: stackTrace,
+              name: 'server_list_item',
+            );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text('Error setting ${server.name} as current: $error'),
+              ),
+            );
+            setState(() {
+              _updatingCurrent = false;
+            });
+          case AsyncData():
+            log(
+              'updated current to ${server.name}',
+              name: 'server_list_item',
+            );
+            setState(() {
+              _updatingCurrent = false;
+            });
+        }
+      });
+    }
+
     if (_removingServer) {
       ref.listen(removeServerProvider(server), (previous, next) {
         switch (next) {
           case AsyncError(:final error, :final stackTrace):
-            log('$error', stackTrace: stackTrace, name: 'server_list_item');
+            log(
+              'error removing server: $error',
+              stackTrace: stackTrace,
+              name: 'server_list_item',
+            );
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error saving ${server.name}: $error')),
+              SnackBar(content: Text('Error removing ${server.name}: $error')),
             );
           case AsyncData():
             log(
@@ -52,10 +87,6 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
             asyncValue: currentServer,
             builder: (context, value) {
               final selected = value.isSomeAnd((value) => value == server);
-              log(
-                'selected: $selected, isSome: ${value.isSome}',
-                name: 'server_list_item',
-              );
               return Dismissible(
                 key: ValueKey(server),
                 background: ColoredBox(
@@ -84,10 +115,6 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                   ),
                 ),
                 onDismissed: (direction) {
-                  log(
-                    'swiped ${server.name} ${direction.name}',
-                    name: 'server_list',
-                  );
                   setState(() {
                     _removingServer = true;
                   });
@@ -95,15 +122,9 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                 child: ListTile(
                   selected: selected,
                   onTap: () {
-                    log(
-                      'set selected server: ${server.name}',
-                      name: 'server_list',
-                    );
-                    unawaited(
-                      ref
-                          .read(currentServerProvider.notifier)
-                          .updateCurrent(server),
-                    );
+                    setState(() {
+                      _updatingCurrent = true;
+                    });
                   },
                   title: Text(server.name),
                   subtitle: Text('${server.uri}'),

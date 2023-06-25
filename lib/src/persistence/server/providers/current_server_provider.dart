@@ -19,8 +19,7 @@ class CurrentServer extends _$CurrentServer {
     final listener = isar.selectedServerDBs
         .watchObject(SelectedServerDB.selectedId)
         .asyncMap(
-          (event) =>
-              event.option.andThenAsync((value) => value.toDomainAsync()),
+          (event) => event.option.andThen((value) => value.toDomain()),
         )
         .listen(
       (event) {
@@ -28,34 +27,27 @@ class CurrentServer extends _$CurrentServer {
       },
     );
     ref.onDispose(listener.cancel);
-    return await selectedServer.option
-        .andThenAsync((value) => value.toDomainAsync());
+    return selectedServer.option.andThen((value) => value.toDomain());
   }
+}
 
-  Future<void> updateCurrent(Server server) async {
-    final isar = ref.read(isarProvider);
-    state = await AsyncValue.guard(
-      () async {
-        final (serverDb, selected) = await isar.txn(() async {
-          final serverDb = await isar.serverDBs.getByName(server.name);
-          final selected =
-              await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
+@riverpod
+Future<void> updateCurrentServer(
+  UpdateCurrentServerRef ref,
+  Server server,
+) async {
+  final isar = ref.read(isarProvider);
+  final (serverDb, selected) = await isar.txn(() async {
+    final serverDb = await isar.serverDBs.getByName(server.name);
+    final selected =
+        await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
 
-          return (serverDb, selected);
-        });
+    return (serverDb, selected ?? SelectedServerDB());
+  });
 
-        await isar.writeTxn(() async {
-          var innerSelected = selected;
-          if (innerSelected == null) {
-            innerSelected = SelectedServerDB();
-            await isar.selectedServerDBs.put(innerSelected);
-          }
-          innerSelected.server.value = serverDb;
-          await innerSelected.server.save();
-        });
-
-        return Some(server);
-      },
-    );
-  }
+  await isar.writeTxn(() async {
+    await isar.selectedServerDBs.put(selected);
+    selected.server.value = serverDb;
+    await selected.server.save();
+  });
 }

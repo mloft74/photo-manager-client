@@ -9,6 +9,9 @@ part 'save_server_provider.g.dart';
 Future<void> saveServer(SaveServerRef ref, Server server) async {
   final isar = ref.watch(isarProvider);
   await isar.writeTxn(
-    () => isar.serverDBs.put(ServerDB(name: server.name, uri: '${server.uri}')),
+    () async {
+      await isar.serverDBs
+          .put(ServerDB(name: server.name, uri: '${server.uri}'));
+    },
   );
 }
