@@ -28,28 +28,6 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
   @override
   Widget build(BuildContext context) {
     final server = widget.server;
-
-    if (_removingServer) {
-      ref.listen(removeServerProvider(server), (previous, next) {
-        switch (next) {
-          case AsyncError(:final error, :final stackTrace):
-            log(
-              'error removing server: $error',
-              stackTrace: stackTrace,
-              name: 'server_list_item',
-            );
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error removing ${server.name}: $error')),
-            );
-          case AsyncData():
-            log(
-              'successfully removed ${server.name}',
-              name: 'server_list_item',
-            );
-        }
-      });
-    }
-
     final currentServer = ref.watch(currentServerProvider);
 
     return _removingServer
@@ -85,10 +63,25 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                     ],
                   ),
                 ),
-                onDismissed: (direction) {
+                onDismissed: (direction) async {
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                   setState(() {
                     _removingServer = true;
                   });
+                  try {
+                    await ref.read(removeServerProvider)(server);
+                  } catch (ex, st) {
+                    log(
+                      'error removing server: $ex',
+                      stackTrace: st,
+                      name: 'server_list_item',
+                    );
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text('Error removing ${server.name}: $ex'),
+                      ),
+                    );
+                  }
                 },
                 child: ListTile(
                   selected: selected,
