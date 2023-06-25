@@ -24,41 +24,10 @@ class ServerListItem extends ConsumerStatefulWidget {
 
 class _ServerListItemState extends ConsumerState<ServerListItem> {
   var _removingServer = false;
-  var _updatingCurrent = false;
 
   @override
   Widget build(BuildContext context) {
     final server = widget.server;
-
-    if (_updatingCurrent) {
-      ref.listen(updateCurrentServerProvider(server), (previous, next) {
-        switch (next) {
-          case AsyncError(:final error, :final stackTrace):
-            log(
-              'error setting current server: $error',
-              stackTrace: stackTrace,
-              name: 'server_list_item',
-            );
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text('Error setting ${server.name} as current: $error'),
-              ),
-            );
-            setState(() {
-              _updatingCurrent = false;
-            });
-          case AsyncData():
-            log(
-              'updated current to ${server.name}',
-              name: 'server_list_item',
-            );
-            setState(() {
-              _updatingCurrent = false;
-            });
-        }
-      });
-    }
 
     if (_removingServer) {
       ref.listen(removeServerProvider(server), (previous, next) {
@@ -123,10 +92,8 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                 },
                 child: ListTile(
                   selected: selected,
-                  onTap: () {
-                    setState(() {
-                      _updatingCurrent = true;
-                    });
+                  onTap: () async {
+                    await ref.read(updateCurrentServerProvider)(server);
                   },
                   title: Text(server.name),
                   subtitle: Text('${server.uri}'),

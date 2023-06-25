@@ -27,8 +27,6 @@ class _ManageServerState extends ConsumerState<ManageServer> {
   late final TextEditingController _uriTextController;
   late final TextEditingController _nameTextController;
 
-  Option<Server> _serverToSelect = const None<Server>();
-
   @override
   void initState() {
     super.initState();
@@ -46,43 +44,6 @@ class _ManageServerState extends ConsumerState<ManageServer> {
 
   @override
   Widget build(BuildContext context) {
-    _serverToSelect.inspect(
-      (server) {
-        ref.listen(updateCurrentServerProvider(server), (previous, next) {
-          switch (next) {
-            case AsyncError(:final error, :final stackTrace):
-              log(
-                'error setting current server: $error',
-                stackTrace: stackTrace,
-                name: 'manage_server',
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text('Error setting ${server.name} as current: $error'),
-                ),
-              );
-              setState(() {
-                _serverToSelect = const None();
-              });
-            case AsyncData():
-              log(
-                'updated current to ${server.name}',
-                name: 'manage_server',
-              );
-              WidgetsBinding.instance.addPostFrameCallback(
-                (timeStamp) {
-                  if (!mounted) {
-                    return;
-                  }
-                  Navigator.pop(context);
-                },
-              );
-          }
-        });
-      },
-    );
-
     return PhotoManagerScaffold(
       bottomAppBar: const PhotoManagerBottomAppBar(
         leading: BackButton(),
@@ -167,25 +128,35 @@ class _ManageServerState extends ConsumerState<ManageServer> {
   }
 
   Future<void> _onSave(Server server) async {
-    ScaffoldMessenger.of(context).showSnackBar(
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    Navigator.pop(context);
+
+    scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Text('Saving ${server.name}'),
         duration: const Duration(seconds: 1),
       ),
     );
-    await ref.read(saveServerProvider)(server);
-    if (!mounted) {
-      return;
+    try {
+      await ref.read(saveServerProvider)(server);
+      await ref.read(updateCurrentServerProvider)(server);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${server.name} saved'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (ex, st) {
+      log(
+        'error saving server: $ex',
+        stackTrace: st,
+        name: 'manage_server',
+      );
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Error saving ${server.name}: $ex'),
+        ),
+      );
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${server.name} saved'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-    setState(() {
-      _serverToSelect = Some(server);
-    });
   }
 }
