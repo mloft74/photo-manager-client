@@ -15,7 +15,7 @@ class ImageDisplay extends ConsumerWidget {
       asyncValue: ref.watch(photoProvider),
       builder: (context, value) {
         return switch (value) {
-          Some(:final value) => Image.file(File(value.path)),
+          Some(:final value) => Image.file(File(value)),
           None() => const Text('Select an image'),
         };
       },

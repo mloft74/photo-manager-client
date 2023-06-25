@@ -1,10 +1,10 @@
-import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'photo_provider.g.dart';
 
-typedef PhotoState = Option<XFile>;
+typedef PhotoStateValue = String;
+typedef PhotoState = Option<PhotoStateValue>;
 
 @riverpod
 class Photo extends _$Photo {
