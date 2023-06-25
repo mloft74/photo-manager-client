@@ -6,6 +6,9 @@ import 'package:photo_manager_client/src/upload_photo/widgets/upload_button.dart
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
+// TODO(mloft74): implement picking directory
+// TODO(mloft74): implement picking multiple photos
+
 class UploadPhoto extends StatelessWidget {
   const UploadPhoto({super.key});
 
