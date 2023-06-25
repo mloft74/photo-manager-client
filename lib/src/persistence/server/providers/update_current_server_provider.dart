@@ -17,12 +17,13 @@ Future<void> updateCurrentServer(
     final selected =
         await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
 
-    return (serverDb, selected ?? SelectedServerDB());
+    return (serverDb, selected);
   });
 
   await isar.writeTxn(() async {
-    await isar.selectedServerDBs.put(selected);
-    selected.server.value = serverDb;
-    await selected.server.save();
+    final innerSelected = selected ?? SelectedServerDB();
+    await isar.selectedServerDBs.put(innerSelected);
+    innerSelected.server.value = serverDb;
+    await innerSelected.server.save();
   });
 }
