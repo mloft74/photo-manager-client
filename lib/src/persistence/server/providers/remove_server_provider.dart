@@ -11,6 +11,8 @@ Future<void> removeServer(RemoveServerRef ref, Server server) async {
   final isar = ref.watch(isarProvider);
   final selected =
       await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
+  // This load needs to be performed outside of the transaction,
+  // because Isar does not support nested transactions.
   await selected?.server.load();
   await isar.writeTxn(() async {
     final innerSelected = selected ?? SelectedServerDB();
