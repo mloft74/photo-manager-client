@@ -12,6 +12,7 @@ import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class ServerListItem extends ConsumerStatefulWidget {
   final Server server;
+
   const ServerListItem({
     required this.server,
     super.key,
