@@ -27,7 +27,6 @@ class _ManageServerState extends ConsumerState<ManageServer> {
   late final TextEditingController _uriTextController;
   late final TextEditingController _nameTextController;
 
-  Option<Server> _serverToSave = const None<Server>();
   Option<Server> _serverToSelect = const None<Server>();
 
   @override
@@ -47,40 +46,6 @@ class _ManageServerState extends ConsumerState<ManageServer> {
 
   @override
   Widget build(BuildContext context) {
-    _serverToSave.inspect(
-      (server) {
-        ref.listen(saveServerProvider(server), (previous, next) {
-          switch (next) {
-            case AsyncError(:final error, :final stackTrace):
-              log(
-                'error saving ${server.name}: $error',
-                stackTrace: stackTrace,
-                name: 'add_server',
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error saving ${server.name}: $error'),
-                ),
-              );
-              setState(() {
-                _serverToSave = const None();
-              });
-            case AsyncData():
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${server.name} saved'),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-              setState(() {
-                _serverToSave = const None();
-                _serverToSelect = Some(server);
-              });
-          }
-        });
-      },
-    );
-
     _serverToSelect.inspect(
       (server) {
         ref.listen(updateCurrentServerProvider(server), (previous, next) {
@@ -130,10 +95,10 @@ class _ManageServerState extends ConsumerState<ManageServer> {
           reverse: true,
           children: [
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 final data = _validateForm();
                 if (data case Some(:final value)) {
-                  _onSave(value);
+                  await _onSave(value);
                 }
               },
               child: const Text('Save'),
@@ -201,15 +166,26 @@ class _ManageServerState extends ConsumerState<ManageServer> {
     );
   }
 
-  void _onSave(Server server) {
+  Future<void> _onSave(Server server) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Saving ${server.name}'),
         duration: const Duration(seconds: 1),
       ),
     );
+    await ref.read(saveServerProvider)(server);
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${server.name} saved'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
     setState(() {
-      _serverToSave = Some(server);
+      _serverToSelect = Some(server);
     });
   }
 }
