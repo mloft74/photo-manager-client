@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -10,7 +11,7 @@ import 'package:photo_manager_client/src/persistence/server/providers/update_cur
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-class ManageServer extends ConsumerStatefulWidget {
+class ManageServer extends HookConsumerWidget {
   final Server? server;
 
   const ManageServer({
@@ -19,54 +20,47 @@ class ManageServer extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ManageServer> createState() => _ManageServerState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(GlobalKey<FormState>.new);
+    final nameTextController =
+        useTextEditingController(text: server?.uri.toString());
+    final uriTextController = useTextEditingController(text: server?.name);
 
-class _ManageServerState extends ConsumerState<ManageServer> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _uriTextController;
-  late final TextEditingController _nameTextController;
-
-  @override
-  void initState() {
-    super.initState();
-    _uriTextController =
-        TextEditingController(text: widget.server?.uri.toString());
-    _nameTextController = TextEditingController(text: widget.server?.name);
-  }
-
-  @override
-  void dispose() {
-    _uriTextController.dispose();
-    _nameTextController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return PhotoManagerScaffold(
       bottomAppBar: const PhotoManagerBottomAppBar(
         leading: BackButton(),
         titleText: 'Manage Server',
       ),
       child: Form(
-        key: _formKey,
+        key: formKey,
         child: ListView(
           padding: edgeInsetsForRoutePadding,
           reverse: true,
           children: [
             FilledButton(
               onPressed: () async {
-                final data = _validateForm();
+                final data = _validateForm(
+                  formKey: formKey,
+                  nameTextController: nameTextController,
+                  uriTextController: uriTextController,
+                );
                 if (data case Some(:final value)) {
-                  await _onSave(value);
+                  await _onSave(
+                    context: context,
+                    ref: ref,
+                    server: value,
+                  );
                 }
               },
               child: const Text('Save'),
             ),
             FilledButton(
               onPressed: () {
-                final data = _validateForm();
+                final data = _validateForm(
+                  formKey: formKey,
+                  nameTextController: nameTextController,
+                  uriTextController: uriTextController,
+                );
                 if (data case Some()) {
                   log(
                     'test connection',
@@ -77,7 +71,7 @@ class _ManageServerState extends ConsumerState<ManageServer> {
               child: const Text('Test connection'),
             ),
             TextFormField(
-              controller: _uriTextController,
+              controller: uriTextController,
               decoration: const InputDecoration(
                 helperText: '',
                 hintText: 'Server uri',
@@ -94,8 +88,8 @@ class _ManageServerState extends ConsumerState<ManageServer> {
               },
             ),
             TextFormField(
-              enabled: widget.server == null,
-              controller: _nameTextController,
+              enabled: server == null,
+              controller: nameTextController,
               decoration: const InputDecoration(
                 helperText: '',
                 hintText: 'Server name',
@@ -115,51 +109,59 @@ class _ManageServerState extends ConsumerState<ManageServer> {
       ),
     );
   }
+}
 
-  Option<Server> _validateForm() {
-    final valid = _formKey.currentState.option
-        .mapOr(or: false, map: (value) => value.validate());
-    if (!valid) {
-      return const None();
-    }
-
-    final name = _nameTextController.text;
-    final uri = Uri.parse(_uriTextController.text);
-    return Some(
-      Server(name: name, uri: uri),
-    );
+Option<Server> _validateForm({
+  required GlobalKey<FormState> formKey,
+  required TextEditingController nameTextController,
+  required TextEditingController uriTextController,
+}) {
+  final valid = formKey.currentState.option
+      .mapOr(or: false, map: (value) => value.validate());
+  if (!valid) {
+    return const None();
   }
 
-  Future<void> _onSave(Server server) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    Navigator.pop(context);
+  final name = nameTextController.text;
+  final uri = Uri.parse(uriTextController.text);
+  return Some(
+    Server(name: name, uri: uri),
+  );
+}
 
+Future<void> _onSave({
+  required BuildContext context,
+  required WidgetRef ref,
+  required Server server,
+}) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  Navigator.pop(context);
+
+  scaffoldMessenger.showSnackBar(
+    SnackBar(
+      content: Text('Saving ${server.name}'),
+      duration: const Duration(seconds: 1),
+    ),
+  );
+  try {
+    await ref.read(saveServerProvider)(server);
+    await ref.read(updateCurrentServerProvider)(server);
     scaffoldMessenger.showSnackBar(
       SnackBar(
-        content: Text('Saving ${server.name}'),
-        duration: const Duration(seconds: 1),
+        content: Text('${server.name} saved'),
+        duration: const Duration(seconds: 2),
       ),
     );
-    try {
-      await ref.read(saveServerProvider)(server);
-      await ref.read(updateCurrentServerProvider)(server);
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('${server.name} saved'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    } catch (ex, st) {
-      log(
-        'error saving server: $ex',
-        stackTrace: st,
-        name: 'ManageServer | _onSave',
-      );
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Error saving ${server.name}: $ex'),
-        ),
-      );
-    }
+  } catch (ex, st) {
+    log(
+      'error saving server: $ex',
+      stackTrace: st,
+      name: 'ManageServer | _onSave',
+    );
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text('Error saving ${server.name}: $ex'),
+      ),
+    );
   }
 }

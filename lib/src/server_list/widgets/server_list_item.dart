@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
@@ -10,7 +11,7 @@ import 'package:photo_manager_client/src/persistence/server/providers/remove_ser
 import 'package:photo_manager_client/src/persistence/server/providers/update_current_server_provider.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
-class ServerListItem extends ConsumerStatefulWidget {
+class ServerListItem extends HookConsumerWidget {
   final Server server;
 
   const ServerListItem({
@@ -19,18 +20,11 @@ class ServerListItem extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ServerListItemState();
-}
-
-class _ServerListItemState extends ConsumerState<ServerListItem> {
-  var _removingServer = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final server = widget.server;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final removingServer = useState(false);
     final currentServer = ref.watch(currentServerProvider);
 
-    return _removingServer
+    return removingServer.value
         ? const SizedBox.shrink()
         : AsyncValueBuilder(
             asyncValue: currentServer,
@@ -65,9 +59,7 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                 ),
                 onDismissed: (direction) async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  setState(() {
-                    _removingServer = true;
-                  });
+                  removingServer.value = true;
                   try {
                     await ref.read(removeServerProvider)(server);
                   } catch (ex, st) {
