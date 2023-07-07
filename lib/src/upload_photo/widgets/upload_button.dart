@@ -16,15 +16,15 @@ class UploadButton extends ConsumerWidget {
     };
     return FilledButton.icon(
       onPressed: photo
-          .andThen(
-            (value) => Some(() {
+          .map(
+            (value) => () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Path: $value'),
                   duration: const Duration(seconds: 2),
                 ),
               );
-            }),
+            },
           )
           .nullable,
       icon: const Icon(Icons.upload),

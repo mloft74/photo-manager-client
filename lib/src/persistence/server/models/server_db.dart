@@ -15,8 +15,6 @@ class ServerDB {
   ServerDB({required this.name, required this.uri});
 
   Option<Server> toDomain() {
-    return Uri.tryParse(uri)
-        .option
-        .andThen((uri) => Some(Server(name: name, uri: uri)));
+    return Uri.tryParse(uri).option.map((uri) => Server(name: name, uri: uri));
   }
 }

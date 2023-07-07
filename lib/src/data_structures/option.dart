@@ -314,3 +314,10 @@ extension IterableOptionExtension<T extends Object> on Iterable<Option<T>> {
 extension StreamOptionExtension<T extends Object> on Stream<Option<T>> {
   Stream<T> whereSome() => whereType<Some<T>>().map((e) => e.value);
 }
+
+extension OptionFutureExtension<T extends Object> on Option<Future<T>> {
+  Future<Option<T>> transpose() async => switch (this) {
+        Some(:final value) => Some(await value),
+        None() => None<T>(),
+      };
+}

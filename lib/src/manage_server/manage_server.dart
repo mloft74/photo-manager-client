@@ -99,7 +99,7 @@ class ManageServer extends HookConsumerWidget {
                     .andThen((value) => value.isNotEmptyOption)
                     .mapOrElse(
                       orElse: () => const Some('Please provide a name'),
-                      map: (value) => const Option<String>.none(),
+                      map: (value) => const None<String>(),
                     )
                     .nullable;
               },
