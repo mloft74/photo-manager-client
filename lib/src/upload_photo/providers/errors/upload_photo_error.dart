@@ -7,6 +7,8 @@ sealed class UploadPhotoError with _$UploadPhotoError {
   const factory UploadPhotoError.generalMessage(String message) =
       GeneralMessage;
 
-  const factory UploadPhotoError.second(Object ex, StackTrace st) =
+  const factory UploadPhotoError.imageAlreadyExists() = ImageAlreadyExists;
+
+  const factory UploadPhotoError.exceptionOccurred(Object ex, StackTrace st) =
       ExceptionOccurred;
 }

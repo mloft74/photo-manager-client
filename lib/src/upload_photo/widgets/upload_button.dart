@@ -49,6 +49,9 @@ class UploadButton extends ConsumerWidget {
                 case Ok():
                   msg = 'Upload finished';
                   duration = const Duration(seconds: 1);
+                case Err(error: ImageAlreadyExists()):
+                  msg = 'Image already exists';
+                  duration = const Duration(seconds: 4);
                 case Err(error: GeneralMessage(:final message)):
                   msg = message;
                   duration = const Duration(seconds: 4);

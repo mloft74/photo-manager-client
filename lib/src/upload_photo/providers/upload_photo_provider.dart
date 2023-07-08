@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -19,8 +20,12 @@ Future<Result<(), UploadPhotoError>> _uploadPhoto({
     if (response.statusCode == 200) {
       return const Ok(());
     } else {
-      final responseParsed = await response.stream.bytesToString();
-      return Err(GeneralMessage(responseParsed));
+      final bodyString = await response.stream.bytesToString();
+      final body = jsonDecode(bodyString);
+      return switch (body) {
+        {'error': 'ImageAlreadyExists'} => const Err(ImageAlreadyExists()),
+        _ => Err(GeneralMessage(bodyString)),
+      };
     }
   } catch (ex, st) {
     return Err(ExceptionOccurred(ex, st));
