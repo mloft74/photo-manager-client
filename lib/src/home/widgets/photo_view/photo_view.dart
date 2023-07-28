@@ -121,8 +121,8 @@ class _PhotoViewState extends ConsumerState<PhotoView> {
                     // TODO(mloft74): make this touchable
                     return CachedNetworkImage(
                       imageUrl: url,
-                      placeholder: (context, _) =>
-                          const CircularProgressIndicator(),
+                      progressIndicatorBuilder: (context, url, progress) =>
+                          CircularProgressIndicator(value: progress.progress),
                     );
                   },
                 );
