@@ -1,11 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'image.freezed.dart';
+part 'hosted_image.freezed.dart';
 
 @freezed
-class Image with _$Image {
-  const factory Image({
-    required Uri url,
+class HostedImage with _$HostedImage {
+  const factory HostedImage({
+    required String fileName,
     required int width,
     required int height,
   }) = _Image;
