@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
-import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/photo_view.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
 import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
@@ -82,42 +81,7 @@ class Home extends ConsumerWidget {
                   ),
                 ],
               ),
-            Some() => RefreshIndicator(
-                onRefresh: () async {
-                  log('started refresh', name: 'Home | onRefresh');
-                  await Future<void>.delayed(const Duration(seconds: 1));
-                  log('ended refresh', name: 'Home | onRefresh');
-                },
-                child: GridView.builder(
-                  itemCount: 360,
-                  padding: edgeInsetsForRoutePadding,
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 72.0,
-                    mainAxisSpacing: 8.0,
-                    crossAxisSpacing: 8.0,
-                  ),
-                  itemBuilder: (context, index) {
-                    final color =
-                        HSLColor.fromAHSL(1.0, index.toDouble(), 1.0, 0.5)
-                            .toColor();
-                    return InkWell(
-                      onTap: () {
-                        unawaited(
-                          Navigator.push<void>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ManagePhoto(color: color),
-                            ),
-                          ),
-                        );
-                      },
-                      child: ColoredBox(
-                        color: color,
-                      ),
-                    );
-                  },
-                ),
-              )
+            Some() => const PhotoView(),
           };
         },
       ),
