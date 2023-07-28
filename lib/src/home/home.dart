@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/photo_view.dart';
+import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
-import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
@@ -56,31 +55,7 @@ class Home extends ConsumerWidget {
         asyncValue: currentServer,
         builder: (context, value) {
           return switch (value) {
-            None() => ListView(
-                reverse: true,
-                padding: edgeInsetsForRoutePadding,
-                children: [
-                  FilledButton(
-                    onPressed: () {
-                      unawaited(
-                        Navigator.push<void>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ServerList(),
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text('Select server'),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    'No server is selected',
-                    style: Theme.of(context).textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+            None() => const ServerNotSelected(),
             Some() => const PhotoView(),
           };
         },
