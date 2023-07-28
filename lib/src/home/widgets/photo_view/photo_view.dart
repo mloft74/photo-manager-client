@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
@@ -89,6 +90,7 @@ class _PhotoViewState extends ConsumerState<PhotoView> {
 
   @override
   Widget build(BuildContext context) {
+    const maxCrossAxisExtent = 256.0;
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {
@@ -105,7 +107,7 @@ class _PhotoViewState extends ConsumerState<PhotoView> {
             sliver: SliverGrid.builder(
               itemCount: _images.length,
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 72.0,
+                maxCrossAxisExtent: maxCrossAxisExtent,
                 mainAxisSpacing: 8.0,
                 crossAxisSpacing: 8.0,
               ),
@@ -116,7 +118,12 @@ class _PhotoViewState extends ConsumerState<PhotoView> {
                     final url = ref.watch(
                       photoUrlProvider(fileName: image.fileName),
                     );
-                    return Image.network(url);
+                    // TODO(mloft74): make this touchable
+                    return CachedNetworkImage(
+                      imageUrl: url,
+                      placeholder: (context, _) =>
+                          const CircularProgressIndicator(),
+                    );
                   },
                 );
               },
@@ -126,7 +133,12 @@ class _PhotoViewState extends ConsumerState<PhotoView> {
             SliverPadding(
               padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
               sliver: const SliverToBoxAdapter(
-                child: CircularProgressIndicator(),
+                child: Center(
+                  child: SizedBox.square(
+                    dimension: maxCrossAxisExtent,
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               ),
             ),
           SliverPadding(
