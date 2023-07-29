@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
@@ -24,12 +22,7 @@ class ServerList extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () {
-              unawaited(
-                Navigator.push<void>(
-                  context,
-                  const ManageServer().materialPageRoute(),
-                ),
-              );
+              const ManageServer().pushMaterialRouteUnawaited(context);
             },
             icon: const Icon(Icons.add),
           ),
@@ -45,12 +38,7 @@ class ServerList extends ConsumerWidget {
               children: [
                 FilledButton(
                   onPressed: () {
-                    unawaited(
-                      Navigator.push<void>(
-                        context,
-                        const ManageServer().materialPageRoute(),
-                      ),
-                    );
+                    const ManageServer().pushMaterialRouteUnawaited(context);
                   },
                   child: const Text('Add server'),
                 ),

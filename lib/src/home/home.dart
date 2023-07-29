@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -25,24 +23,14 @@ class Home extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () {
-              unawaited(
-                Navigator.push<void>(
-                  context,
-                  const Settings().materialPageRoute(),
-                ),
-              );
+              const Settings().pushMaterialRouteUnawaited(context);
             },
             icon: const Icon(Icons.settings),
           ),
           if (currentServer case AsyncData(value: Some()))
             IconButton(
               onPressed: () {
-                unawaited(
-                  Navigator.push<void>(
-                    context,
-                    const UploadPhoto().materialPageRoute(),
-                  ),
-                );
+                const UploadPhoto().pushMaterialRouteUnawaited(context);
               },
               icon: const Icon(Icons.add),
             ),

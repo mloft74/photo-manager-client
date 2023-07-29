@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
@@ -18,12 +16,7 @@ class ServerSettings extends ConsumerWidget {
       builder: (context, value) {
         return ListTile(
           onTap: () {
-            unawaited(
-              Navigator.push<void>(
-                context,
-                const ServerList().materialPageRoute(),
-              ),
-            );
+            const ServerList().pushMaterialRouteUnawaited(context);
           },
           title: const Text('Servers'),
           subtitle: value.map((value) => Text(value.name)).nullable,

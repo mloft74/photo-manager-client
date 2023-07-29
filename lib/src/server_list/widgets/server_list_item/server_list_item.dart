@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -86,12 +85,8 @@ class ServerListItem extends HookConsumerWidget {
                   subtitle: Text('${server.uri}'),
                   trailing: IconButton(
                     onPressed: () {
-                      unawaited(
-                        Navigator.push<void>(
-                          context,
-                          ManageServer(server: server).materialPageRoute(),
-                        ),
-                      );
+                      ManageServer(server: server)
+                          .pushMaterialRouteUnawaited(context);
                     },
                     icon: const Icon(Icons.edit),
                   ),

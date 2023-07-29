@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
@@ -16,12 +14,7 @@ class ServerNotSelected extends StatelessWidget {
       children: [
         FilledButton(
           onPressed: () {
-            unawaited(
-              Navigator.push<void>(
-                context,
-                const ServerList().materialPageRoute(),
-              ),
-            );
+            const ServerList().pushMaterialRouteUnawaited(context);
           },
           child: const Text('Select server'),
         ),
