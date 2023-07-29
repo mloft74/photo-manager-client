@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
@@ -27,9 +28,7 @@ class Home extends ConsumerWidget {
               unawaited(
                 Navigator.push<void>(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const Settings(),
-                  ),
+                  const Settings().materialPageRoute(),
                 ),
               );
             },
@@ -41,9 +40,7 @@ class Home extends ConsumerWidget {
                 unawaited(
                   Navigator.push<void>(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const UploadPhoto(),
-                    ),
+                    const UploadPhoto().materialPageRoute(),
                   ),
                 );
               },

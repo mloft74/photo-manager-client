@@ -6,10 +6,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/remove_server_provider.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/update_current_server_provider.dart';
+import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/confirm_server_delete_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class ServerListItem extends HookConsumerWidget {
@@ -39,7 +41,7 @@ class ServerListItem extends HookConsumerWidget {
                 ),
                 confirmDismiss: (direction) async => await showDialog<bool>(
                   context: context,
-                  builder: (context) => _FD(server),
+                  builder: (context) => ConfirmServerDeleteDialog(server),
                 ),
                 onDismissed: (direction) async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -87,9 +89,7 @@ class ServerListItem extends HookConsumerWidget {
                       unawaited(
                         Navigator.push<void>(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => ManageServer(server: server),
-                          ),
+                          ManageServer(server: server).materialPageRoute(),
                         ),
                       );
                     },
@@ -99,32 +99,5 @@ class ServerListItem extends HookConsumerWidget {
               );
             },
           );
-  }
-}
-
-class _FD extends StatelessWidget {
-  final Server server;
-  const _FD(this.server);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Delete ${server.name}?'),
-      content: const Text('This will permanently delete this server'),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context, false);
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context, true);
-          },
-          child: const Text('Delete'),
-        ),
-      ],
-    );
   }
 }

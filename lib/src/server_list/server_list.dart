@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
+import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/servers_provider.dart';
-import 'package:photo_manager_client/src/server_list/widgets/server_list_item.dart';
+import 'package:photo_manager_client/src/server_list/widgets/server_list_item/server_list_item.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -24,8 +25,9 @@ class ServerList extends ConsumerWidget {
           IconButton(
             onPressed: () {
               unawaited(
-                Navigator.of(context).push<void>(
-                  MaterialPageRoute(builder: (context) => const ManageServer()),
+                Navigator.push<void>(
+                  context,
+                  const ManageServer().materialPageRoute(),
                 ),
               );
             },
@@ -46,9 +48,7 @@ class ServerList extends ConsumerWidget {
                     unawaited(
                       Navigator.push<void>(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const ManageServer(),
-                        ),
+                        const ManageServer().materialPageRoute(),
                       ),
                     );
                   },

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
+import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/server_list/server_list.dart';
 
 class ServerNotSelected extends StatelessWidget {
@@ -18,9 +19,7 @@ class ServerNotSelected extends StatelessWidget {
             unawaited(
               Navigator.push<void>(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ServerList(),
-                ),
+                const ServerList().materialPageRoute(),
               ),
             );
           },
