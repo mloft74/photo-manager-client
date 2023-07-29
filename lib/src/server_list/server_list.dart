@@ -35,8 +35,7 @@ class ServerList extends ConsumerWidget {
       ),
       child: AsyncValueBuilder(
         asyncValue: servers,
-        builder: (context, value) {
-          final servers = value.toList();
+        builder: (context, servers) {
           if (servers.isEmpty) {
             return ListView(
               reverse: true,

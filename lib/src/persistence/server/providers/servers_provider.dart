@@ -8,9 +8,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'servers_provider.g.dart';
 
 @riverpod
-Stream<Iterable<Server>> servers(ServersRef ref) {
+Stream<List<Server>> servers(ServersRef ref) {
   final isar = ref.watch(isarProvider);
   return isar.serverDBs.where().watch(fireImmediately: true).map(
-        (event) => event.map((e) => e.toDomain()).whereSome(),
+        (event) => event.map((e) => e.toDomain()).whereSome().toList(),
       );
 }
