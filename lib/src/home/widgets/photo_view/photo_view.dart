@@ -1,118 +1,48 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
-import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/domain/hosted_image.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/providers/models/paginated_photos_state.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/providers/paginated_photos_provider.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/providers/photo_url_provider.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/photos_page_provider.dart';
 
-class PhotoView extends ConsumerStatefulWidget {
-  const PhotoView({super.key});
-
+class NewPhotoView extends HookConsumerWidget {
+  const NewPhotoView({super.key});
   @override
-  ConsumerState<PhotoView> createState() => _PhotoViewState();
-}
-
-class _PhotoViewState extends ConsumerState<PhotoView> {
-  final _controller = ScrollController();
-
-  var _loading = false;
-
-  var _hasNextPage = true;
-  var _cursor = const Option<int>.none();
-  var _images = const <HostedImage>[];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_listenToScrollController);
-    unawaited(_nextPage());
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(_listenToScrollController);
-    super.dispose();
-  }
-
-  void _listenToScrollController() {
-    if (_controller.position.extentAfter < 100.0) {
-      unawaited(_nextPage());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final providerInitialized = useState(false);
+    if (!providerInitialized.value) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        unawaited(ref.read(paginatedPhotosProvider.notifier).nextPage());
+        providerInitialized.value = true;
+      });
     }
-  }
 
-  Future<void> _nextPage() async {
-    if (_loading || !_hasNextPage) {
-      return;
-    }
-    setState(() {
-      _loading = true;
-    });
-    final result = await ref.read(photosPageProvider)(after: _cursor);
-    switch (result) {
-      case Ok(:final value):
-        if (mounted) {
-          setState(() {
-            _loading = false;
-            _cursor = value.cursor;
-            _hasNextPage = _cursor.isSome;
-            _images = _images + value.images;
-          });
-        }
-        _cursor = value.cursor;
-
-      case Err(:final error):
-        log(
-          'error fetching page',
-          name: 'PhotoView | _nextPage',
-          error: error,
-        );
-        if (mounted) {
-          setState(() {
-            _hasNextPage = false;
-            _loading = false;
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error fetching page: $error'),
-              duration: const Duration(seconds: 10),
-            ),
-          );
-        }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+    final state = ref.watch(paginatedPhotosProvider);
     const maxCrossAxisExtent = 256.0;
     return RefreshIndicator(
       onRefresh: () async {
-        setState(() {
-          _hasNextPage = true;
-          _cursor = const None();
-          _images = const [];
-        });
-        await _nextPage();
+        unawaited(
+          ref.read(paginatedPhotosProvider.notifier).refreshImages(),
+        );
       },
       child: CustomScrollView(
         slivers: [
           SliverPadding(
             padding: edgeInsetsForRoutePadding.copyWith(bottom: 0.0),
             sliver: SliverGrid.builder(
-              itemCount: _images.length,
+              itemCount: state.images.length,
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: maxCrossAxisExtent,
                 mainAxisSpacing: 8.0,
                 crossAxisSpacing: 8.0,
               ),
               itemBuilder: (context, index) {
-                final image = _images[index];
+                final image = state.images[index];
                 return Consumer(
                   builder: (context, ref, child) {
                     final url = ref.watch(
@@ -129,18 +59,29 @@ class _PhotoViewState extends ConsumerState<PhotoView> {
               },
             ),
           ),
-          if (_loading)
-            SliverPadding(
-              padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
-              sliver: const SliverToBoxAdapter(
-                child: Center(
-                  child: SizedBox.square(
-                    dimension: maxCrossAxisExtent,
-                    child: CircularProgressIndicator(),
+          switch (state.loading) {
+            Ok(value: PaginatedPhotosLoadingState.ready) =>
+              const SliverPadding(padding: EdgeInsets.zero),
+            Ok(value: PaginatedPhotosLoadingState.loading) => SliverPadding(
+                padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
+                sliver: const SliverToBoxAdapter(
+                  child: Center(
+                    child: SizedBox.square(
+                      dimension: maxCrossAxisExtent,
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
                 ),
               ),
-            ),
+            Err(:final error) => SliverPadding(
+                padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: Center(
+                    child: Text(error, textAlign: TextAlign.center),
+                  ),
+                ),
+              ),
+          },
           SliverPadding(
             padding: edgeInsetsForRoutePadding.copyWith(top: 0.0),
           )
