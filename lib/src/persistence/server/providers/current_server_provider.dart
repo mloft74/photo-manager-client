@@ -9,23 +9,9 @@ part 'current_server_provider.g.dart';
 typedef CurrentServerState = Option<Server>;
 
 @riverpod
-class CurrentServer extends _$CurrentServer {
-  @override
-  FutureOr<CurrentServerState> build() async {
-    final isar = ref.watch(isarProvider);
-    final selectedServer =
-        await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
-    final listener = isar.selectedServerDBs
-        .watchObject(SelectedServerDB.selectedId)
-        .asyncMap(
-          (event) => event.option.andThen((value) => value.toDomain()),
-        )
-        .listen(
-      (event) {
-        state = AsyncValue.data(event);
-      },
-    );
-    ref.onDispose(listener.cancel);
-    return selectedServer.option.andThen((value) => value.toDomain());
-  }
+Stream<CurrentServerState> currentServer(CurrentServerRef ref) {
+  final isar = ref.watch(isarProvider);
+  return isar.selectedServerDBs
+      .watchObject(SelectedServerDB.selectedId, fireImmediately: true)
+      .asyncMap((event) => event.option.andThen((value) => value.toDomain()));
 }
