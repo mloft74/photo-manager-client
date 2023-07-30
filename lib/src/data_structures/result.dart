@@ -273,6 +273,13 @@ extension NestedResult<T extends Object, E extends Object>
       };
 }
 
+extension MatchingResult<T extends Object> on Result<T, T> {
+  T get coalesced => switch (this) {
+        Ok(:final value) => value,
+        Err(:final error) => error,
+      };
+}
+
 /// This is a separate function to reduce the code size of the methods.
 Never _unwrapFailed(String msg, Object error) {
   throw StateError('$msg: $error');

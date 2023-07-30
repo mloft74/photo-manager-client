@@ -5,8 +5,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
+import 'package:photo_manager_client/src/manage_server/pods/test_connection_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/save_server_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -22,9 +24,9 @@ class ManageServer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
-    final nameTextController =
+    final nameTextController = useTextEditingController(text: server?.name);
+    final uriTextController =
         useTextEditingController(text: server?.uri.toString());
-    final uriTextController = useTextEditingController(text: server?.name);
 
     return PhotoManagerScaffold(
       bottomAppBar: const PhotoManagerBottomAppBar(
@@ -55,17 +57,20 @@ class ManageServer extends HookConsumerWidget {
               child: const Text('Save'),
             ),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 final data = _validateForm(
                   formKey: formKey,
                   nameTextController: nameTextController,
                   uriTextController: uriTextController,
                 );
-                if (data case Some()) {
-                  log(
-                    'test connection',
-                    name: 'ManageServer | test connection',
-                  );
+                if (data case Some(:final value)) {
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  final result = await ref.read(testConnectionPod)(value);
+                  final message =
+                      result.map((value) => 'Connection successful').coalesced;
+
+                  scaffoldMessenger
+                      .showSnackBar(SnackBar(content: Text(message)));
                 }
               },
               child: const Text('Test connection'),

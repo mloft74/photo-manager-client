@@ -7,6 +7,7 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,9 +30,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
 
   final response = await get(uri);
   if (response.statusCode != 200) {
-    final reason = response.reasonPhrase ?? 'NO REASON FOUND';
-    final error = 'Reason: $reason, Body: ${response.body}';
-    return Err(error);
+    return response.reasonPhraseErr();
   }
 
   final body = jsonDecode(response.body);
