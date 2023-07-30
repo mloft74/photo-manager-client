@@ -7,7 +7,6 @@ import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/persistence/server/providers/save_server_provider.dart';
-import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -21,9 +20,6 @@ class ManageServer extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO(mloft74): prevent save button from being hit multiple times
-    final serverToSave = useState(const Option<Server>.none());
-
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final nameTextController =
         useTextEditingController(text: server?.uri.toString());
@@ -48,7 +44,11 @@ class ManageServer extends HookConsumerWidget {
                   uriTextController: uriTextController,
                 );
                 if (data case Some(:final value)) {
-                  serverToSave.value = Some(value);
+                  await _onSave(
+                    context: context,
+                    ref: ref,
+                    server: value,
+                  );
                 }
               },
               child: const Text('Save'),
@@ -103,18 +103,6 @@ class ManageServer extends HookConsumerWidget {
                     .nullable;
               },
             ),
-            if (serverToSave.value case Some(value: final serverToSave))
-              AsyncValueBuilder(
-                asyncValue: ref.watch(saveServerProvider(serverToSave)),
-                loadingBuilder: (context) => const Text(
-                  'Saving server...',
-                  textAlign: TextAlign.center,
-                ),
-                builder: (context, value) => const Text(
-                  'Server saved',
-                  textAlign: TextAlign.center,
-                ),
-              ),
           ],
         ),
       ),
@@ -138,4 +126,41 @@ Option<Server> _validateForm({
   return Some(
     Server(name: name, uri: uri),
   );
+}
+
+Future<void> _onSave({
+  required BuildContext context,
+  required WidgetRef ref,
+  required Server server,
+}) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final navigator = Navigator.of(context);
+
+  scaffoldMessenger.showSnackBar(
+    SnackBar(
+      content: Text('Saving ${server.name}'),
+      duration: const Duration(seconds: 1),
+    ),
+  );
+  try {
+    await ref.read(saveServerProvider)(server);
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text('${server.name} saved'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    navigator.pop();
+  } catch (ex, st) {
+    log(
+      'error saving server: $ex',
+      stackTrace: st,
+      name: 'ManageServer | _onSave',
+    );
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text('Error saving ${server.name}: $ex'),
+      ),
+    );
+  }
 }
