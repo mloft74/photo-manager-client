@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
@@ -24,7 +23,6 @@ class ServerListItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final removingServer = useState(false);
-    final serverToSet = useState(const Option<Server>.none());
     final currentServer = ref.watch(currentServerProvider);
 
     return removingServer.value
@@ -63,25 +61,23 @@ class ServerListItem extends HookConsumerWidget {
                 child: ListTile(
                   selected: selected,
                   onTap: () async {
-                    serverToSet.value = Some(server);
-                  },
-                  title: serverToSet.value
-                      .map<Widget>(
-                        (value) => AsyncValueBuilder(
-                          asyncValue:
-                              ref.watch(updateCurrentServerProvider(server)),
-                          loadingBuilder: (context) =>
-                              const CircularProgressIndicator(),
-                          builder: (context, value) {
-                            WidgetsBinding.instance
-                                .addPostFrameCallback((timeStamp) {
-                              serverToSet.value = const None();
-                            });
-                            return const SizedBox.shrink();
-                          },
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+                    try {
+                      await ref.read(updateCurrentServerProvider)(server);
+                    } catch (ex, st) {
+                      log(
+                        'error selecting server: $ex',
+                        stackTrace: st,
+                        name: 'ServerListItem | select server',
+                      );
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text('Error selecting ${server.name}: $ex'),
                         ),
-                      )
-                      .unwrapOrElse(() => Text(server.name)),
+                      );
+                    }
+                  },
+                  title: Text(server.name),
                   subtitle: Text('${server.uri}'),
                   trailing: IconButton(
                     onPressed: () {
