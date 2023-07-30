@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/paginated_photos_pod.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 

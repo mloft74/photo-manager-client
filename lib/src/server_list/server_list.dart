@@ -4,7 +4,7 @@ import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod.dart';
-import 'package:photo_manager_client/src/server_list/widgets/server_list_item/server_list_item.dart';
+import 'package:photo_manager_client/src/server_list/widgets/server_list_item.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';

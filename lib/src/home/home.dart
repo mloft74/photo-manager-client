@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/photo_view.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';

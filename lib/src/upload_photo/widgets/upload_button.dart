@@ -6,9 +6,9 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
-import 'package:photo_manager_client/src/upload_photo/pods/errors/upload_photo_error.dart';
-import 'package:photo_manager_client/src/upload_photo/pods/photo_pod.dart';
-import 'package:photo_manager_client/src/upload_photo/pods/upload_photo_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/errors/upload_photo_error.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/photo_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 
 class UploadButton extends ConsumerWidget {
   const UploadButton({

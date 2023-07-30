@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/upload_photo/pods/errors/upload_photo_error.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/errors/upload_photo_error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'upload_photo_pod.g.dart';
