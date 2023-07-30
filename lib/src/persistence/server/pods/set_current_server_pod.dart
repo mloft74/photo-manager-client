@@ -5,9 +5,9 @@ import 'package:photo_manager_client/src/persistence/server/models/selected_serv
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'update_current_server_pod.g.dart';
+part 'set_current_server_pod.g.dart';
 
-Future<void> _updateCurrentServer(Isar isar, Server server) async {
+Future<void> _setCurrentServer(Isar isar, Server server) async {
   final (serverDb, selected) = await isar.txn(() async {
     final serverDb = await isar.serverDBs.getByName(server.name);
     final selected =
@@ -25,10 +25,10 @@ Future<void> _updateCurrentServer(Isar isar, Server server) async {
 }
 
 @riverpod
-Future<void> Function(Server server) updateCurrentServer(
-  UpdateCurrentServerRef ref,
+Future<void> Function(Server server) setCurrentServer(
+  SetCurrentServerRef ref,
 ) {
   final isar = ref.watch(isarPod);
 
-  return (server) => _updateCurrentServer(isar, server);
+  return (server) => _setCurrentServer(isar, server);
 }

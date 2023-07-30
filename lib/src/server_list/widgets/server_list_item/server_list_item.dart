@@ -8,7 +8,7 @@ import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/remove_server_pod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/update_current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/set_current_server_pod.dart';
 import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/confirm_server_delete_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
@@ -63,7 +63,7 @@ class ServerListItem extends HookConsumerWidget {
                   onTap: () async {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
                     try {
-                      await ref.read(updateCurrentServerPod)(server);
+                      await ref.read(setCurrentServerPod)(server);
                     } catch (ex, st) {
                       log(
                         'error selecting server: $ex',
