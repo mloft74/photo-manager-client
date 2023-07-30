@@ -64,13 +64,11 @@ class ManageServer extends HookConsumerWidget {
                   uriTextController: uriTextController,
                 );
                 if (data case Some(:final value)) {
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  final result = await ref.read(testConnectionPod)(value);
-                  final message =
-                      result.map((value) => 'Connection successful').coalesced;
-
-                  scaffoldMessenger
-                      .showSnackBar(SnackBar(content: Text(message)));
+                  await _onTestConnection(
+                    context: context,
+                    ref: ref,
+                    server: value,
+                  );
                 }
               },
               child: const Text('Test connection'),
@@ -168,4 +166,27 @@ Future<void> _onSave({
       ),
     );
   }
+}
+
+Future<void> _onTestConnection({
+  required BuildContext context,
+  required WidgetRef ref,
+  required Server server,
+}) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  String message;
+  try {
+    final result = await ref.read(testConnectionPod)(server);
+    message = result.map((value) => 'Connection successful').coalesced;
+  } catch (ex, st) {
+    log(
+      'error connecting to server',
+      name: 'ManageServer',
+      error: ex,
+      stackTrace: st,
+    );
+    message = 'Error connecting to server: $ex';
+  }
+
+  scaffoldMessenger.showSnackBar(SnackBar(content: Text(message)));
 }
