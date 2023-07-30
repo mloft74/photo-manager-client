@@ -21,9 +21,8 @@ class PaginatedPhotos extends _$PaginatedPhotos {
     _hasNextPage = true;
 
     final fetchPhotosPage = ref.watch(fetchPhotosPageProvider);
-    final result = await fetchPhotosPage(
-      _cursor,
-    );
+    final result =
+        await fetchPhotosPage.andThenAsync((value) => value(_cursor));
     return _stateFromResult(
       result,
       const PaginatedPhotosState(
@@ -48,8 +47,8 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       );
 
       final fetchPhotosPage = ref.read(fetchPhotosPageProvider);
-      final result = await fetchPhotosPage(
-        _cursor,
+      final result = await fetchPhotosPage.andThenAsync(
+        (value) => value(_cursor),
       );
       state = AsyncData(_stateFromResult(result, stateData));
     }

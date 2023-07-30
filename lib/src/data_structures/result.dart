@@ -87,10 +87,10 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// This function can be used to unpack a successful
   /// result while handling an error.
-  U mapOrElse<U extends Object>(
-    U Function(E error) orElse,
-    U Function(T value) map,
-  ) =>
+  U mapOrElse<U extends Object>({
+    required U Function(E error) orElse,
+    required U Function(T value) map,
+  }) =>
       switch (this) {
         Ok(:final value) => map(value),
         Err(:final error) => orElse(error),
@@ -198,6 +198,14 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   Result<U, E> andThen<U extends Object>(Result<U, E> Function(T value) fn) =>
       switch (this) {
         Ok(:final value) => fn(value),
+        Err(:final error) => Err(error),
+      };
+
+  Future<Result<U, E>> andThenAsync<U extends Object>(
+    Future<Result<U, E>> Function(T value) fn,
+  ) async =>
+      switch (this) {
+        Ok(:final value) => await fn(value),
         Err(:final error) => Err(error),
       };
 

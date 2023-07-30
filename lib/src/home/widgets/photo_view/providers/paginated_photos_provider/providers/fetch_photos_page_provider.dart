@@ -8,12 +8,14 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/providers/paginated_photos_provider/models/photos_page.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/current_server_unchecked_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/providers/current_server_result_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fetch_photos_page_provider.g.dart';
 
-Future<Result<PhotosPage, String>> _fetchPhotosPage(
+typedef FetchPhotosPageResult = Result<PhotosPage, String>;
+
+Future<FetchPhotosPageResult> _fetchPhotosPage(
   Server server,
   Option<int> after,
 ) async {
@@ -62,10 +64,15 @@ Future<Result<PhotosPage, String>> _fetchPhotosPage(
   }
 }
 
+typedef FetchPhotosPageFn = Future<FetchPhotosPageResult> Function(
+  Option<int> after,
+);
+
 @riverpod
-Future<Result<PhotosPage, String>> Function(Option<int> after) fetchPhotosPage(
+Result<FetchPhotosPageFn, String> fetchPhotosPage(
   FetchPhotosPageRef ref,
 ) {
-  final server = ref.watch(currentServerUncheckedProvider);
-  return (after) => _fetchPhotosPage(server, after);
+  final server = ref.watch(currentServerResultProvider);
+  return server
+      .map((value) => (after) async => await _fetchPhotosPage(value, after));
 }

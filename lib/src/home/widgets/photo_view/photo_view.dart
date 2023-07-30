@@ -40,13 +40,16 @@ class NewPhotoView extends ConsumerWidget {
                           photoUrlProvider(fileName: image.fileName),
                         );
                         // TODO(mloft74): make this touchable
-                        return CachedNetworkImage(
-                          imageUrl: url,
-                          progressIndicatorBuilder: (context, url, progress) {
-                            return CircularProgressIndicator(
-                              value: progress.progress,
-                            );
-                          },
+                        return url.mapOrElse(
+                          orElse: Text.new,
+                          map: (value) => CachedNetworkImage(
+                            imageUrl: value,
+                            progressIndicatorBuilder: (context, url, progress) {
+                              return CircularProgressIndicator(
+                                value: progress.progress,
+                              );
+                            },
+                          ),
                         );
                       },
                     );
