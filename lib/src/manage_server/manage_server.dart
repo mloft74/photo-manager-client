@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/save_server_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -75,16 +76,8 @@ class ManageServer extends HookConsumerWidget {
                 helperText: '',
                 hintText: 'Server uri',
               ),
-              validator: (value) {
-                return value.option
-                    .andThen((value) => value.isNotEmptyOption)
-                    .andThen((value) => Uri.tryParse(value).option)
-                    .mapOrElse(
-                      orElse: () => const Some('Invalid URI'),
-                      map: (value) => const None<String>(),
-                    )
-                    .nullable;
-              },
+              validator: (value) =>
+                  value.option.pipe(_validateServerUri).nullable,
             ),
             TextFormField(
               enabled: server == null,
@@ -93,15 +86,8 @@ class ManageServer extends HookConsumerWidget {
                 helperText: '',
                 hintText: 'Server name',
               ),
-              validator: (value) {
-                return value.option
-                    .andThen((value) => value.isNotEmptyOption)
-                    .mapOrElse(
-                      orElse: () => const Some('Please provide a name'),
-                      map: (value) => const None<String>(),
-                    )
-                    .nullable;
-              },
+              validator: (value) =>
+                  value.option.pipe(_validateServerName).nullable,
             ),
           ],
         ),
@@ -109,6 +95,20 @@ class ManageServer extends HookConsumerWidget {
     );
   }
 }
+
+Option<String> _validateServerUri(Option<String> value) => value
+    .andThen((value) => value.isNotEmptyOption)
+    .andThen((value) => Uri.tryParse(value).option)
+    .mapOrElse(
+      orElse: () => const Some('Invalid URI'),
+      map: (value) => const None<String>(),
+    );
+
+Option<String> _validateServerName(Option<String> value) =>
+    value.andThen((value) => value.isNotEmptyOption).mapOrElse(
+          orElse: () => const Some('Please provide a name'),
+          map: (value) => const None<String>(),
+        );
 
 Option<Server> _validateForm({
   required GlobalKey<FormState> formKey,
