@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/models/paginated_photos_state.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/paginated_photos_provider/paginated_photos_provider.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/photo_url_provider.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/paginated_photos_pod.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class NewPhotoView extends ConsumerWidget {
@@ -14,12 +14,12 @@ class NewPhotoView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AsyncValueBuilder(
-      asyncValue: ref.watch(paginatedPhotosProvider),
+      asyncValue: ref.watch(paginatedPhotosPod),
       builder: (context, state) {
         const maxCrossAxisExtent = 256.0;
         return RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(paginatedPhotosProvider);
+            ref.invalidate(paginatedPhotosPod);
           },
           child: CustomScrollView(
             slivers: [
@@ -37,7 +37,7 @@ class NewPhotoView extends ConsumerWidget {
                     return Consumer(
                       builder: (context, ref, child) {
                         final url = ref.watch(
-                          photoUrlProvider(fileName: image.fileName),
+                          photoUrlPod(fileName: image.fileName),
                         );
                         // TODO(mloft74): make this touchable
                         return url.mapOrElse(

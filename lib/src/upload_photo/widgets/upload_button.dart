@@ -5,10 +5,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
-import 'package:photo_manager_client/src/upload_photo/providers/errors/upload_photo_error.dart';
-import 'package:photo_manager_client/src/upload_photo/providers/photo_provider.dart';
-import 'package:photo_manager_client/src/upload_photo/providers/upload_photo_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/pods/errors/upload_photo_error.dart';
+import 'package:photo_manager_client/src/upload_photo/pods/photo_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/pods/upload_photo_pod.dart';
 
 class UploadButton extends ConsumerWidget {
   const UploadButton({
@@ -17,11 +17,11 @@ class UploadButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final photo = switch (ref.watch(photoProvider)) {
+    final photo = switch (ref.watch(photoPod)) {
       AsyncData(:final value) => value,
       _ => const None<PhotoStateValue>(),
     };
-    final currentServer = switch (ref.watch(currentServerProvider)) {
+    final currentServer = switch (ref.watch(currentServerPod)) {
       AsyncData(:final value) => value,
       _ => const None<Server>(),
     };
@@ -39,7 +39,7 @@ class UploadButton extends ConsumerWidget {
                   duration: const Duration(seconds: 1),
                 ),
               );
-              final res = await ref.read(uploadPhotoProvider)(
+              final res = await ref.read(uploadPhotoPod)(
                 path: path,
                 serverUri: server.uri,
               );

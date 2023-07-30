@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/save_server_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/save_server_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -143,7 +143,7 @@ Future<void> _onSave({
     ),
   );
   try {
-    await ref.read(saveServerProvider)(server);
+    await ref.read(saveServerPod)(server);
     scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Text('${server.name} saved'),

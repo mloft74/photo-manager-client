@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_manager_client/src/persistence/isar_provider.dart';
+import 'package:photo_manager_client/src/persistence/isar_pod.dart';
 import 'package:photo_manager_client/src/persistence/schemas.dart';
 import 'package:photo_manager_client/src/photo_manager_app.dart';
 
@@ -33,7 +33,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
-        isarProvider.overrideWithValue(isar),
+        isarPod.overrideWithValue(isar),
       ],
       child: const PhotoManagerApp(),
     ),

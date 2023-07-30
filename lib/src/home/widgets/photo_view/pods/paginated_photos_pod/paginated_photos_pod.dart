@@ -3,12 +3,12 @@ import 'dart:developer';
 
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/models/paginated_photos_state.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/paginated_photos_provider/models/photos_page.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/paginated_photos_provider/providers/fetch_photos_page_provider.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/pods/fetch_photos_page_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'paginated_photos_provider.g.dart';
+part 'paginated_photos_pod.g.dart';
 
 @riverpod
 class PaginatedPhotos extends _$PaginatedPhotos {
@@ -20,7 +20,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
     _cursor = const None();
     _hasNextPage = true;
 
-    final fetchPhotosPage = ref.watch(fetchPhotosPageProvider);
+    final fetchPhotosPage = ref.watch(fetchPhotosPagePod);
     final result =
         await fetchPhotosPage.andThenAsync((value) => value(_cursor));
     return _stateFromResult(
@@ -46,7 +46,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
         ),
       );
 
-      final fetchPhotosPage = ref.read(fetchPhotosPageProvider);
+      final fetchPhotosPage = ref.read(fetchPhotosPagePod);
       final result = await fetchPhotosPage.andThenAsync(
         (value) => value(_cursor),
       );
@@ -70,7 +70,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       case Err(:final error):
         log(
           'error fetching page',
-          name: 'paginatedPhotosProvider | nextPage',
+          name: 'paginatedPhotosPod | nextPage',
           error: error,
         );
 

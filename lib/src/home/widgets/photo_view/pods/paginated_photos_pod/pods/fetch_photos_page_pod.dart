@@ -7,11 +7,11 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/providers/paginated_photos_provider/models/photos_page.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/current_server_result_provider.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'fetch_photos_page_provider.g.dart';
+part 'fetch_photos_page_pod.g.dart';
 
 typedef FetchPhotosPageResult = Result<PhotosPage, String>;
 
@@ -25,7 +25,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
     or: countParam,
   );
   final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
-  log('uri: $uri', name: 'photosPageProvider');
+  log('uri: $uri', name: 'photosPagePod');
 
   final response = await get(uri);
   if (response.statusCode != 200) {
@@ -72,7 +72,7 @@ typedef FetchPhotosPageFn = Future<FetchPhotosPageResult> Function(
 Result<FetchPhotosPageFn, String> fetchPhotosPage(
   FetchPhotosPageRef ref,
 ) {
-  final server = ref.watch(currentServerResultProvider);
+  final server = ref.watch(currentServerResultPod);
   return server
       .map((value) => (after) async => await _fetchPhotosPage(value, after));
 }

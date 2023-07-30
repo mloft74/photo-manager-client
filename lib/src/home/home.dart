@@ -4,7 +4,7 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
@@ -16,7 +16,7 @@ class Home extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentServer = ref.watch(currentServerProvider);
+    final currentServer = ref.watch(currentServerPod);
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
         titleText: 'Home',

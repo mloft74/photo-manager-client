@@ -1,7 +1,7 @@
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'photo_provider.g.dart';
+part 'photo_pod.g.dart';
 
 typedef PhotoStateValue = String;
 typedef PhotoState = Option<PhotoStateValue>;

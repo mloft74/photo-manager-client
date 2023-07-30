@@ -6,9 +6,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/current_server_provider.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/remove_server_provider.dart';
-import 'package:photo_manager_client/src/persistence/server/providers/update_current_server_provider.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/remove_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/update_current_server_pod.dart';
 import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/confirm_server_delete_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
@@ -23,7 +23,7 @@ class ServerListItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final removingServer = useState(false);
-    final currentServer = ref.watch(currentServerProvider);
+    final currentServer = ref.watch(currentServerPod);
 
     return removingServer.value
         ? const SizedBox.shrink()
@@ -44,7 +44,7 @@ class ServerListItem extends HookConsumerWidget {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
                   removingServer.value = true;
                   try {
-                    await ref.read(removeServerProvider)(server);
+                    await ref.read(removeServerPod)(server);
                   } catch (ex, st) {
                     log(
                       'error removing server: $ex',
@@ -63,7 +63,7 @@ class ServerListItem extends HookConsumerWidget {
                   onTap: () async {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
                     try {
-                      await ref.read(updateCurrentServerProvider)(server);
+                      await ref.read(updateCurrentServerPod)(server);
                     } catch (ex, st) {
                       log(
                         'error selecting server: $ex',

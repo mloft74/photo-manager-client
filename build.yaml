@@ -11,3 +11,6 @@ targets:
             map: false
             map_or_null: false
             maybe_map: false
+      riverpod_generator:
+        options:
+          provider_name_suffix: "Pod"
