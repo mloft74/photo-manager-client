@@ -17,6 +17,9 @@ class PaginatedPhotos extends _$PaginatedPhotos {
 
   @override
   Future<PaginatedPhotosState> build() async {
+    _cursor = const None();
+    _hasNextPage = true;
+
     final fetchPhotosPage = ref.watch(fetchPhotosPageProvider);
     final result = await fetchPhotosPage(
       _cursor,
@@ -28,19 +31,6 @@ class PaginatedPhotos extends _$PaginatedPhotos {
         images: [],
       ),
     );
-  }
-
-  Future<void> refreshImages() async {
-    _cursor = const None();
-    _hasNextPage = true;
-    state = const AsyncData(
-      PaginatedPhotosState(
-        loading: Ok(PaginatedPhotosLoadingState.ready),
-        images: [],
-      ),
-    );
-
-    await nextPage();
   }
 
   Future<void> nextPage() async {

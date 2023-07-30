@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,9 +19,7 @@ class NewPhotoView extends ConsumerWidget {
         const maxCrossAxisExtent = 256.0;
         return RefreshIndicator(
           onRefresh: () async {
-            unawaited(
-              ref.read(paginatedPhotosProvider.notifier).refreshImages(),
-            );
+            ref.invalidate(paginatedPhotosProvider);
           },
           child: CustomScrollView(
             slivers: [
