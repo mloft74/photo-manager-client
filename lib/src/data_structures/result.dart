@@ -21,6 +21,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   const factory Result.err(E error) = Err;
 
   /// Returns `true` if the result is [Ok].
+  @useResult
   bool get isOk => switch (this) {
         Ok() => true,
         Err() => false,
@@ -28,28 +29,33 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
 
   /// Returns `true` if the result is [Ok]
   /// and the value inside of it matches a predicate.
+  @useResult
   bool isOkAnd(bool Function(T value) fn) => switch (this) {
         Ok(:final value) => fn(value),
         Err() => false,
       };
 
   /// Returns `true` if the result is [Err].
+  @useResult
   bool get isErr => !isOk;
 
   /// Returns `true` if the result is [Err]
   /// and the value inside of it matches a predicate.
+  @useResult
   bool isErrAnd(bool Function(E error) fn) => switch (this) {
         Ok() => false,
         Err(:final error) => fn(error),
       };
 
   /// Converts from [Result] of [T] and [E] to [Option] of [T].
+  @useResult
   Option<T> get ok => switch (this) {
         Ok(:final value) => Some(value),
         Err() => None<T>(),
       };
 
   /// Converts from [Result] of [T] and [E] to [Option] of [E].
+  @useResult
   Option<E> get err => switch (this) {
         Ok() => None<E>(),
         Err(:final error) => Some(error),
@@ -60,6 +66,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// leaving an [Err] value untouched.
   ///
   /// This function can be used to compose the results of two functions.
+  @useResult
   Result<U, E> map<U extends Object>(U Function(T value) fn) => switch (this) {
         Ok(:final value) => Ok(fn(value)),
         Err(:final error) => Err(error),
@@ -72,6 +79,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// if you are passing the result of a function call,
   /// it is recommended to use [mapOrElse],
   /// which is lazily evaluated.
+  @useResult
   U mapOr<U extends Object>({
     required U or,
     required U Function(T value) map,
@@ -87,6 +95,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// This function can be used to unpack a successful
   /// result while handling an error.
+  @useResult
   U mapOrElse<U extends Object>({
     required U Function(E error) orElse,
     required U Function(T value) map,
@@ -102,6 +111,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// This function can be used to pass through a successful
   /// result while handling an error.
+  @useResult
   Result<T, F> mapErr<F extends Object>(F Function(E error) fn) =>
       switch (this) {
         Ok(:final value) => Ok(value),
@@ -109,6 +119,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
       };
 
   /// Calls the provided closure with a reference to the contained value (if [Ok]).
+  @useResult
   () inspect(() Function(T value) fn) {
     if (this case Ok(:final value)) {
       fn(value);
@@ -117,6 +128,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   }
 
   /// Calls the provided closure with a reference to the contained error (if [Err]).
+  @useResult
   () inspectErr(() Function(E error) fn) {
     if (this case Err(:final error)) {
       fn(error);
@@ -127,6 +139,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// Returns an iterable over the possibly contained value.
   ///
   /// The iterator yields one value if the result is [Ok], otherwise none.
+  @useResult
   Iterable<T> get iterable => switch (this) {
         Ok(:final value) => [value],
         Err() => [],
@@ -141,6 +154,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// Throws a [StateError] if the value is an [Err]
   /// with a custom error message provided by [msg] and the content of [Err].
+  @useResult
   T expect(String msg) => switch (this) {
         Ok(:final value) => value,
         Err(:final error) => _unwrapFailed(msg, error),
@@ -155,6 +169,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// Throws a [StateError] if the value is an [Err]
   /// with an error message provided by the [Err]'s value.
+  @useResult
   T unwrap() => switch (this) {
         Ok(:final value) => value,
         Err(:final error) =>
@@ -165,6 +180,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// Throws a [StateError] if the value is an [Ok]
   /// with a custom error message provided by [msg] and the content of [Ok].
+  @useResult
   E expectErr(String msg) => switch (this) {
         Ok(:final value) => _unwrapFailed(msg, value),
         Err(:final error) => error,
@@ -174,6 +190,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   ///
   /// Throws a [StateError] if the value is an [Ok]
   /// with an error message provided by the [Ok]'s value.
+  @useResult
   E unwrapErr() => switch (this) {
         Ok(:final value) =>
           _unwrapFailed('called `Result.unwrapErr()` on an `Ok` value', value),
@@ -187,6 +204,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// if you are passing the result of a function call,
   /// it is recommended to use [andThen],
   /// which is lazily evaluated.
+  @useResult
   Result<U, E> and<U extends Object>(Result<U, E> other) => switch (this) {
         Ok() => other,
         Err(:final error) => Err(error),
@@ -197,12 +215,14 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// This function can be used for control flow based on [Result] values.
   ///
   /// Often used to chain fallible operations that may return [Err].
+  @useResult
   Result<U, E> andThen<U extends Object>(Result<U, E> Function(T value) fn) =>
       switch (this) {
         Ok(:final value) => fn(value),
         Err(:final error) => Err(error),
       };
 
+  @useResult
   Future<Result<U, E>> andThenAsync<U extends Object>(
     Future<Result<U, E>> Function(T value) fn,
   ) =>
@@ -218,6 +238,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// if you are passing the result of a function call,
   /// it is recommended to use [orElse],
   /// which is lazily evaluated.
+  @useResult
   Result<T, F> or<F extends Object>(Result<T, F> res) => switch (this) {
         Ok(:final value) => Ok(value),
         Err() => res,
@@ -227,6 +248,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// otherwise returns the [Ok] value of this.
   ///
   /// This function can be used for control flow based on result values.
+  @useResult
   Result<T, F> orElse<F extends Object>(Result<T, F> Function(E error) fn) =>
       switch (this) {
         Ok(:final value) => Ok(value),
@@ -239,12 +261,14 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
   /// if you are passing the result of a function call,
   /// it is recommended to use [unwrapOrElse],
   /// which is lazily evaluated.
+  @useResult
   T unwrapOr(T defaultValue) => switch (this) {
         Ok(:final value) => value,
         Err() => defaultValue,
       };
 
   /// Returns the contained [Ok] value or computes it from a closure.
+  @useResult
   T unwrapOrElse(T Function(E error) fn) => switch (this) {
         Ok(:final value) => value,
         Err(:final error) => fn(error),
@@ -258,6 +282,7 @@ extension ResultOptionExtension<T extends Object, E extends Object>
   /// [Ok] with [None] will be mapped to [None].
   /// [Ok] with [Some] and [Err] will be
   /// mapped to [Some] with [Ok] and [Some] with [Err].
+  @useResult
   Option<Result<T, E>> get transposed => switch (this) {
         Ok(value: Some(:final value)) => Some(Ok(value)),
         Ok(value: None()) => None<Result<T, E>>(),
@@ -269,6 +294,7 @@ extension NestedResult<T extends Object, E extends Object>
     on Result<Result<T, E>, E> {
   /// Converts from [Result] of [Result] of [T] and [E] and [E]
   /// to [Result] of [T] and [E].
+  @useResult
   Result<T, E> get flattened => switch (this) {
         Ok(:final value) => value,
         Err(:final error) => Err(error),
@@ -276,6 +302,7 @@ extension NestedResult<T extends Object, E extends Object>
 }
 
 extension MatchingResult<T extends Object> on Result<T, T> {
+  @useResult
   T get coalesced => switch (this) {
         Ok(:final value) => value,
         Err(:final error) => error,
