@@ -33,13 +33,13 @@ class PaginatedPhotos extends _$PaginatedPhotos {
     );
   }
 
-  Future<void> nextPage() async {
+  Future<()> nextPage() async {
     if (state case AsyncData(value: final stateData)) {
       final shouldShortCircuitLoading = stateData.loading
           .map((value) => value == PaginatedPhotosLoadingState.loading)
           .unwrapOr(true);
       if (shouldShortCircuitLoading || !_hasNextPage) {
-        return;
+        return ();
       }
       state = AsyncData(
         stateData.copyWith(
@@ -53,6 +53,8 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       );
       state = AsyncData(_stateFromResult(result, stateData));
     }
+
+    return ();
   }
 
   PaginatedPhotosState _stateFromResult(

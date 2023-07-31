@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'remove_server_pod.g.dart';
 
-Future<void> _removeServer(Isar isar, Server server) async {
+Future<()> _removeServer(Isar isar, Server server) async {
   final selected =
       await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
   // This load needs to be performed outside of the transaction,
@@ -22,10 +22,12 @@ Future<void> _removeServer(Isar isar, Server server) async {
     }
     await isar.serverDBs.deleteByName(server.name);
   });
+
+  return ();
 }
 
 @riverpod
-Future<void> Function(Server server) removeServer(RemoveServerRef ref) {
+Future<()> Function(Server server) removeServer(RemoveServerRef ref) {
   final isar = ref.watch(isarPod);
   return (server) => _removeServer(isar, server);
 }

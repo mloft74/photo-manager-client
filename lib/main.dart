@@ -9,7 +9,7 @@ import 'package:photo_manager_client/src/persistence/isar_pod.dart';
 import 'package:photo_manager_client/src/persistence/schemas.dart';
 import 'package:photo_manager_client/src/photo_manager_app.dart';
 
-Future<void> main() async {
+Future<()> main() async {
   // FlutterError.onError can be assigned to if custom error handling is needed.
 
   PlatformDispatcher.instance.onError = (exception, stackTrace) {
@@ -38,4 +38,6 @@ Future<void> main() async {
       child: const PhotoManagerApp(),
     ),
   );
+
+  return ();
 }

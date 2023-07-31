@@ -131,7 +131,7 @@ Option<Server> _validateForm({
   );
 }
 
-Future<void> _onSave({
+Future<()> _onSave({
   required BuildContext context,
   required WidgetRef ref,
   required Server server,
@@ -166,9 +166,11 @@ Future<void> _onSave({
       ),
     );
   }
+
+  return ();
 }
 
-Future<void> _onTestConnection({
+Future<()> _onTestConnection({
   required BuildContext context,
   required WidgetRef ref,
   required Server server,
@@ -189,4 +191,6 @@ Future<void> _onTestConnection({
   }
 
   scaffoldMessenger.showSnackBar(SnackBar(content: Text(message)));
+
+  return ();
 }

@@ -13,8 +13,9 @@ class Photo extends _$Photo {
     return const None();
   }
 
-  Future<void> updateAsync(Future<PhotoState> Function() fn) async {
+  Future<()> updateAsync(Future<PhotoState> Function() fn) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(fn);
+    return ();
   }
 }

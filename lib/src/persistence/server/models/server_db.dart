@@ -14,6 +14,9 @@ class ServerDB {
 
   ServerDB({required this.name, required this.uri});
 
+  ServerDB.fromDomain(Server server)
+      : this(name: server.name, uri: server.uri.toString());
+
   Option<Server> toDomain() {
     return Uri.tryParse(uri).option.map((uri) => Server(name: name, uri: uri));
   }

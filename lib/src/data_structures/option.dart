@@ -12,6 +12,10 @@ extension NullableTToOptionExtension<T extends Object> on T? {
   Option<T> get option => Option.from(this);
 }
 
+extension FutureNullableToOptionExtension<T extends Object> on Future<T?> {
+  Future<Option<T>> get futureOption => then((value) => value.option);
+}
+
 extension StringToOptionExtension on String {
   Option<String> get isNotEmptyOption => isNotEmpty ? Some(this) : const None();
 }
@@ -108,10 +112,11 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   /// Calls the provided closure with a reference
   /// to the contained value (if [Some]).
-  void inspect(void Function(T value) fn) {
+  () inspect(() Function(T value) fn) {
     if (this case Some(:final value)) {
       fn(value);
     }
+    return ();
   }
 
   /// Returns the provided default result (if [None]),
@@ -191,10 +196,10 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   Future<Option<U>> andThenAsync<U extends Object>(
     Future<Option<U>> Function(T value) fn,
-  ) async =>
+  ) =>
       switch (this) {
-        Some(:final value) => await fn(value),
-        None() => None<U>(),
+        Some(:final value) => fn(value),
+        None() => Future.value(None<U>()),
       };
 
   /// Returns [None] if the option is [None],
@@ -316,8 +321,8 @@ extension StreamOptionExtension<T extends Object> on Stream<Option<T>> {
 }
 
 extension OptionFutureExtension<T extends Object> on Option<Future<T>> {
-  Future<Option<T>> transpose() async => switch (this) {
-        Some(:final value) => Some(await value),
-        None() => None<T>(),
+  Future<Option<T>> transpose() => switch (this) {
+        Some(:final value) => value.then(Some.new),
+        None() => Future.value(None<T>()),
       };
 }

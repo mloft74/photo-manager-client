@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'set_current_server_pod.g.dart';
 
-Future<void> _setCurrentServer(Isar isar, Server server) async {
+Future<()> _setCurrentServer(Isar isar, Server server) async {
   final (serverDb, selected) = await isar.txn(() async {
     final serverDb = await isar.serverDBs.getByName(server.name);
     final selected =
@@ -22,10 +22,12 @@ Future<void> _setCurrentServer(Isar isar, Server server) async {
     innerSelected.server.value = serverDb;
     await innerSelected.server.save();
   });
+
+  return ();
 }
 
 @riverpod
-Future<void> Function(Server server) setCurrentServer(
+Future<()> Function(Server server) setCurrentServer(
   SetCurrentServerRef ref,
 ) {
   final isar = ref.watch(isarPod);

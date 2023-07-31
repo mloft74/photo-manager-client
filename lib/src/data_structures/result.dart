@@ -109,17 +109,19 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
       };
 
   /// Calls the provided closure with a reference to the contained value (if [Ok]).
-  void inspect(void Function(T value) fn) {
+  () inspect(() Function(T value) fn) {
     if (this case Ok(:final value)) {
       fn(value);
     }
+    return ();
   }
 
   /// Calls the provided closure with a reference to the contained error (if [Err]).
-  void inspectErr(void Function(E error) fn) {
+  () inspectErr(() Function(E error) fn) {
     if (this case Err(:final error)) {
       fn(error);
     }
+    return ();
   }
 
   /// Returns an iterable over the possibly contained value.
@@ -203,10 +205,10 @@ sealed class Result<T extends Object, E extends Object> with _$Result {
 
   Future<Result<U, E>> andThenAsync<U extends Object>(
     Future<Result<U, E>> Function(T value) fn,
-  ) async =>
+  ) =>
       switch (this) {
-        Ok(:final value) => await fn(value),
-        Err(:final error) => Err(error),
+        Ok(:final value) => fn(value),
+        Err(:final error) => Future.value(Err(error)),
       };
 
   /// Returns [res] if the result is [Err],
