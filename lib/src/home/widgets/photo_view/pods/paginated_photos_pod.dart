@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
@@ -27,7 +28,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       result,
       const PaginatedPhotosState(
         loading: Ok(PaginatedPhotosLoadingState.loading),
-        images: [],
+        images: IListConst([]),
       ),
     );
   }
