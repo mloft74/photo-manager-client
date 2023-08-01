@@ -17,59 +17,25 @@ class UploadButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final photo = switch (ref.watch(photoPod)) {
-      AsyncData(:final value) => value,
-      _ => const None<PhotoStateValue>(),
-    };
-    final currentServer = switch (ref.watch(currentServerPod)) {
-      AsyncData(:final value) => value,
-      _ => const None<Server>(),
-    };
+    final photoPath =
+        ref.watch(photoPod).asData.option.andThen((value) => value.value);
+    final currentServer = ref
+        .watch(currentServerPod)
+        .asData
+        .option
+        .andThen((value) => value.value);
 
     return FilledButton.icon(
-      onPressed: photo
+      onPressed: photoPath
           .zip(currentServer)
           .map(
             (value) => () async {
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              final (path, server) = value;
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text('Uploading $path'),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-              final res = await ref.read(uploadPhotoPod)(
-                path: path,
-                serverUri: server.uri,
-              );
-              final String msg;
-              final Duration duration;
-              switch (res) {
-                case Ok():
-                  msg = 'Upload finished';
-                  duration = const Duration(seconds: 1);
-                case Err(error: ImageAlreadyExists()):
-                  msg = 'Image already exists';
-                  duration = const Duration(seconds: 4);
-                case Err(error: GeneralMessage(:final message)):
-                  msg = message;
-                  duration = const Duration(seconds: 4);
-                case Err(error: ExceptionOccurred(:final ex, :final st)):
-                  log(
-                    'error uploading photo $path',
-                    error: ex,
-                    stackTrace: st,
-                    name: 'UploadButton | onPressed',
-                  );
-                  msg = ex.toString();
-                  duration = const Duration(seconds: 4);
-              }
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text(msg),
-                  duration: duration,
-                ),
+              final (photoPath, server) = value;
+              await _onButtonPressed(
+                context: context,
+                ref: ref,
+                photoPath: photoPath,
+                server: server,
               );
             },
           )
@@ -78,4 +44,56 @@ class UploadButton extends ConsumerWidget {
       label: const Text('Upload'),
     );
   }
+}
+
+Future<()> _onButtonPressed({
+  required BuildContext context,
+  required WidgetRef ref,
+  required String photoPath,
+  required Server server,
+}) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context)
+    ..showSnackBar(
+      SnackBar(
+        content: Text('Uploading $photoPath'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+
+  final res = await ref.read(uploadPhotoPod)(
+    path: photoPath,
+    serverUri: server.uri,
+  );
+
+  final String msg;
+  final Duration duration;
+  switch (res) {
+    case Ok():
+      msg = 'Upload finished';
+      duration = const Duration(seconds: 1);
+    case Err(error: ImageAlreadyExists()):
+      msg = 'Image already exists';
+      duration = const Duration(seconds: 4);
+    case Err(error: GeneralMessage(:final message)):
+      msg = message;
+      duration = const Duration(seconds: 4);
+    case Err(error: ExceptionOccurred(:final ex, :final st)):
+      log(
+        'error uploading photo $photoPath',
+        error: ex,
+        stackTrace: st,
+        name: 'UploadButton | onPressed',
+      );
+      msg = ex.toString();
+      duration = const Duration(seconds: 4);
+  }
+
+  scaffoldMessenger.showSnackBar(
+    SnackBar(
+      content: Text(msg),
+      duration: duration,
+    ),
+  );
+
+  return ();
 }
