@@ -211,6 +211,14 @@ analyzer:
     package_names: warning
     secure_pubspec_urls: warning
     sort_pub_dependencies: warning
+    # analyzer built-ins?
+    inference_failure_on_function_invocation: error
+    inference_failure_on_function_return_type: error 
+    inference_failure_on_collection_literal: error
+    inference_failure_on_generic_invocation: error
+    inference_failure_on_instance_creation: error
+    inference_failure_on_uninitialized_variable: error 
+    inference_failure_on_untyped_parameter: error
 
 linter:
   rules:

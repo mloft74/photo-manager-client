@@ -11,7 +11,7 @@ part 'result.freezed.dart';
 ///
 /// See https://doc.rust-lang.org/std/result/index.html for more.
 @freezed
-sealed class Result<T extends Object, E extends Object> with _$Result {
+sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
   const Result._();
 
   /// Contains the success value.

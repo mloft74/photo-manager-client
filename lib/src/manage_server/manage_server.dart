@@ -104,13 +104,13 @@ Option<String> _validateServerUri(Option<String> value) => value
     .andThen((value) => Uri.tryParse(value).option)
     .mapOrElse(
       orElse: () => const Some('Invalid URI'),
-      map: (value) => const None<String>(),
+      map: (value) => const None(),
     );
 
 Option<String> _validateServerName(Option<String> value) =>
     value.andThen((value) => value.isNotEmptyOption).mapOrElse(
           orElse: () => const Some('Please provide a name'),
-          map: (value) => const None<String>(),
+          map: (value) => const None(),
         );
 
 Option<Server> _validateForm({
