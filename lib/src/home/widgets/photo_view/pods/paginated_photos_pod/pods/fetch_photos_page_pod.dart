@@ -22,46 +22,55 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
   Server server,
   Option<int> after,
 ) async {
-  const countParam = 'count=50';
-  final params = after.mapOr(
-    map: (value) => '$countParam&after=$value',
-    or: countParam,
-  );
-  final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
-  log('uri: $uri', name: 'photosPagePod');
-
-  final response = await get(uri);
-  if (response.statusCode != 200) {
-    return response.reasonPhraseErr();
-  }
-
-  final body = jsonDecode(response.body);
-  if (body
-      case {
-        'cursor': final int? cursor,
-        'images': final List<dynamic> images,
-      }) {
-    final parsedImages = images
-        .map(
-          (e) => HostedImage(
-            // ignore: avoid_dynamic_calls
-            fileName: e['file_name'] as String,
-            // ignore: avoid_dynamic_calls
-            width: e['width'] as int,
-            // ignore: avoid_dynamic_calls
-            height: e['height'] as int,
-          ),
-        )
-        .pipe(IList.new);
-
-    return Ok(
-      PhotosPage(
-        images: parsedImages,
-        cursor: cursor.option,
-      ),
+  try {
+    const countParam = 'count=50';
+    final params = after.mapOr(
+      map: (value) => '$countParam&after=$value',
+      or: countParam,
     );
-  } else {
-    return Err('Unknown body: $body');
+    final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
+
+    final response = await get(uri);
+    if (response.statusCode != 200) {
+      return response.reasonPhraseErr();
+    }
+
+    final body = jsonDecode(response.body);
+    if (body
+        case {
+          'cursor': final int? cursor,
+          'images': final List<dynamic> images,
+        }) {
+      final parsedImages = images
+          .map(
+            (e) => HostedImage(
+              // ignore: avoid_dynamic_calls
+              fileName: e['file_name'] as String,
+              // ignore: avoid_dynamic_calls
+              width: e['width'] as int,
+              // ignore: avoid_dynamic_calls
+              height: e['height'] as int,
+            ),
+          )
+          .pipe(IList.new);
+
+      return Ok(
+        PhotosPage(
+          images: parsedImages,
+          cursor: cursor.option,
+        ),
+      );
+    } else {
+      return Err('Unknown body: $body');
+    }
+  } catch (ex, st) {
+    log(
+      'error occurred fetching next page',
+      error: ex,
+      stackTrace: st,
+      name: 'fetchPhotosPagePod',
+    );
+    return Err('Error occurred while fetching page: $ex');
   }
 }
 

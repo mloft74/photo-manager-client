@@ -32,12 +32,16 @@ class AsyncValueBuilder<T> extends StatelessWidget {
               return errorBuilder(context, error, stackTrace);
             }
 
-            final errorStr = '$error';
             final theme = Theme.of(context);
-            log(errorStr, stackTrace: stackTrace, name: 'AsyncValueLoader');
+            log(
+              'error occurred',
+              error: error,
+              stackTrace: stackTrace,
+              name: 'AsyncValueBuilder',
+            );
             return Center(
               child: Text(
-                errorStr,
+                'Error occurred: $error',
                 style: theme.textTheme.bodyLarge
                     ?.copyWith(color: theme.colorScheme.error),
               ),

@@ -47,7 +47,8 @@ class ServerListItem extends HookConsumerWidget {
                     await ref.read(removeServerPod)(server);
                   } catch (ex, st) {
                     log(
-                      'error removing server: $ex',
+                      'error removing server',
+                      error: ex,
                       stackTrace: st,
                       name: 'ServerListItem | onDismissed',
                     );
@@ -66,7 +67,8 @@ class ServerListItem extends HookConsumerWidget {
                       await ref.read(setCurrentServerPod)(server);
                     } catch (ex, st) {
                       log(
-                        'error selecting server: $ex',
+                        'error selecting server',
+                        error: ex,
                         stackTrace: st,
                         name: 'ServerListItem | select server',
                       );

@@ -12,11 +12,11 @@ import 'package:photo_manager_client/src/photo_manager_app.dart';
 Future<()> main() async {
   // FlutterError.onError can be assigned to if custom error handling is needed.
 
-  PlatformDispatcher.instance.onError = (exception, stackTrace) {
+  PlatformDispatcher.instance.onError = (ex, st) {
     log(
-      'Error caught by PlatformDispatcher',
-      error: exception,
-      stackTrace: stackTrace,
+      'error caught by PlatformDispatcher',
+      error: ex,
+      stackTrace: st,
       name: 'PlatformDispatcher',
     );
     return true;

@@ -156,7 +156,8 @@ Future<()> _onSave({
     navigator.pop();
   } catch (ex, st) {
     log(
-      'error saving server: $ex',
+      'error saving server',
+      error: ex,
       stackTrace: st,
       name: 'ManageServer | _onSave',
     );

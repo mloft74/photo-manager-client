@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -71,12 +70,6 @@ class PaginatedPhotos extends _$PaginatedPhotos {
           images: stateData.images + value.images,
         );
       case Err(:final error):
-        log(
-          'error fetching page',
-          name: 'paginatedPhotosPod | nextPage',
-          error: error,
-        );
-
         _hasNextPage = false;
 
         return stateData.copyWith(loading: Err(error));
