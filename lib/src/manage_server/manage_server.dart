@@ -171,16 +171,11 @@ Future<()> _onTestConnection({
   final scaffoldMessenger = ScaffoldMessenger.of(context);
 
   final result = await ref.read(testConnectionPod)(server);
-  final String message;
-  final Duration duration;
-  switch (result) {
-    case Ok():
-      duration = const Duration(seconds: 1);
-      message = 'Connection successful';
-    case Err(:final error):
-      duration = const Duration(seconds: 4);
-      message = '$error';
-  }
+  final (message, duration) = result
+      .map((value) => const ('Connection successful', Duration(seconds: 1)))
+      .mapErr((error) => const ('$error', Duration(seconds: 4)))
+      // ignore: unused_result, it is destructured
+      .coalesced;
 
   scaffoldMessenger.showSnackBar(
     SnackBar(

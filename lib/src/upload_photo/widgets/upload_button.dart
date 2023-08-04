@@ -4,7 +4,6 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
-import 'package:photo_manager_client/src/upload_photo/widgets/pods/errors/upload_photo_error.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/photo_pod.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 
@@ -63,22 +62,16 @@ Future<()> _onButtonPressed({
     serverUri: server.uri,
   );
 
-  final String msg;
-  final Duration duration;
-  switch (res) {
-    case Ok():
-      msg = 'Upload finished';
-      duration = const Duration(seconds: 1);
-    case Err(error: ImageAlreadyExists()):
-      msg = 'Image already exists';
-      duration = const Duration(seconds: 4);
-    case Err(error: UnknownBody(:final body)):
-      msg = 'Unknown body: $body';
-      duration = const Duration(seconds: 4);
-    case Err(error: ErrorOccurred(:final error)):
-      msg = 'Error occurred: $error';
-      duration = const Duration(seconds: 4);
-  }
+  final (msg, duration) = res
+      .map((value) => const ('Upload finished', Duration(seconds: 1)))
+      .mapErr(
+        (error) => (
+          '$error',
+          const Duration(seconds: 4),
+        ),
+      )
+      // ignore: unused_result, it is destructured
+      .coalesced;
 
   scaffoldMessenger.showSnackBar(
     SnackBar(
