@@ -4,11 +4,12 @@ part 'upload_photo_error.freezed.dart';
 
 @freezed
 sealed class UploadPhotoError with _$UploadPhotoError {
-  const factory UploadPhotoError.generalMessage(String message) =
-      GeneralMessage;
+  const factory UploadPhotoError.unknownBody(String body) = UnknownBody;
 
   const factory UploadPhotoError.imageAlreadyExists() = ImageAlreadyExists;
 
-  const factory UploadPhotoError.exceptionOccurred(Object ex, StackTrace st) =
-      ExceptionOccurred;
+  const factory UploadPhotoError.errorOccurred(
+    Object error,
+    StackTrace stackTrace,
+  ) = ErrorOccurred;
 }

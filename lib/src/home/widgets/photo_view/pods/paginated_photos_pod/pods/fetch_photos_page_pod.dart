@@ -11,12 +11,13 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/pods/errors/fetch_photos_page_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fetch_photos_page_pod.g.dart';
 
-typedef FetchPhotosPageResult = Result<PhotosPage, String>;
+typedef FetchPhotosPageResult = Result<PhotosPage, FetchPhotosPageError>;
 
 Future<FetchPhotosPageResult> _fetchPhotosPage(
   Server server,
@@ -32,10 +33,11 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
 
     final response = await get(uri);
     if (response.statusCode != 200) {
-      return response.reasonPhraseErr();
+      return Err(NotOk(response.reasonPhraseNonNull));
     }
 
-    final body = jsonDecode(response.body);
+    final bodyStr = response.body;
+    final body = jsonDecode(bodyStr);
     if (body
         case {
           'cursor': final int? cursor,
@@ -61,16 +63,16 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
         ),
       );
     } else {
-      return Err('Unknown body: $body');
+      return Err(UnknownBody(bodyStr));
     }
   } catch (ex, st) {
     log(
       'error occurred fetching next page',
       error: ex,
       stackTrace: st,
-      name: 'fetchPhotosPagePod',
+      name: 'fetchPhotosPage',
     );
-    return Err('Error occurred while fetching page: $ex');
+    return Err(ErrorOccurred(ex, st));
   }
 }
 

@@ -4,7 +4,6 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/pods/fetch_photos_page_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -20,11 +19,9 @@ class PaginatedPhotos extends _$PaginatedPhotos {
     _cursor = const None();
     _hasNextPage = true;
 
-    final fetchPhotosPage = ref.watch(fetchPhotosPagePod);
-    final result =
-        await fetchPhotosPage.andThenAsync((value) => value(_cursor));
-    return _stateFromResult(
-      result,
+    final fetchPhotosPageRes = ref.watch(fetchPhotosPagePod);
+    return await _fetchPhotosPageSafe(
+      fetchPhotosPageRes,
       const PaginatedPhotosState(
         loading: Ok(PaginatedPhotosLoadingState.loading),
         images: IListConst([]),
@@ -46,18 +43,32 @@ class PaginatedPhotos extends _$PaginatedPhotos {
         ),
       );
 
-      final fetchPhotosPage = ref.read(fetchPhotosPagePod);
-      final result = await fetchPhotosPage.andThenAsync(
-        (value) => value(_cursor),
-      );
-      state = AsyncData(_stateFromResult(result, stateData));
+      final fetchPhotosPageRes = ref.read(fetchPhotosPagePod);
+      state =
+          AsyncData(await _fetchPhotosPageSafe(fetchPhotosPageRes, stateData));
     }
 
     return ();
   }
 
+  Future<PaginatedPhotosState> _fetchPhotosPageSafe(
+    Result<FetchPhotosPageFn, String> fetchPhotosPageRes,
+    PaginatedPhotosState stateData,
+  ) async {
+    switch (fetchPhotosPageRes) {
+      case Ok(value: final fetchPhotosPage):
+        final result = await fetchPhotosPage(_cursor);
+        return _stateFromResult(
+          result,
+          stateData,
+        );
+      case Err(:final error):
+        return stateData.copyWith(loading: Err(error));
+    }
+  }
+
   PaginatedPhotosState _stateFromResult(
-    Result<PhotosPage, String> result,
+    FetchPhotosPageResult result,
     PaginatedPhotosState stateData,
   ) {
     switch (result) {
@@ -72,7 +83,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       case Err(:final error):
         _hasNextPage = false;
 
-        return stateData.copyWith(loading: Err(error));
+        return stateData.copyWith(loading: Err('$error'));
     }
   }
 }

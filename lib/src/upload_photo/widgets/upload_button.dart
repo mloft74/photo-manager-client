@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -74,17 +72,11 @@ Future<()> _onButtonPressed({
     case Err(error: ImageAlreadyExists()):
       msg = 'Image already exists';
       duration = const Duration(seconds: 4);
-    case Err(error: GeneralMessage(:final message)):
-      msg = message;
+    case Err(error: UnknownBody(:final body)):
+      msg = 'Unknown body: $body';
       duration = const Duration(seconds: 4);
-    case Err(error: ExceptionOccurred(:final ex, :final st)):
-      log(
-        'error uploading photo $photoPath',
-        error: ex,
-        stackTrace: st,
-        name: 'UploadButton | onPressed',
-      );
-      msg = ex.toString();
+    case Err(error: ErrorOccurred(:final error)):
+      msg = 'Error occurred: $error';
       duration = const Duration(seconds: 4);
   }
 

@@ -7,4 +7,6 @@ extension ResponseExtension on Response {
     final error = 'Reason: $reason, Body: $body';
     return Err(error);
   }
+
+  String get reasonPhraseNonNull => reasonPhrase ?? 'UNKNOWN_REASON';
 }
