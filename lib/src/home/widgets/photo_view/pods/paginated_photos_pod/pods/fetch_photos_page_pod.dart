@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:http/http.dart';
@@ -66,12 +65,6 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
       return Err(UnknownBody(bodyStr));
     }
   } catch (ex, st) {
-    log(
-      'error occurred fetching next page',
-      error: ex,
-      stackTrace: st,
-      name: 'fetchPhotosPage',
-    );
     return Err(ErrorOccurred(ex, st));
   }
 }

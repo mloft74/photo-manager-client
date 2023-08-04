@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:http/http.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -29,12 +28,6 @@ Future<Result<(), UploadPhotoError>> _uploadPhoto({
       };
     }
   } catch (ex, st) {
-    log(
-      'error uploading photo $path',
-      error: ex,
-      stackTrace: st,
-      name: 'uploadPhoto',
-    );
     return Err(ErrorOccurred(ex, st));
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -33,12 +31,6 @@ class AsyncValueBuilder<T> extends StatelessWidget {
             }
 
             final theme = Theme.of(context);
-            log(
-              'error occurred',
-              error: error,
-              stackTrace: stackTrace,
-              name: 'AsyncValueBuilder',
-            );
             return Center(
               child: Text(
                 'Error occurred: $error',

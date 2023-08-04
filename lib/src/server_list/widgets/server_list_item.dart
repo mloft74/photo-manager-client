@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -45,13 +43,7 @@ class ServerListItem extends HookConsumerWidget {
                   removingServer.value = true;
                   try {
                     await ref.read(removeServerPod)(server);
-                  } catch (ex, st) {
-                    log(
-                      'error removing server',
-                      error: ex,
-                      stackTrace: st,
-                      name: 'ServerListItem | onDismissed',
-                    );
+                  } catch (ex) {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text('Error removing ${server.name}: $ex'),
@@ -65,13 +57,7 @@ class ServerListItem extends HookConsumerWidget {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
                     try {
                       await ref.read(setCurrentServerPod)(server);
-                    } catch (ex, st) {
-                      log(
-                        'error selecting server',
-                        error: ex,
-                        stackTrace: st,
-                        name: 'ServerListItem | select server',
-                      );
+                    } catch (ex) {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
                           content: Text('Error selecting ${server.name}: $ex'),

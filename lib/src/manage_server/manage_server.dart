@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -154,13 +152,7 @@ Future<()> _onSave({
       ),
     );
     navigator.pop();
-  } catch (ex, st) {
-    log(
-      'error saving server',
-      error: ex,
-      stackTrace: st,
-      name: 'ManageServer | _onSave',
-    );
+  } catch (ex) {
     scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Text('Error saving ${server.name}: $ex'),
@@ -181,13 +173,7 @@ Future<()> _onTestConnection({
   try {
     final result = await ref.read(testConnectionPod)(server);
     message = result.map((value) => 'Connection successful').coalesced;
-  } catch (ex, st) {
-    log(
-      'error connecting to server',
-      name: 'ManageServer',
-      error: ex,
-      stackTrace: st,
-    );
+  } catch (ex) {
     message = 'Error connecting to server: $ex';
   }
 
