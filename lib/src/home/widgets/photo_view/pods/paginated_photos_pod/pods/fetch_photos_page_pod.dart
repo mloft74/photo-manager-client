@@ -58,7 +58,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
       return Ok(
         PhotosPage(
           images: parsedImages,
-          cursor: cursor.option,
+          cursor: cursor.toOption(),
         ),
       );
     } else {

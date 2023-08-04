@@ -19,7 +19,7 @@ class ServerSettings extends ConsumerWidget {
             const ServerList().pushMaterialRouteUnawaited(context);
           },
           title: const Text('Servers'),
-          subtitle: value.map((value) => Text(value.name)).nullable,
+          subtitle: value.map((value) => Text(value.name)).toNullable(),
           trailing: const Icon(Icons.arrow_forward),
         );
       },

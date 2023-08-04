@@ -18,8 +18,8 @@ class SelectPhotoButton extends ConsumerWidget {
         unawaited(
           ref.read(photoPod.notifier).updateAsync(
                 () async => (await FilePicker.platform.pickFiles())
-                    .option
-                    .andThen((value) => value.paths.first.option),
+                    .toOption()
+                    .andThen((value) => value.paths.first.toOption()),
               ),
         );
       },

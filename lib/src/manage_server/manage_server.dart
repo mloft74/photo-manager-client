@@ -78,7 +78,7 @@ class ManageServer extends HookConsumerWidget {
                 hintText: 'Server uri',
               ),
               validator: (value) =>
-                  value.option.pipe(_validateServerUri).nullable,
+                  value.toOption().pipe(_validateServerUri).toNullable(),
             ),
             TextFormField(
               enabled: server == null,
@@ -88,7 +88,7 @@ class ManageServer extends HookConsumerWidget {
                 hintText: 'Server name',
               ),
               validator: (value) =>
-                  value.option.pipe(_validateServerName).nullable,
+                  value.toOption().pipe(_validateServerName).toNullable(),
             ),
           ],
         ),
@@ -98,15 +98,15 @@ class ManageServer extends HookConsumerWidget {
 }
 
 Option<String> _validateServerUri(Option<String> value) => value
-    .andThen((value) => value.isNotEmptyOption)
-    .andThen((value) => Uri.tryParse(value).option)
+    .andThen((value) => value.toNotEmptyOption())
+    .andThen((value) => Uri.tryParse(value).toOption())
     .mapOrElse(
       orElse: () => const Some('Invalid URI'),
       map: (value) => const None(),
     );
 
 Option<String> _validateServerName(Option<String> value) =>
-    value.andThen((value) => value.isNotEmptyOption).mapOrElse(
+    value.andThen((value) => value.toNotEmptyOption()).mapOrElse(
           orElse: () => const Some('Please provide a name'),
           map: (value) => const None(),
         );
@@ -116,7 +116,8 @@ Option<Server> _validateForm({
   required TextEditingController nameTextController,
   required TextEditingController uriTextController,
 }) {
-  final valid = formKey.currentState.option
+  final valid = formKey.currentState
+      .toOption()
       .mapOr(or: false, map: (value) => value.validate());
   if (!valid) {
     return const None();
@@ -175,7 +176,7 @@ Future<()> _onTestConnection({
       .map((value) => const ('Connection successful', Duration(seconds: 1)))
       .mapErr((error) => const ('$error', Duration(seconds: 4)))
       // ignore: unused_result, it is destructured
-      .coalesced;
+      .coalesce();
 
   scaffoldMessenger.showSnackBar(
     SnackBar(

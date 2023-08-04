@@ -15,10 +15,10 @@ sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
   const Result._();
 
   /// Contains the success value.
-  const factory Result.ok(T value) = Ok;
+  const factory Result.okToOption(T value) = Ok;
 
   /// Contains the error value.
-  const factory Result.err(E error) = Err;
+  const factory Result.errToOption(E error) = Err;
 
   /// Returns `true` if the result is [Ok].
   @useResult
@@ -37,7 +37,10 @@ sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
 
   /// Returns `true` if the result is [Err].
   @useResult
-  bool get isErr => !isOk;
+  bool get isErr => switch (this) {
+        Ok() => false,
+        Err() => true,
+      };
 
   /// Returns `true` if the result is [Err]
   /// and the value inside of it matches a predicate.
@@ -49,14 +52,14 @@ sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
 
   /// Converts from [Result] of [T] and [E] to [Option] of [T].
   @useResult
-  Option<T> get ok => switch (this) {
+  Option<T> okToOption() => switch (this) {
         Ok(:final value) => Some(value),
         Err() => None<T>(),
       };
 
   /// Converts from [Result] of [T] and [E] to [Option] of [E].
   @useResult
-  Option<E> get err => switch (this) {
+  Option<E> errToOption() => switch (this) {
         Ok() => None<E>(),
         Err(:final error) => Some(error),
       };
@@ -140,7 +143,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
   ///
   /// The iterator yields one value if the result is [Ok], otherwise none.
   @useResult
-  Iterable<T> get iterable => switch (this) {
+  Iterable<T> toIterable() => switch (this) {
         Ok(:final value) => [value],
         Err() => [],
       };
@@ -283,7 +286,7 @@ extension ResultOptionExtension<T extends Object, E extends Object>
   /// [Ok] with [Some] and [Err] will be
   /// mapped to [Some] with [Ok] and [Some] with [Err].
   @useResult
-  Option<Result<T, E>> get transposed => switch (this) {
+  Option<Result<T, E>> transpose() => switch (this) {
         Ok(value: Some(:final value)) => Some(Ok(value)),
         Ok(value: None()) => None<Result<T, E>>(),
         Err(:final error) => Some(Err(error)),
@@ -295,7 +298,7 @@ extension NestedResult<T extends Object, E extends Object>
   /// Converts from [Result] of [Result] of [T] and [E] and [E]
   /// to [Result] of [T] and [E].
   @useResult
-  Result<T, E> get flattened => switch (this) {
+  Result<T, E> flatten() => switch (this) {
         Ok(:final value) => value,
         Err(:final error) => Err(error),
       };
@@ -303,7 +306,7 @@ extension NestedResult<T extends Object, E extends Object>
 
 extension MatchingResult<T extends Object> on Result<T, T> {
   @useResult
-  T get coalesced => switch (this) {
+  T coalesce() => switch (this) {
         Ok(:final value) => value,
         Err(:final error) => error,
       };

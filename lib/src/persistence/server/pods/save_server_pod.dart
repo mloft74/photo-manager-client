@@ -13,7 +13,8 @@ Future<Result<(), ServerAlreadyExists>> _saveServer(
   Isar isar,
   Server server,
 ) async {
-  final existingDB = await isar.serverDBs.getByName(server.name).futureOption;
+  final existingDB =
+      await isar.serverDBs.getByName(server.name).toFutureOption();
   final existing = existingDB.andThen((value) => value.toDomain());
   if (existing case Some(:final value)) {
     return Err(ServerAlreadyExists(value));

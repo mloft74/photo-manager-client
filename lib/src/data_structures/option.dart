@@ -10,17 +10,17 @@ part 'option.freezed.dart';
 
 extension NullableTToOptionExtension<T extends Object> on T? {
   @useResult
-  Option<T> get option => Option.from(this);
+  Option<T> toOption() => Option.from(this);
 }
 
 extension FutureNullableToOptionExtension<T extends Object> on Future<T?> {
   @useResult
-  Future<Option<T>> get futureOption => then((value) => value.option);
+  Future<Option<T>> toFutureOption() => then(Option.from);
 }
 
 extension StringToOptionExtension on String {
   @useResult
-  Option<String> get isNotEmptyOption => isNotEmpty ? Some(this) : const None();
+  Option<String> toNotEmptyOption() => isNotEmpty ? Some(this) : const None();
 }
 
 /// The [Option] type.
@@ -41,7 +41,7 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   /// Converts an [Option] of [T] to a nullable [T].
   @useResult
-  T? get nullable => switch (this) {
+  T? toNullable() => switch (this) {
         Some(:final value) => value,
         None() => null,
       };
@@ -63,7 +63,10 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   /// Returns `true` if the option is a [None] value.
   @useResult
-  bool get isNone => !isSome;
+  bool get isNone => switch (this) {
+        Some() => false,
+        None() => true,
+      };
 
   /// Returns the contained [Some] value.
   ///
@@ -184,7 +187,7 @@ sealed class Option<T extends Object> with _$Option<T> {
 
   /// Returns an [Iterable] over the possibly contained value.
   @useResult
-  Iterable<T> get iterable => switch (this) {
+  Iterable<T> toIterable() => switch (this) {
         Some(:final value) => [value],
         None() => [],
       };
@@ -310,7 +313,7 @@ extension ZippedOptionExtension<T extends Object, U extends Object>
   /// If this is [Some] this method returns ([Some], [Some]).
   /// Otherwise, ([None], [None]) is returned.
   @useResult
-  (Option<T>, Option<U>) get unzipped => switch (this) {
+  (Option<T>, Option<U>) unzip() => switch (this) {
         Some(value: (final a, final b)) => (Some(a), Some(b)),
         None() => (None<T>(), None<U>()),
       };
@@ -324,7 +327,7 @@ extension OptionResultExtension<T extends Object, E extends Object>
   /// [Some] with [Ok] and [Some] with [Err] will
   /// be mapped to [Ok] with [Some] and [Err].
   @useResult
-  Result<Option<T>, E> get transposed => switch (this) {
+  Result<Option<T>, E> transpose() => switch (this) {
         Some(value: Ok(:final value)) => Ok(Some(value)),
         Some(value: Err(:final error)) => Err(error),
         None() => Ok(None<T>()),
@@ -336,7 +339,7 @@ extension NestedOptionExtension<T extends Object> on Option<Option<T>> {
   ///
   /// Flattening only removes one level of nesting at a time.
   @useResult
-  Option<T> get flattened => switch (this) {
+  Option<T> flatten() => switch (this) {
         Some(:final value) => value,
         None() => None<T>(),
       };

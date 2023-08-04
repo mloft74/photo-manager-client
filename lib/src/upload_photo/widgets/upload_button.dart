@@ -15,11 +15,11 @@ class UploadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final photoPath =
-        ref.watch(photoPod).asData.option.andThen((value) => value.value);
+        ref.watch(photoPod).asData.toOption().andThen((value) => value.value);
     final currentServer = ref
         .watch(currentServerPod)
         .asData
-        .option
+        .toOption()
         .andThen((value) => value.value);
 
     return FilledButton.icon(
@@ -36,7 +36,7 @@ class UploadButton extends ConsumerWidget {
               );
             },
           )
-          .nullable,
+          .toNullable(),
       icon: const Icon(Icons.upload),
       label: const Text('Upload'),
     );
@@ -71,7 +71,7 @@ Future<()> _onButtonPressed({
         ),
       )
       // ignore: unused_result, it is destructured
-      .coalesced;
+      .coalesce();
 
   scaffoldMessenger.showSnackBar(
     SnackBar(

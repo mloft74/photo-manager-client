@@ -13,7 +13,7 @@ class SelectedServerDB {
   final server = IsarLink<ServerDB>();
 
   Option<ServerDB> toDB() {
-    return server.value.option;
+    return server.value.toOption();
   }
 
   Option<Server> toDomain() {

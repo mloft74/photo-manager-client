@@ -13,5 +13,7 @@ Stream<CurrentServerState> currentServer(CurrentServerRef ref) {
   final isar = ref.watch(isarPod);
   return isar.selectedServerDBs
       .watchObject(SelectedServerDB.selectedId, fireImmediately: true)
-      .asyncMap((event) => event.option.andThen((value) => value.toDomain()));
+      .asyncMap(
+        (event) => event.toOption().andThen((value) => value.toDomain()),
+      );
 }

@@ -10,6 +10,6 @@ part 'current_server_result_pod.g.dart';
 Result<Server, String> currentServerResult(CurrentServerResultRef ref) => ref
     .watch(currentServerPod)
     .asData
-    .option
+    .toOption()
     .andThen((value) => value.value)
     .okOr('No server selected');
