@@ -7,16 +7,16 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/pods/errors/fetch_photos_page_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fetch_photos_page_pod.g.dart';
 
-typedef FetchPhotosPageResult = Result<PhotosPage, FetchPhotosPageError>;
+typedef FetchPhotosPageResult = Result<PhotosPage, GeneralHttpError>;
 
 Future<FetchPhotosPageResult> _fetchPhotosPage(
   Server server,

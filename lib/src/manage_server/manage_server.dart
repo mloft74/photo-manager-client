@@ -169,15 +169,25 @@ Future<()> _onTestConnection({
   required Server server,
 }) async {
   final scaffoldMessenger = ScaffoldMessenger.of(context);
-  String message;
-  try {
-    final result = await ref.read(testConnectionPod)(server);
-    message = result.map((value) => 'Connection successful').coalesced;
-  } catch (ex) {
-    message = 'Error connecting to server: $ex';
+
+  final result = await ref.read(testConnectionPod)(server);
+  final String message;
+  final Duration duration;
+  switch (result) {
+    case Ok():
+      duration = const Duration(seconds: 1);
+      message = 'Connection successful';
+    case Err(:final error):
+      duration = const Duration(seconds: 4);
+      message = '$error';
   }
 
-  scaffoldMessenger.showSnackBar(SnackBar(content: Text(message)));
+  scaffoldMessenger.showSnackBar(
+    SnackBar(
+      content: Text(message),
+      duration: duration,
+    ),
+  );
 
   return ();
 }
