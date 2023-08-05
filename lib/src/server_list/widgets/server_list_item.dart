@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
@@ -41,12 +42,12 @@ class ServerListItem extends HookConsumerWidget {
                 onDismissed: (direction) async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
                   removingServer.value = true;
-                  try {
-                    await ref.read(removeServerPod)(server);
-                  } catch (ex) {
+                  final res = await ref.read(removeServerPod)(server);
+                  if (res case Err(:final error)) {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
-                        content: Text('Error removing ${server.name}: $ex'),
+                        content: Text(
+                            'Error removing ${server.name}: ${error.error}'),
                       ),
                     );
                   }
