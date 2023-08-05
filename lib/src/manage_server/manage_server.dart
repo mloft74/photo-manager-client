@@ -174,7 +174,7 @@ Future<()> _onTestConnection({
   final result = await ref.read(testConnectionPod)(server);
   final (message, duration) = result
       .map((value) => const ('Connection successful', Duration(seconds: 1)))
-      .mapErr((error) => const ('$error', Duration(seconds: 4)))
+      .mapErr((error) => ('$error', const Duration(seconds: 4)))
       // ignore: unused_result, it is destructured
       .coalesce();
 

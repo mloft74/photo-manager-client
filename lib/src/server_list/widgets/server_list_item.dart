@@ -47,7 +47,8 @@ class ServerListItem extends HookConsumerWidget {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
-                            'Error removing ${server.name}: ${error.error}'),
+                          'Error removing ${server.name}: ${error.error}',
+                        ),
                       ),
                     );
                   }

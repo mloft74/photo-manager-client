@@ -7,6 +7,6 @@ part 'error_trace.freezed.dart';
 class ErrorTrace<T extends Object> with _$ErrorTrace<T> {
   const factory ErrorTrace(
     T error, [
-    @Default(None<StackTrace>) Option<StackTrace> stackTrace,
+    @Default(None<StackTrace>()) Option<StackTrace> stackTrace,
   ]) = _ErrorTrace;
 }
