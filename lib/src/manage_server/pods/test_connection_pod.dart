@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,7 +29,7 @@ Future<TestConnectionResult> _testConnection(Server server) async {
       return Err(UnknownBody(bodyStr));
     }
   } catch (ex, st) {
-    return Err(ErrorOccurred(ex, st));
+    return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }
 }
 

@@ -7,6 +7,7 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
@@ -66,7 +67,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
       return Err(UnknownBody(bodyStr));
     }
   } catch (ex, st) {
-    return Err(ErrorOccurred(ex, st));
+    return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }
 }
 

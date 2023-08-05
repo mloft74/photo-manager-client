@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/upload_photo/widgets/pods/errors/upload_photo_error.dart';
+import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+part 'upload_photo_pod.freezed.dart';
 part 'upload_photo_pod.g.dart';
 
 Future<Result<(), UploadPhotoError>> _uploadPhoto({
@@ -28,7 +31,7 @@ Future<Result<(), UploadPhotoError>> _uploadPhoto({
       };
     }
   } catch (ex, st) {
-    return Err(ErrorOccurred(ex, st));
+    return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }
 }
 
@@ -37,3 +40,13 @@ Future<Result<(), UploadPhotoError>> Function({
   required String path,
   required Uri serverUri,
 }) uploadPhoto(UploadPhotoRef ref) => _uploadPhoto;
+
+@freezed
+sealed class UploadPhotoError with _$UploadPhotoError {
+  const factory UploadPhotoError.unknownBody(String body) = UnknownBody;
+
+  const factory UploadPhotoError.imageAlreadyExists() = ImageAlreadyExists;
+
+  const factory UploadPhotoError.errorOccurred(ErrorTrace<Object> errorTrace) =
+      ErrorOccurred;
+}

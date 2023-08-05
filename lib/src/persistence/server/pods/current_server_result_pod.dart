@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -17,7 +18,7 @@ Result<Server, CurrentServerResultError> currentServerResult(
     AsyncData(value: Some(:final value)) => Ok(value),
     AsyncData() => const Err(NoServerSelected()),
     AsyncError(:final error, :final stackTrace) =>
-      Err(ErrorOccurred(error, stackTrace)),
+      Err(ErrorOccurred(ErrorTrace(error, Some(stackTrace)))),
     _ => const Err(Loading()),
   };
 }
@@ -27,8 +28,7 @@ sealed class CurrentServerResultError with _$CurrentServerResultError {
   const factory CurrentServerResultError.noServerSelected() = NoServerSelected;
 
   const factory CurrentServerResultError.errorOccurred(
-    Object error,
-    StackTrace stackTrace,
+    ErrorTrace<Object> errorTrace,
   ) = ErrorOccurred;
 
   const factory CurrentServerResultError.loading() = Loading;
