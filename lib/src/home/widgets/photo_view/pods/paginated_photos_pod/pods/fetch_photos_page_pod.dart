@@ -11,7 +11,8 @@ import 'package:photo_manager_client/src/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
+    hide ErrorOccurred;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fetch_photos_page_pod.g.dart';
@@ -74,7 +75,7 @@ typedef FetchPhotosPageFn = Future<FetchPhotosPageResult> Function(
 );
 
 @riverpod
-Result<FetchPhotosPageFn, String> fetchPhotosPage(
+Result<FetchPhotosPageFn, CurrentServerResultError> fetchPhotosPage(
   FetchPhotosPageRef ref,
 ) {
   final server = ref.watch(currentServerResultPod);

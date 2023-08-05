@@ -5,6 +5,7 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/pods/fetch_photos_page_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'paginated_photos_pod.g.dart';
@@ -52,7 +53,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
   }
 
   Future<PaginatedPhotosState> _fetchPhotosPageSafe(
-    Result<FetchPhotosPageFn, String> fetchPhotosPageRes,
+    Result<FetchPhotosPageFn, CurrentServerResultError> fetchPhotosPageRes,
     PaginatedPhotosState stateData,
   ) async {
     switch (fetchPhotosPageRes) {
@@ -63,7 +64,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
           stateData,
         );
       case Err(:final error):
-        return stateData.copyWith(loading: Err(error));
+        return stateData.copyWith(loading: Err('$error'));
     }
   }
 

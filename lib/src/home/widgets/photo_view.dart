@@ -41,7 +41,7 @@ class NewPhotoView extends ConsumerWidget {
                         );
                         // TODO(mloft74): make this touchable
                         return url.mapOrElse(
-                          orElse: Text.new,
+                          orElse: (error) => Text('$error'),
                           map: (value) => CachedNetworkImage(
                             imageUrl: value,
                             progressIndicatorBuilder: (context, url, progress) {

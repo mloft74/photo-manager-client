@@ -5,7 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'photo_url_pod.g.dart';
 
 @riverpod
-Result<String, String> photoUrl(PhotoUrlRef ref, {required String fileName}) {
+Result<String, CurrentServerResultError> photoUrl(
+  PhotoUrlRef ref, {
+  required String fileName,
+}) {
   final server = ref.watch(currentServerResultPod);
   return server.map((value) => '${value.uri}/image/$fileName');
 }
