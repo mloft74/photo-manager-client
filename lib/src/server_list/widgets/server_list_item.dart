@@ -57,12 +57,12 @@ class ServerListItem extends HookConsumerWidget {
                   selected: selected,
                   onTap: () async {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    try {
-                      await ref.read(setCurrentServerPod)(server);
-                    } catch (ex) {
+                    final res = await ref.read(setCurrentServerPod)(server);
+                    if (res case Err(:final error)) {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
-                          content: Text('Error selecting ${server.name}: $ex'),
+                          content:
+                              Text('Error selecting ${server.name}: $error'),
                         ),
                       );
                     }
