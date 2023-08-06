@@ -31,9 +31,11 @@ sealed class Option<T extends Object> with _$Option<T> {
   const Option._();
 
   /// Some value of type [T].
+  @literal
   const factory Option.some(T value) = Some;
 
   /// No value.
+  @literal
   const factory Option.none() = None;
 
   /// Converts a nullable [T] to an [Option] of [T].

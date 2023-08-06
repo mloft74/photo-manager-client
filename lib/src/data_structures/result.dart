@@ -15,10 +15,12 @@ sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
   const Result._();
 
   /// Contains the success value.
-  const factory Result.okToOption(T value) = Ok;
+  @literal
+  const factory Result.ok(T value) = Ok;
 
   /// Contains the error value.
-  const factory Result.errToOption(E error) = Err;
+  @literal
+  const factory Result.err(E error) = Err;
 
   /// Returns `true` if the result is [Ok].
   @useResult
