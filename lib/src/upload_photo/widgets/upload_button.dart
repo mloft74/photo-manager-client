@@ -70,7 +70,8 @@ Future<()> _onButtonPressed({
           const Duration(seconds: 4),
         ),
       )
-      // ignore: unused_result, it is destructured
+      // It's destructured.
+      // ignore: unused_result
       .coalesce();
 
   scaffoldMessenger.showSnackBar(

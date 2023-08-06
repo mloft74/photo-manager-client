@@ -176,7 +176,8 @@ Future<()> _onTestConnection({
   final (message, duration) = result
       .map((value) => const ('Connection successful', Duration(seconds: 1)))
       .mapErr((error) => ('$error', const Duration(seconds: 4)))
-      // ignore: unused_result, it is destructured
+      // It's destructured
+      // ignore: unused_result
       .coalesce();
 
   scaffoldMessenger.showSnackBar(
