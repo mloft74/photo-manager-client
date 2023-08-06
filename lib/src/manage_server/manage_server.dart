@@ -144,21 +144,22 @@ Future<()> _onSave({
       duration: const Duration(seconds: 1),
     ),
   );
-  try {
-    await ref.read(saveServerPod)(server);
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: Text('${server.name} saved'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-    navigator.pop();
-  } catch (ex) {
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: Text('Error saving ${server.name}: $ex'),
-      ),
-    );
+  final res = await ref.read(saveServerPod)(server);
+  switch (res) {
+    case Ok():
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${server.name} saved'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      navigator.pop();
+    case Err(:final error):
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Error saving ${server.name}: $error'),
+        ),
+      );
   }
 
   return ();
