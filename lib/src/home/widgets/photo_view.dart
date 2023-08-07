@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/photo_url_pod.dart';
+import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
+import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class NewPhotoView extends ConsumerWidget {
@@ -39,16 +41,20 @@ class NewPhotoView extends ConsumerWidget {
                         final url = ref.watch(
                           photoUrlPod(fileName: image.fileName),
                         );
-                        // TODO(mloft74): make this touchable
                         return url.mapOrElse(
                           orElse: (error) => Text('$error'),
-                          map: (value) => CachedNetworkImage(
-                            imageUrl: value,
-                            progressIndicatorBuilder: (context, url, progress) {
-                              return CircularProgressIndicator(
-                                value: progress.progress,
-                              );
-                            },
+                          map: (value) => InkWell(
+                            onTap: () => ManagePhoto(image: image)
+                                .pushMaterialRouteUnawaited(context),
+                            child: CachedNetworkImage(
+                              imageUrl: value,
+                              progressIndicatorBuilder:
+                                  (context, url, progress) {
+                                return CircularProgressIndicator(
+                                  value: progress.progress,
+                                );
+                              },
+                            ),
                           ),
                         );
                       },
