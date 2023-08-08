@@ -1,0 +1,47 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:photo_manager_client/src/domain/hosted_image.dart';
+import 'package:photo_manager_client/src/extensions/widget_extension.dart';
+import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
+import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
+import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
+
+class PhotoViewPhoto extends ConsumerWidget {
+  final HostedImage image;
+
+  const PhotoViewPhoto({
+    required this.image,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final url = ref.watch(
+      photoUrlPod(fileName: image.fileName),
+    );
+    return url.mapOrElse(
+      orElse: (error) => Text('$error'),
+      map: (value) => InkWell(
+        onTap: () async {
+          final response = await ManagePhoto(image: image)
+                  .pushMaterialRoute<ManagePhotoResponse>(
+                context,
+              ) ??
+              ManagePhotoResponse.photoNotDeleted;
+          if (response == ManagePhotoResponse.photoDeleted) {
+            ref.invalidate(paginatedPhotosPod);
+          }
+        },
+        child: CachedNetworkImage(
+          imageUrl: value,
+          progressIndicatorBuilder: (context, url, progress) {
+            return CircularProgressIndicator(
+              value: progress.progress,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
