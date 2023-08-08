@@ -50,11 +50,7 @@ Result<DeletePhotoFn, CurrentServerResultError> deletePhoto(
 ) {
   final serverRes = ref.watch(currentServerResultPod);
   return serverRes.map(
-    (value) =>
-        // Type inference cannot determine this type.
-        // ignore: avoid_types_on_closure_parameters
-        (HostedImage hostedImage) async =>
-            await _deletePhoto(value, hostedImage),
+    (value) => (hostedImage) async => await _deletePhoto(value, hostedImage),
   );
 }
 

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/domain/server.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/photo_pod.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 
@@ -16,23 +15,15 @@ class UploadButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final photoPath =
         ref.watch(photoPod).asData.toOption().andThen((value) => value.value);
-    final currentServer = ref
-        .watch(currentServerPod)
-        .asData
-        .toOption()
-        .andThen((value) => value.value);
 
     return FilledButton.icon(
       onPressed: photoPath
-          .zip(currentServer)
           .map(
             (value) => () async {
-              final (photoPath, server) = value;
               await _onButtonPressed(
                 context: context,
                 ref: ref,
-                photoPath: photoPath,
-                server: server,
+                photoPath: value,
               );
             },
           )
@@ -47,39 +38,28 @@ Future<()> _onButtonPressed({
   required BuildContext context,
   required WidgetRef ref,
   required String photoPath,
-  required Server server,
 }) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context)
-    ..showSnackBar(
-      SnackBar(
-        content: Text('Uploading $photoPath'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final navigator = Navigator.of(context);
 
-  final res = await ref.read(uploadPhotoPod)(
-    path: photoPath,
-    serverUri: server.uri,
-  );
+  final uploadPhotoRes = ref.read(uploadPhotoPod);
 
-  final (msg, duration) = res
-      .map((value) => const ('Upload finished', Duration(seconds: 1)))
-      .mapErr(
-        (error) => (
-          '$error',
-          const Duration(seconds: 4),
-        ),
-      )
-      // It's destructured.
-      // ignore: unused_result
-      .coalesce();
-
-  scaffoldMessenger.showSnackBar(
-    SnackBar(
-      content: Text(msg),
-      duration: duration,
-    ),
-  );
+  switch (uploadPhotoRes) {
+    case Err(:final error):
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
+    case Ok(value: final uploadPhoto):
+      final res = await uploadPhoto(photoPath);
+      if (res case Err(:final error)) {
+        scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
+      } else {
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('Upload finished'),
+          ),
+        );
+        navigator.pop(UploadPhotoResponse.photoUploaded);
+      }
+  }
 
   return ();
 }

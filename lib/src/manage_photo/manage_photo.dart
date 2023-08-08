@@ -9,7 +9,9 @@ import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-enum ManagePhotoResponse { photoDeleted, photoNotDeleted }
+enum ManagePhotoResponse {
+  photoDeleted,
+}
 
 class ManagePhoto extends ConsumerWidget {
   final HostedImage image;
@@ -27,10 +29,7 @@ class ManagePhoto extends ConsumerWidget {
     };
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
-        leading: BackButton(
-          onPressed: () =>
-              Navigator.pop(context, ManagePhotoResponse.photoNotDeleted),
-        ),
+        leading: const BackButton(),
         titleText: 'Manage Photo',
         actions: [
           IconButton(

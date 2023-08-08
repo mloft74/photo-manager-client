@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
@@ -25,11 +26,11 @@ class PhotoViewPhoto extends ConsumerWidget {
       map: (value) => InkWell(
         onTap: () async {
           final response = await ManagePhoto(image: image)
-                  .pushMaterialRoute<ManagePhotoResponse>(
+              .pushMaterialRoute<ManagePhotoResponse>(
                 context,
-              ) ??
-              ManagePhotoResponse.photoNotDeleted;
-          if (response == ManagePhotoResponse.photoDeleted) {
+              )
+              .toFutureOption();
+          if (response case Some(value: ManagePhotoResponse.photoDeleted)) {
             ref.invalidate(paginatedPhotosPod);
           }
         },
