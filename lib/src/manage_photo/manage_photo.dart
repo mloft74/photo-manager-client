@@ -59,6 +59,7 @@ Future<()> _onDeletePressed(
 ) async {
   final scaffoldMessenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
+
   final shouldDelete = await showDialog<bool>(
         context: context,
         builder: (context) => const ConfirmDeletePhotoDialog(),
