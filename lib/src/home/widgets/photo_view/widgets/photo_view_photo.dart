@@ -30,7 +30,11 @@ class PhotoViewPhoto extends ConsumerWidget {
                 context,
               )
               .toFutureOption();
-          if (response case Some(value: ManagePhotoResponse.photoDeleted)) {
+          if (response
+              case Some(
+                value: ManagePhotoResponse.photoDeleted ||
+                    ManagePhotoResponse.photoRenamed
+              )) {
             ref.invalidate(paginatedPhotosPod);
           }
         },

@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/rename_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/widgets/rename_photo_dialog.dart';
 
@@ -19,7 +19,6 @@ class ManagePhotoBody extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fileName = useState(this.fileName);
     return Column(
       children: [
         Expanded(
@@ -29,7 +28,7 @@ class ManagePhotoBody extends HookConsumerWidget {
           ),
         ),
         const SizedBox(height: 4.0),
-        Text('Name: ${fileName.value}', textAlign: TextAlign.center),
+        Text('Name: $fileName', textAlign: TextAlign.center),
         const SizedBox(height: 8.0),
         SizedBox(
           width: double.infinity,
@@ -40,17 +39,17 @@ class ManagePhotoBody extends HookConsumerWidget {
               final newName = await showDialog<String>(
                 context: context,
                 builder: (context) =>
-                    RenamePhotoDialog(currentFileName: fileName.value),
+                    RenamePhotoDialog(currentFileName: fileName),
               ).toFutureOption();
               if (newName case Some(value: final newName)) {
                 final res = await _renamePhoto(
                   scaffoldMessenger,
                   ref,
-                  oldName: fileName.value,
+                  oldName: fileName,
                   newName: newName,
                 );
                 if (res case Ok()) {
-                  fileName.value = newName;
+                  ref.read(managePhotoImagePod.notifier).fileName = newName;
                 }
               }
             },

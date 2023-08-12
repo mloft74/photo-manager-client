@@ -6,23 +6,43 @@ import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/manage_photo/pods/delete_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/confirm_delete_photo_dialog.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body.dart';
+import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
 import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
 enum ManagePhotoResponse {
   photoDeleted,
+  photoRenamed,
 }
 
-class ManagePhoto extends ConsumerWidget {
+class ManagePhoto extends StatelessWidget {
   final HostedImage image;
+
   const ManagePhoto({
     required this.image,
     super.key,
   });
 
   @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      overrides: [
+        managePhotoImagePod.overrideWith(
+          () => ManagePhotoImage()..initialImage = image,
+        ),
+      ],
+      child: const _ManagePhoto(),
+    );
+  }
+}
+
+class _ManagePhoto extends ConsumerWidget {
+  const _ManagePhoto();
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final image = ref.watch(managePhotoImagePod.select((value) => value.image));
     final res = ref.watch(photoUrlPod(fileName: image.fileName));
     final child = switch (res) {
       Ok(:final value) => ManagePhotoBody(
@@ -33,7 +53,16 @@ class ManagePhoto extends ConsumerWidget {
     };
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
-        leading: const BackButton(),
+        leading: BackButton(
+          onPressed: () {
+            final renamed = ref.read(managePhotoImagePod).renamed;
+            if (renamed) {
+              Navigator.pop(context, ManagePhotoResponse.photoRenamed);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+        ),
         titleText: 'Manage Photo',
         actions: [
           IconButton(
