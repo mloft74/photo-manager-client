@@ -4,14 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manage_photo_image_pod.g.dart';
 
-@Riverpod(dependencies: [])
+@riverpod
 class ManagePhotoImage extends _$ManagePhotoImage {
-  // Needed to override the starting value
-  // ignore: avoid_public_notifier_properties
-  late final HostedImage initialImage;
-
   @override
-  ManagePhotoImageState build() {
+  ManagePhotoImageState build({
+    required HostedImage initialImage,
+  }) {
     return ManagePhotoImageState(image: initialImage);
   }
 

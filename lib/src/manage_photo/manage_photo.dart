@@ -7,7 +7,6 @@ import 'package:photo_manager_client/src/manage_photo/pods/delete_photo_pod.dart
 import 'package:photo_manager_client/src/manage_photo/widgets/confirm_delete_photo_dialog.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
-import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -16,46 +15,27 @@ enum ManagePhotoResponse {
   photoRenamed,
 }
 
-class ManagePhoto extends StatelessWidget {
-  final HostedImage image;
+class ManagePhoto extends ConsumerWidget {
+  final HostedImage initialImage;
 
   const ManagePhoto({
-    required this.image,
+    required this.initialImage,
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return ProviderScope(
-      overrides: [
-        managePhotoImagePod.overrideWith(
-          () => ManagePhotoImage()..initialImage = image,
-        ),
-      ],
-      child: const _ManagePhoto(),
-    );
-  }
-}
-
-class _ManagePhoto extends ConsumerWidget {
-  const _ManagePhoto();
-
-  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final image = ref.watch(managePhotoImagePod.select((value) => value.image));
-    final res = ref.watch(photoUrlPod(fileName: image.fileName));
-    final child = switch (res) {
-      Ok(:final value) => ManagePhotoBody(
-          photoUrl: value,
-          fileName: image.fileName,
-        ),
-      Err(:final error) => Center(child: Text('$error')),
-    };
+    final image = ref.watch(
+      managePhotoImagePod(initialImage: initialImage)
+          .select((value) => value.image),
+    );
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
         leading: BackButton(
           onPressed: () {
-            final renamed = ref.read(managePhotoImagePod).renamed;
+            final renamed = ref
+                .read(managePhotoImagePod(initialImage: initialImage))
+                .renamed;
             if (renamed) {
               Navigator.pop(context, ManagePhotoResponse.photoRenamed);
             } else {
@@ -75,7 +55,9 @@ class _ManagePhoto extends ConsumerWidget {
       ),
       child: Padding(
         padding: edgeInsetsForRoutePadding,
-        child: child,
+        child: ManagePhotoBody(
+          initialImage: initialImage,
+        ),
       ),
     );
   }

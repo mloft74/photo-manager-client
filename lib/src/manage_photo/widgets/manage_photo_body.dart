@@ -3,28 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/rename_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/widgets/rename_photo_dialog.dart';
+import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 
 class ManagePhotoBody extends HookConsumerWidget {
-  final String photoUrl;
-  final String fileName;
+  final HostedImage initialImage;
 
   const ManagePhotoBody({
-    required this.photoUrl,
-    required this.fileName,
+    required this.initialImage,
     super.key,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final fileName = ref.watch(
+      managePhotoImagePod(initialImage: initialImage)
+          .select((value) => value.image.fileName),
+    );
+    final res = ref.watch(photoUrlPod(fileName: fileName));
+
     return Column(
       children: [
         Expanded(
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: CachedNetworkImage(imageUrl: photoUrl),
+            child: switch (res) {
+              Ok(:final value) => CachedNetworkImage(imageUrl: value),
+              Err(:final error) => Text(
+                  '$error',
+                  textAlign: TextAlign.center,
+                ),
+            },
           ),
         ),
         const SizedBox(height: 4.0),
@@ -34,24 +46,7 @@ class ManagePhotoBody extends HookConsumerWidget {
           width: double.infinity,
           child: FilledButton(
             onPressed: () async {
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-              final newName = await showDialog<String>(
-                context: context,
-                builder: (context) =>
-                    RenamePhotoDialog(currentFileName: fileName),
-              ).toFutureOption();
-              if (newName case Some(value: final newName)) {
-                final res = await _renamePhoto(
-                  scaffoldMessenger,
-                  ref,
-                  oldName: fileName,
-                  newName: newName,
-                );
-                if (res case Ok()) {
-                  ref.read(managePhotoImagePod.notifier).fileName = newName;
-                }
-              }
+              await _onRenamePressed(context, ref, fileName, initialImage);
             },
             child: const Text('Rename'),
           ),
@@ -59,6 +54,35 @@ class ManagePhotoBody extends HookConsumerWidget {
       ],
     );
   }
+}
+
+Future<()> _onRenamePressed(
+  BuildContext context,
+  WidgetRef ref,
+  String fileName,
+  HostedImage initialImage,
+) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+  final newName = await showDialog<String>(
+    context: context,
+    builder: (context) => RenamePhotoDialog(currentFileName: fileName),
+  ).toFutureOption();
+  if (newName case Some(value: final newName)) {
+    final res = await _renamePhoto(
+      scaffoldMessenger,
+      ref,
+      oldName: fileName,
+      newName: newName,
+    );
+    if (res case Ok()) {
+      ref
+          .read(managePhotoImagePod(initialImage: initialImage).notifier)
+          .fileName = newName;
+    }
+  }
+
+  return ();
 }
 
 Future<Result<(), ()>> _renamePhoto(

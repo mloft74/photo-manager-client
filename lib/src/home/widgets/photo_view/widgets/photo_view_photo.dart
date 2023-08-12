@@ -25,7 +25,7 @@ class PhotoViewPhoto extends ConsumerWidget {
       orElse: (error) => Text('$error'),
       map: (value) => InkWell(
         onTap: () async {
-          final response = await ManagePhoto(image: image)
+          final response = await ManagePhoto(initialImage: image)
               .pushMaterialRoute<ManagePhotoResponse>(
                 context,
               )
