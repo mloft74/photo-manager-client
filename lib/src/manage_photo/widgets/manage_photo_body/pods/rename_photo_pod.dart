@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/basic_http_error.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
@@ -12,21 +11,23 @@ import 'package:photo_manager_client/src/persistence/server/pods/current_server_
     hide ErrorOccurred;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'delete_photo_pod.g.dart';
+part 'rename_photo_pod.g.dart';
 
-typedef DeletePhotoResult = Result<(), BasicHttpError>;
+typedef RenamePhotoResult = Result<(), BasicHttpError>;
 
-Future<DeletePhotoResult> _deletePhoto(
-  Server server,
-  HostedImage hostedImage,
-) async {
+Future<RenamePhotoResult> _renamePhoto(
+  Server server, {
+  required String oldName,
+  required String newName,
+}) async {
   try {
-    final uri = Uri.parse('${server.uri}/api/image/delete');
+    final uri = Uri.parse('${server.uri}/api/image/rename');
     final response = await post(
       uri,
       headers: {'content-type': 'application/json'},
       body: jsonEncode({
-        'file_name': hostedImage.fileName,
+        'old_name': oldName,
+        'new_name': newName,
       }),
     );
 
@@ -40,16 +41,25 @@ Future<DeletePhotoResult> _deletePhoto(
   }
 }
 
-typedef DeletePhotoFn = Future<DeletePhotoResult> Function(
-  HostedImage hostedImage,
-);
+typedef RenamePhotoFn = Future<RenamePhotoResult> Function({
+  required String oldName,
+  required String newName,
+});
 
 @riverpod
-Result<DeletePhotoFn, CurrentServerResultError> deletePhoto(
-  DeletePhotoRef ref,
+Result<RenamePhotoFn, CurrentServerResultError> renamePhoto(
+  RenamePhotoRef ref,
 ) {
-  final serverRes = ref.watch(currentServerResultPod);
-  return serverRes.map(
-    (value) => (hostedImage) async => await _deletePhoto(value, hostedImage),
+  final server = ref.watch(currentServerResultPod);
+  return server.map(
+    (value) => ({
+      required oldName,
+      required newName,
+    }) async =>
+        await _renamePhoto(
+          value,
+          oldName: oldName,
+          newName: newName,
+        ),
   );
 }

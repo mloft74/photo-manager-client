@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -32,12 +30,11 @@ class ManagePhotoBody extends StatelessWidget {
           width: double.infinity,
           child: FilledButton(
             onPressed: () async {
-              final foo = await showDialog<String>(
+              final newName = await showDialog<String>(
                 context: context,
                 builder: (context) =>
                     RenamePhotoDialog(currentFileName: fileName),
               ).toFutureOption();
-              log('foo: $foo', name: 'ManagePhotoBody | onPressed');
             },
             child: const Text('Rename'),
           ),

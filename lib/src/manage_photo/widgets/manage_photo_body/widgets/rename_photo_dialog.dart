@@ -26,7 +26,12 @@ class RenamePhotoDialog extends HookWidget {
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(context, controller.text);
+            final text = controller.text;
+            if (currentFileName != text) {
+              Navigator.pop(context, text);
+            } else {
+              Navigator.pop(context);
+            }
           },
           child: const Text('Rename'),
         ),
