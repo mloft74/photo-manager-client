@@ -32,7 +32,7 @@ class Home extends ConsumerWidget {
           if (currentServer case AsyncData(value: Some())) ...[
             IconButton(
               onPressed: () async {
-                final response = await showDialog<bool>(
+                final response = await showDialog<UpdateCanonResponse>(
                   context: context,
                   builder: (context) => const UpdateCanonDialog(),
                 );

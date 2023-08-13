@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+enum UpdateCanonResponse {
+  update,
+}
+
 class UpdateCanonDialog extends StatelessWidget {
   const UpdateCanonDialog({super.key});
 
@@ -13,13 +17,13 @@ class UpdateCanonDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(context, false);
+            Navigator.pop(context);
           },
           child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(context, true);
+            Navigator.pop(context, UpdateCanonResponse.update);
           },
           child: const Text('Update'),
         ),

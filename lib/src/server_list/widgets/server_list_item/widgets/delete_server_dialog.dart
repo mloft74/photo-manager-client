@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 
-class ConfirmServerDeleteDialog extends StatelessWidget {
+enum DeleteServerResponse {
+  delete,
+}
+
+class DeleteServerDialog extends StatelessWidget {
   final Server server;
-  const ConfirmServerDeleteDialog(this.server, {super.key});
+  const DeleteServerDialog(this.server, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +17,13 @@ class ConfirmServerDeleteDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(context, false);
+            Navigator.pop(context);
           },
           child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(context, true);
+            Navigator.pop(context, DeleteServerResponse.delete);
           },
           child: const Text('Delete'),
         ),

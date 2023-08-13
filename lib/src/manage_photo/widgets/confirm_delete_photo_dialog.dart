@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ConfirmDeletePhotoDialog extends StatelessWidget {
-  const ConfirmDeletePhotoDialog({super.key});
+enum DeletePhotoResponse {
+  delete,
+}
+
+class DeletePhotoDialog extends StatelessWidget {
+  const DeletePhotoDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +16,13 @@ class ConfirmDeletePhotoDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(context, false);
+            Navigator.pop(context);
           },
           child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(context, true);
+            Navigator.pop(context, DeletePhotoResponse.delete);
           },
           child: const Text('Delete'),
         ),

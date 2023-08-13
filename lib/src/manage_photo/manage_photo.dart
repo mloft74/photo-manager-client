@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/manage_photo/pods/delete_photo_pod.dart';
@@ -71,11 +72,17 @@ Future<()> _onDeletePressed(
   final scaffoldMessenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
-  final shouldDelete = await showDialog<bool>(
-        context: context,
-        builder: (context) => const ConfirmDeletePhotoDialog(),
-      ) ??
-      false;
+  final response = await showDialog<DeletePhotoResponse>(
+    context: context,
+    builder: (context) => const DeletePhotoDialog(),
+  ).toFutureOption();
+  final shouldDelete = response
+      .andThen(
+        (value) => value == DeletePhotoResponse.delete
+            ? const Some(())
+            : const None<()>(),
+      )
+      .isSome;
   if (!shouldDelete) {
     return ();
   }

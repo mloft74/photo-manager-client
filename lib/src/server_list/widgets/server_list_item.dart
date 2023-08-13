@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
@@ -8,7 +9,7 @@ import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/remove_server_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/set_current_server_pod.dart';
-import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/confirm_server_delete_dialog.dart';
+import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/delete_server_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class ServerListItem extends HookConsumerWidget {
@@ -35,10 +36,20 @@ class ServerListItem extends HookConsumerWidget {
                 background: ColoredBox(
                   color: Theme.of(context).colorScheme.error,
                 ),
-                confirmDismiss: (direction) async => await showDialog<bool>(
-                  context: context,
-                  builder: (context) => ConfirmServerDeleteDialog(server),
-                ),
+                confirmDismiss: (direction) async {
+                  final response = await showDialog<DeleteServerResponse>(
+                    context: context,
+                    builder: (context) => DeleteServerDialog(server),
+                  ).toFutureOption();
+                  final shouldDelete = response
+                      .andThen(
+                        (value) => value == DeleteServerResponse.delete
+                            ? const Some(())
+                            : const None<()>(),
+                      )
+                      .isSome;
+                  return shouldDelete;
+                },
                 onDismissed: (direction) async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
                   removingServer.value = true;
