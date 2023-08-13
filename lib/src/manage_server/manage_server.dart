@@ -145,6 +145,7 @@ Future<()> _onSave({
     ),
   );
   final res = await ref.read(saveServerPod)(server);
+  scaffoldMessenger.clearSnackBars();
   switch (res) {
     case Ok():
       scaffoldMessenger.showSnackBar(
@@ -157,7 +158,7 @@ Future<()> _onSave({
     case Err(:final error):
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('Error saving ${server.name}: $error'),
+          content: Text('Error: $error'),
         ),
       );
   }
@@ -170,22 +171,22 @@ Future<()> _onTestConnection({
   required WidgetRef ref,
   required Server server,
 }) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final scaffoldMessenger = ScaffoldMessenger.of(context)
+    ..showSnackBar(
+      const SnackBar(content: Text('Testing connection')),
+    );
 
   final result = await ref.read(testConnectionPod)(server);
-  final (message, duration) = result
-      .map((value) => const ('Connection successful', Duration(seconds: 1)))
-      .mapErr((error) => ('$error', const Duration(seconds: 4)))
-      // It's destructured
-      // ignore: unused_result
-      .coalesce();
+  final message = switch (result) {
+    Ok() => 'Connection successful',
+    Err(:final error) => 'Error: $error',
+  };
 
-  scaffoldMessenger.showSnackBar(
-    SnackBar(
-      content: Text(message),
-      duration: duration,
-    ),
-  );
+  scaffoldMessenger
+    ..clearSnackBars()
+    ..showSnackBar(
+      SnackBar(content: Text(message)),
+    );
 
   return ();
 }

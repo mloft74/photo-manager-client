@@ -91,19 +91,25 @@ Future<Result<(), ()>> _renamePhoto(
   required String oldName,
   required String newName,
 }) async {
-  final renamePhotoRes = ref.watch(renamePhotoPod);
+  scaffoldMessenger
+      .showSnackBar(SnackBar(content: Text('Renaming $oldName to $newName')));
+
+  final renamePhotoRes = ref.read(renamePhotoPod);
   switch (renamePhotoRes) {
     case Err(:final error):
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
+      scaffoldMessenger.clearSnackBars();
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $error')));
       return const Err(());
     case Ok(value: final renamePhoto):
       final result = await renamePhoto(oldName: oldName, newName: newName);
+      scaffoldMessenger.clearSnackBars();
       if (result case Err(:final error)) {
-        scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
+        scaffoldMessenger
+            .showSnackBar(SnackBar(content: Text('Error: $error')));
         return const Err(());
       } else {
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Renamed to $newName')),
+          SnackBar(content: Text('Renamed $oldName to $newName')),
         );
         return const Ok(());
       }
