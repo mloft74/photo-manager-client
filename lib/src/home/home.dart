@@ -5,6 +5,7 @@ import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
+import 'package:photo_manager_client/src/home/widgets/update_canon_dialog.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
@@ -28,7 +29,16 @@ class Home extends ConsumerWidget {
             },
             icon: const Icon(Icons.settings),
           ),
-          if (currentServer case AsyncData(value: Some()))
+          if (currentServer case AsyncData(value: Some())) ...[
+            IconButton(
+              onPressed: () async {
+                final response = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => const UpdateCanonDialog(),
+                );
+              },
+              icon: const Icon(Icons.refresh),
+            ),
             IconButton(
               onPressed: () async {
                 final response = await const UploadPhoto()
@@ -41,6 +51,7 @@ class Home extends ConsumerWidget {
               },
               icon: const Icon(Icons.add),
             ),
+          ]
         ],
       ),
       child: AsyncValueBuilder(
