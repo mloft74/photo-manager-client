@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
+import 'package:photo_manager_client/src/home/pods/update_canon_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
@@ -32,10 +34,7 @@ class Home extends ConsumerWidget {
           if (currentServer case AsyncData(value: Some())) ...[
             IconButton(
               onPressed: () async {
-                final response = await showDialog<UpdateCanonResponse>(
-                  context: context,
-                  builder: (context) => const UpdateCanonDialog(),
-                );
+                await _onUpdateCanonPressed(context, ref);
               },
               icon: const Icon(Icons.refresh),
             ),
@@ -65,4 +64,41 @@ class Home extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+  final response = await showDialog<UpdateCanonResponse>(
+    context: context,
+    builder: (context) => const UpdateCanonDialog(),
+  ).toFutureOption();
+  if (response case Some(value: UpdateCanonResponse.update)) {
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(content: Text('Updating canon')),
+    );
+    final updateCanonRes = ref.read(updateCanonPod);
+    switch (updateCanonRes) {
+      case Err(:final error):
+        scaffoldMessenger.clearSnackBars();
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('Error: $error')),
+        );
+      case Ok(value: final updateCanon):
+        final result = await updateCanon();
+        scaffoldMessenger.clearSnackBars();
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              switch (result) {
+                Err(:final error) => 'Error: $error',
+                Ok() => 'Canon updated',
+              },
+            ),
+          ),
+        );
+    }
+  }
+
+  return ();
 }
