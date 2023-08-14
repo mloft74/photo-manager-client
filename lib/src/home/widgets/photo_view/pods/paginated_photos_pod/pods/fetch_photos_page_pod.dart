@@ -75,8 +75,11 @@ typedef FetchPhotosPageFn = Future<FetchPhotosPageResult> Function(
   Option<int> after,
 );
 
+typedef FetchPhotosPagePodResult
+    = Result<FetchPhotosPageFn, CurrentServerResultError>;
+
 @riverpod
-Result<FetchPhotosPageFn, CurrentServerResultError> fetchPhotosPage(
+FetchPhotosPagePodResult fetchPhotosPage(
   FetchPhotosPageRef ref,
 ) {
   final server = ref.watch(currentServerResultPod);

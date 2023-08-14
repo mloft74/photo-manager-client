@@ -63,7 +63,7 @@ Future<()> _onRenamePressed(
   String fileName,
   HostedImage initialImage,
 ) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final messenger = ScaffoldMessenger.of(context);
 
   final newName = await showDialog<String>(
     context: context,
@@ -71,7 +71,7 @@ Future<()> _onRenamePressed(
   ).toFutureOption();
   if (newName case Some(value: final newName)) {
     final res = await _renamePhoto(
-      scaffoldMessenger,
+      messenger,
       ref,
       oldName: fileName,
       newName: newName,
@@ -87,7 +87,7 @@ Future<()> _onRenamePressed(
 }
 
 Future<Result<(), ()>> _renamePhoto(
-  ScaffoldMessengerState scaffoldMessenger,
+  ScaffoldMessengerState messenger,
   WidgetRef ref, {
   required String oldName,
   required String newName,
@@ -95,17 +95,17 @@ Future<Result<(), ()>> _renamePhoto(
   final renamePhotoRes = ref.read(renamePhotoPod);
   switch (renamePhotoRes) {
     case Err(:final error):
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $error')));
+      messenger.showSnackBar(SnackBar(content: Text('Error: $error')));
       return const Err(());
     case Ok(value: final renamePhoto):
-      final result = await runWithToasts(
-        messenger: scaffoldMessenger,
+      final res = await runWithToasts(
+        messenger: messenger,
         op: () => renamePhoto(oldName: oldName, newName: newName),
         startingMsg: 'Renaming $oldName to $newName',
         finishedMsg: 'Renamed $oldName to $newName',
       );
 
-      return switch (result) {
+      return switch (res) {
         Ok() => const Ok(()),
         Err() => const Err(()),
       };

@@ -68,7 +68,7 @@ class Home extends ConsumerWidget {
 }
 
 Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final messenger = ScaffoldMessenger.of(context);
 
   final response = await showDialog<UpdateCanonResponse>(
     context: context,
@@ -78,12 +78,12 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
     final updateCanonRes = ref.read(updateCanonPod);
     switch (updateCanonRes) {
       case Err(:final error):
-        scaffoldMessenger.showSnackBar(
+        messenger.showSnackBar(
           SnackBar(content: Text('Error: $error')),
         );
       case Ok(value: final updateCanon):
         await runWithToasts(
-          messenger: scaffoldMessenger,
+          messenger: messenger,
           op: updateCanon,
           startingMsg: 'Updating canon',
           finishedMsg: 'Canon updated',

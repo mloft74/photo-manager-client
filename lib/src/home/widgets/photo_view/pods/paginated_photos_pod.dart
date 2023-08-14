@@ -5,7 +5,6 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/models/paginated_photos_state.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/pods/fetch_photos_page_pod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'paginated_photos_pod.g.dart';
@@ -53,14 +52,14 @@ class PaginatedPhotos extends _$PaginatedPhotos {
   }
 
   Future<PaginatedPhotosState> _fetchPhotosPageSafe(
-    Result<FetchPhotosPageFn, CurrentServerResultError> fetchPhotosPageRes,
+    FetchPhotosPagePodResult podRes,
     PaginatedPhotosState stateData,
   ) async {
-    switch (fetchPhotosPageRes) {
+    switch (podRes) {
       case Ok(value: final fetchPhotosPage):
-        final result = await fetchPhotosPage(_cursor);
+        final res = await fetchPhotosPage(_cursor);
         return _stateFromResult(
-          result,
+          res,
           stateData,
         );
       case Err(:final error):
@@ -69,10 +68,10 @@ class PaginatedPhotos extends _$PaginatedPhotos {
   }
 
   PaginatedPhotosState _stateFromResult(
-    FetchPhotosPageResult result,
+    FetchPhotosPageResult res,
     PaginatedPhotosState stateData,
   ) {
-    switch (result) {
+    switch (res) {
       case Ok(:final value):
         _cursor = value.cursor;
         _hasNextPage = _cursor.isSome;

@@ -70,7 +70,7 @@ Future<()> _onDeletePressed(
   WidgetRef ref,
   HostedImage image,
 ) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
   final response = await showDialog<DeletePhotoResponse>(
@@ -91,15 +91,15 @@ Future<()> _onDeletePressed(
   final deletePhotoRes = ref.read(deletePhotoPod);
   switch (deletePhotoRes) {
     case Err(:final error):
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $error')));
+      messenger.showSnackBar(SnackBar(content: Text('Error: $error')));
     case Ok(value: final deletePhoto):
-      final result = runWithToasts(
-        messenger: scaffoldMessenger,
+      final res = runWithToasts(
+        messenger: messenger,
         op: () => deletePhoto(image),
         startingMsg: 'Deleting ${image.fileName}',
         finishedMsg: 'Deleted ${image.fileName}',
       );
-      if (result case Ok()) {
+      if (res case Ok()) {
         navigator.pop(ManagePhotoResponse.photoDeleted);
       }
   }

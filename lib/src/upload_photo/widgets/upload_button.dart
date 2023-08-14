@@ -40,17 +40,17 @@ Future<()> _onButtonPressed({
   required WidgetRef ref,
   required String photoPath,
 }) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
   final uploadPhotoRes = ref.read(uploadPhotoPod);
 
   switch (uploadPhotoRes) {
     case Err(:final error):
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
+      messenger.showSnackBar(SnackBar(content: Text('$error')));
     case Ok(value: final uploadPhoto):
       final res = await runWithToasts(
-        messenger: scaffoldMessenger,
+        messenger: messenger,
         op: () => uploadPhoto(photoPath),
         startingMsg: 'Uploading',
         finishedMsg: 'Upload finished',

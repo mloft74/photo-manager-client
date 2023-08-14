@@ -136,16 +136,16 @@ Future<()> _onSave({
   required WidgetRef ref,
   required Server server,
 }) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
-  final result = await runWithToasts(
-    messenger: scaffoldMessenger,
+  final res = await runWithToasts(
+    messenger: messenger,
     op: () => ref.read(saveServerPod)(server),
     startingMsg: 'Saving ${server.name}',
     finishedMsg: '${server.name} saved',
   );
-  if (result case Ok()) {
+  if (res case Ok()) {
     navigator.pop();
   }
 
@@ -157,10 +157,10 @@ Future<()> _onTestConnection({
   required WidgetRef ref,
   required Server server,
 }) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  final messenger = ScaffoldMessenger.of(context);
 
   await runWithToasts(
-    messenger: scaffoldMessenger,
+    messenger: messenger,
     op: () => ref.read(testConnectionPod)(server),
     startingMsg: 'Testing connection',
     finishedMsg: 'Connection successful',

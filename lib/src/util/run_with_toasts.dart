@@ -8,13 +8,13 @@ Future<Result<R, E>> runWithToasts<R extends Object, E extends Object>({
   required String finishedMsg,
 }) async {
   messenger.showSnackBar(SnackBar(content: Text(startingMsg)));
-  final result = await op();
+  final res = await op();
   messenger
     ..clearSnackBars()
     ..showSnackBar(
       SnackBar(
         content: Text(
-          switch (result) {
+          switch (res) {
             Err(:final error) => 'Error: $error',
             Ok() => finishedMsg,
           },
@@ -22,5 +22,5 @@ Future<Result<R, E>> runWithToasts<R extends Object, E extends Object>({
       ),
     );
 
-  return result;
+  return res;
 }
