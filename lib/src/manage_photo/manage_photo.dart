@@ -87,15 +87,13 @@ Future<()> _onDeletePressed(
     return ();
   }
 
-  scaffoldMessenger
-      .showSnackBar(SnackBar(content: Text('Deleting ${image.fileName}')));
-
   final deletePhotoRes = ref.read(deletePhotoPod);
   switch (deletePhotoRes) {
     case Err(:final error):
-      scaffoldMessenger.clearSnackBars();
       scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $error')));
     case Ok(value: final deletePhoto):
+      scaffoldMessenger
+          .showSnackBar(SnackBar(content: Text('Deleting ${image.fileName}')));
       final result = await deletePhoto(image);
       scaffoldMessenger.clearSnackBars();
       if (result case Err(:final error)) {

@@ -74,29 +74,29 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
     builder: (context) => const UpdateCanonDialog(),
   ).toFutureOption();
   if (response case Some(value: UpdateCanonResponse.update)) {
-    scaffoldMessenger.showSnackBar(
-      const SnackBar(content: Text('Updating canon')),
-    );
     final updateCanonRes = ref.read(updateCanonPod);
     switch (updateCanonRes) {
       case Err(:final error):
-        scaffoldMessenger.clearSnackBars();
         scaffoldMessenger.showSnackBar(
           SnackBar(content: Text('Error: $error')),
         );
       case Ok(value: final updateCanon):
-        final result = await updateCanon();
-        scaffoldMessenger.clearSnackBars();
         scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              switch (result) {
-                Err(:final error) => 'Error: $error',
-                Ok() => 'Canon updated',
-              },
-            ),
-          ),
+          const SnackBar(content: Text('Updating canon')),
         );
+        final result = await updateCanon();
+        scaffoldMessenger
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                switch (result) {
+                  Err(:final error) => 'Error: $error',
+                  Ok() => 'Canon updated',
+                },
+              ),
+            ),
+          );
     }
   }
 
