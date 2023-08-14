@@ -8,6 +8,7 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/manage_server/pods/test_connection_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/save_server_pod.dart';
+import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -138,29 +139,14 @@ Future<()> _onSave({
   final scaffoldMessenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
-  scaffoldMessenger.showSnackBar(
-    SnackBar(
-      content: Text('Saving ${server.name}'),
-      duration: const Duration(seconds: 1),
-    ),
+  final result = await runWithToasts(
+    messenger: scaffoldMessenger,
+    op: () => ref.read(saveServerPod)(server),
+    startingMsg: 'Saving ${server.name}',
+    finishedMsg: '${server.name} saved',
   );
-  final res = await ref.read(saveServerPod)(server);
-  scaffoldMessenger.clearSnackBars();
-  switch (res) {
-    case Ok():
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('${server.name} saved'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      navigator.pop();
-    case Err(:final error):
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Error: $error'),
-        ),
-      );
+  if (result case Ok()) {
+    navigator.pop();
   }
 
   return ();
@@ -171,22 +157,14 @@ Future<()> _onTestConnection({
   required WidgetRef ref,
   required Server server,
 }) async {
-  final scaffoldMessenger = ScaffoldMessenger.of(context)
-    ..showSnackBar(
-      const SnackBar(content: Text('Testing connection')),
-    );
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-  final result = await ref.read(testConnectionPod)(server);
-  final message = switch (result) {
-    Ok() => 'Connection successful',
-    Err(:final error) => 'Error: $error',
-  };
-
-  scaffoldMessenger
-    ..clearSnackBars()
-    ..showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+  await runWithToasts(
+    messenger: scaffoldMessenger,
+    op: () => ref.read(testConnectionPod)(server),
+    startingMsg: 'Testing connection',
+    finishedMsg: 'Connection successful',
+  );
 
   return ();
 }

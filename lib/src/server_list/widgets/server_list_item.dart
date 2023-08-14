@@ -53,6 +53,7 @@ class ServerListItem extends HookConsumerWidget {
                 onDismissed: (direction) async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
                   removingServer.value = true;
+
                   final res = await ref.read(removeServerPod)(server);
                   if (res case Err(:final error)) {
                     scaffoldMessenger.showSnackBar(

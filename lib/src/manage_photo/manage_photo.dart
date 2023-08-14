@@ -8,6 +8,7 @@ import 'package:photo_manager_client/src/manage_photo/pods/delete_photo_pod.dart
 import 'package:photo_manager_client/src/manage_photo/widgets/confirm_delete_photo_dialog.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
+import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -92,17 +93,13 @@ Future<()> _onDeletePressed(
     case Err(:final error):
       scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $error')));
     case Ok(value: final deletePhoto):
-      scaffoldMessenger
-          .showSnackBar(SnackBar(content: Text('Deleting ${image.fileName}')));
-      final result = await deletePhoto(image);
-      scaffoldMessenger.clearSnackBars();
-      if (result case Err(:final error)) {
-        scaffoldMessenger
-            .showSnackBar(SnackBar(content: Text('Error: $error')));
-      } else {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Deleted ${image.fileName}')),
-        );
+      final result = runWithToasts(
+        messenger: scaffoldMessenger,
+        op: () => deletePhoto(image),
+        startingMsg: 'Deleting ${image.fileName}',
+        finishedMsg: 'Deleted ${image.fileName}',
+      );
+      if (result case Ok()) {
         navigator.pop(ManagePhotoResponse.photoDeleted);
       }
   }

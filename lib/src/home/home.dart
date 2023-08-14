@@ -11,6 +11,7 @@ import 'package:photo_manager_client/src/home/widgets/update_canon_dialog.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
+import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -81,22 +82,12 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
           SnackBar(content: Text('Error: $error')),
         );
       case Ok(value: final updateCanon):
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('Updating canon')),
+        await runWithToasts(
+          messenger: scaffoldMessenger,
+          op: updateCanon,
+          startingMsg: 'Updating canon',
+          finishedMsg: 'Canon updated',
         );
-        final result = await updateCanon();
-        scaffoldMessenger
-          ..clearSnackBars()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                switch (result) {
-                  Err(:final error) => 'Error: $error',
-                  Ok() => 'Canon updated',
-                },
-              ),
-            ),
-          );
     }
   }
 

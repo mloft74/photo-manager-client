@@ -8,6 +8,7 @@ import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/rename_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/widgets/rename_photo_dialog.dart';
 import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
+import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 
 class ManagePhotoBody extends HookConsumerWidget {
   final HostedImage initialImage;
@@ -97,19 +98,16 @@ Future<Result<(), ()>> _renamePhoto(
       scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $error')));
       return const Err(());
     case Ok(value: final renamePhoto):
-      scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Renaming $oldName to $newName')));
-      final result = await renamePhoto(oldName: oldName, newName: newName);
-      scaffoldMessenger.clearSnackBars();
-      if (result case Err(:final error)) {
-        scaffoldMessenger
-            .showSnackBar(SnackBar(content: Text('Error: $error')));
-        return const Err(());
-      } else {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Renamed $oldName to $newName')),
-        );
-        return const Ok(());
-      }
+      final result = await runWithToasts(
+        messenger: scaffoldMessenger,
+        op: () => renamePhoto(oldName: oldName, newName: newName),
+        startingMsg: 'Renaming $oldName to $newName',
+        finishedMsg: 'Renamed $oldName to $newName',
+      );
+
+      return switch (result) {
+        Ok() => const Ok(()),
+        Err() => const Err(()),
+      };
   }
 }

@@ -5,6 +5,7 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/photo_pod.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
+import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 
 class UploadButton extends ConsumerWidget {
   const UploadButton({
@@ -48,15 +49,13 @@ Future<()> _onButtonPressed({
     case Err(:final error):
       scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
     case Ok(value: final uploadPhoto):
-      final res = await uploadPhoto(photoPath);
-      if (res case Err(:final error)) {
-        scaffoldMessenger.showSnackBar(SnackBar(content: Text('$error')));
-      } else {
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('Upload finished'),
-          ),
-        );
+      final res = await runWithToasts(
+        messenger: scaffoldMessenger,
+        op: () => uploadPhoto(photoPath),
+        startingMsg: 'Uploading',
+        finishedMsg: 'Upload finished',
+      );
+      if (res case Ok()) {
         navigator.pop(UploadPhotoResponse.photoUploaded);
       }
   }
