@@ -93,7 +93,7 @@ Future<()> _onDeletePressed(
     case Err(:final error):
       messenger.showSnackBar(SnackBar(content: Text('Error: $error')));
     case Ok(value: final deletePhoto):
-      final res = runWithToasts(
+      final res = await runWithToasts(
         messenger: messenger,
         op: () => deletePhoto(image),
         startingMsg: 'Deleting ${image.fileName}',
