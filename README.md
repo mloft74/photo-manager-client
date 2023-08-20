@@ -1,16 +1,11 @@
-# photo_manager_client
+# Photo Manager Client
 
-A new Flutter project.
+An app to upload and manage photos on a [server](https://github.com/mloft74/photo-manager-server).
 
-## Getting Started
+## Installing
 
-This project is a starting point for a Flutter application.
+Currently, only Android is supported.
 
-A few resources to get you started if this is your first Flutter project:
+### Android
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Build the APK by running `flutter build apk --release`. Then side load the APK onto the phone.
