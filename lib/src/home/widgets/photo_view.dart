@@ -7,11 +7,42 @@ import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_
 import 'package:photo_manager_client/src/home/widgets/photo_view/widgets/photo_view_photo.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
-class NewPhotoView extends ConsumerWidget {
+class NewPhotoView extends ConsumerStatefulWidget {
   const NewPhotoView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NewPhotoView> createState() => _NewPhotoViewState();
+}
+
+class _NewPhotoViewState extends ConsumerState<NewPhotoView> {
+  final _controller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller.addListener(_loadPageListener);
+  }
+
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_loadPageListener)
+      ..dispose();
+
+    super.dispose();
+  }
+
+  Future<()> _loadPageListener() async {
+    if (_controller.position.extentAfter < 200.0) {
+      await ref.read(paginatedPhotosPod.notifier).nextPage();
+    }
+
+    return ();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AsyncValueBuilder(
       asyncValue: ref.watch(paginatedPhotosPod),
       builder: (context, state) {
@@ -21,6 +52,7 @@ class NewPhotoView extends ConsumerWidget {
             ref.invalidate(paginatedPhotosPod);
           },
           child: CustomScrollView(
+            controller: _controller,
             slivers: [
               SliverPadding(
                 padding: edgeInsetsForRoutePadding.copyWith(bottom: 0.0),
@@ -62,7 +94,7 @@ class NewPhotoView extends ConsumerWidget {
               },
               SliverPadding(
                 padding: edgeInsetsForRoutePadding.copyWith(top: 0.0),
-              )
+              ),
             ],
           ),
         );

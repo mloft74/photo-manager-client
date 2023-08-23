@@ -51,7 +51,7 @@ class Home extends ConsumerWidget {
               },
               icon: const Icon(Icons.add),
             ),
-          ]
+          ],
         ],
       ),
       child: AsyncValueBuilder(
