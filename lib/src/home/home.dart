@@ -42,8 +42,7 @@ class Home extends ConsumerWidget {
             IconButton(
               onPressed: () async {
                 final response = await const UploadPhoto()
-                    .pushMaterialRoute<UploadPhotoResponse>(context)
-                    .toFutureOption();
+                    .pushMaterialRoute<UploadPhotoResponse>(context);
                 if (response
                     case Some(value: UploadPhotoResponse.photoUploaded)) {
                   ref.invalidate(paginatedPhotosPod);

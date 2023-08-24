@@ -27,9 +27,8 @@ class PhotoViewPhoto extends ConsumerWidget {
         onTap: () async {
           final response = await ManagePhoto(initialImage: image)
               .pushMaterialRoute<ManagePhotoResponse>(
-                context,
-              )
-              .toFutureOption();
+            context,
+          );
           if (response
               case Some(
                 value: ManagePhotoResponse.photoDeleted ||

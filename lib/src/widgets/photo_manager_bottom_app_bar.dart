@@ -15,12 +15,10 @@ class PhotoManagerBottomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final leading = this.leading;
-
     return BottomAppBar(
       child: Row(
         children: [
-          if (leading != null) leading,
+          if (leading case final leading?) leading,
           BottomAppBarTitle(titleText),
           const Spacer(),
           ...actions,

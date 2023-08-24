@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/extensions/navigator_extension.dart';
 
 extension WidgetExtension on Widget {
@@ -8,6 +9,6 @@ extension WidgetExtension on Widget {
   () pushMaterialRouteUnawaited(BuildContext context) =>
       Navigator.of(context).pushUnawaited(materialRoute());
 
-  Future<T?> pushMaterialRoute<T>(BuildContext context) =>
-      Navigator.push(context, materialRoute());
+  Future<Option<T>> pushMaterialRoute<T extends Object>(BuildContext context) =>
+      Navigator.push<T>(context, materialRoute()).toFutureOption();
 }
