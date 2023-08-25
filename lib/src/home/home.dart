@@ -16,6 +16,8 @@ import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
+// TODO(mloft74): add some kind of error reporting pod/service to make toasts less awful
+
 class Home extends ConsumerWidget {
   const Home({super.key});
 
