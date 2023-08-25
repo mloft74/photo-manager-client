@@ -4,6 +4,7 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/persistence/isar_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/models/selected_server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,9 +17,19 @@ Future<SaveServerResult> _saveServer(
   Server server,
 ) async {
   try {
+    final currentServer =
+        await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
+    await currentServer?.server.load();
     await isar.writeTxn(
       () async {
-        await isar.serverDBs.put(ServerDB.fromDomain(server));
+        final serverDb = ServerDB.fromDomain(server);
+        await isar.serverDBs.put(serverDb);
+        if (currentServer != null &&
+            currentServer.server.value?.name == server.name) {
+          await isar.selectedServerDBs.put(currentServer);
+          currentServer.server.value = serverDb;
+          await currentServer.server.save();
+        }
       },
     );
 
