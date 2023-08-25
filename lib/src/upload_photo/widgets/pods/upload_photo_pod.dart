@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
+import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,14 +17,15 @@ part 'upload_photo_pod.g.dart';
 typedef UploadPhotoResult = Result<(), UploadPhotoError>;
 
 Future<UploadPhotoResult> _uploadPhoto(
+  http.Client client,
   Server server,
   String imagePath,
 ) async {
   try {
     final uploadUri = Uri.parse('${server.uri}/api/image/upload');
-    final request = MultipartRequest('POST', uploadUri)
-      ..files.add(await MultipartFile.fromPath('', imagePath));
-    final response = await request.send();
+    final request = http.MultipartRequest('POST', uploadUri)
+      ..files.add(await http.MultipartFile.fromPath('', imagePath));
+    final response = await client.send(request);
     if (response.statusCode == 200) {
       return const Ok(());
     } else {
@@ -47,9 +49,11 @@ typedef UploadPhotoFn = Future<Result<(), UploadPhotoError>> Function(
 Result<UploadPhotoFn, CurrentServerResultError> uploadPhoto(
   UploadPhotoRef ref,
 ) {
+  final client = ref.watch(httpClientPod);
   final serverRes = ref.watch(currentServerResultPod);
   return serverRes.map(
-    (value) => (imagePath) async => await _uploadPhoto(value, imagePath),
+    (value) =>
+        (imagePath) async => await _uploadPhoto(client, value, imagePath),
   );
 }
 

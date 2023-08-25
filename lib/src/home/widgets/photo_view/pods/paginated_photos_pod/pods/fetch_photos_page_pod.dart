@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
@@ -12,6 +12,7 @@ import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
+import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
     hide ErrorOccurred;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -21,6 +22,7 @@ part 'fetch_photos_page_pod.g.dart';
 typedef FetchPhotosPageResult = Result<PhotosPage, GeneralHttpError>;
 
 Future<FetchPhotosPageResult> _fetchPhotosPage(
+  http.Client client,
   Server server,
   Option<int> after,
 ) async {
@@ -32,7 +34,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
     );
     final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
 
-    final response = await get(uri);
+    final response = await client.get(uri);
     if (response.statusCode != 200) {
       return Err(NotOk(response.reasonPhraseNonNull));
     }
@@ -82,7 +84,9 @@ typedef FetchPhotosPagePodResult
 FetchPhotosPagePodResult fetchPhotosPage(
   FetchPhotosPageRef ref,
 ) {
+  final client = ref.watch(httpClientPod);
   final server = ref.watch(currentServerResultPod);
-  return server
-      .map((value) => (after) async => await _fetchPhotosPage(value, after));
+  return server.map(
+    (value) => (after) async => await _fetchPhotosPage(client, value, after),
+  );
 }
