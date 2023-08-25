@@ -5,8 +5,8 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
-import 'package:photo_manager_client/src/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
+import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'test_connection_pod.g.dart';

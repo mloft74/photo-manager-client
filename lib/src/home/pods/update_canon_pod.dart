@@ -2,9 +2,9 @@ import 'package:http/http.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
-import 'package:photo_manager_client/src/errors/basic_http_error.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
+import 'package:photo_manager_client/src/http/errors/basic_http_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
     hide ErrorOccurred;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
