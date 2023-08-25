@@ -87,7 +87,7 @@ class _NewPhotoViewState extends ConsumerState<NewPhotoView> {
                     padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
                     sliver: SliverToBoxAdapter(
                       child: Center(
-                        child: Text(error, textAlign: TextAlign.center),
+                        child: Text(error),
                       ),
                     ),
                   ),
