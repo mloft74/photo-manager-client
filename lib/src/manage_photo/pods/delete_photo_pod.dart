@@ -15,6 +15,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'delete_photo_pod.g.dart';
 
+// TODO(mloft74): update to use timeout exception
+
 typedef DeletePhotoResult = Result<(), BasicHttpError>;
 
 Future<DeletePhotoResult> _deletePhoto(

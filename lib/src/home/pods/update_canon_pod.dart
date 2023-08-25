@@ -12,6 +12,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'update_canon_pod.g.dart';
 
+// TODO(mloft74): update to use timeout exception
+
 typedef UpdateCanonResult = Result<(), BasicHttpError>;
 
 Future<UpdateCanonResult> _updateCanon(

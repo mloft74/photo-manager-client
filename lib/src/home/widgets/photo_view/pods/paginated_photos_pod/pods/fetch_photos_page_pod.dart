@@ -19,6 +19,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fetch_photos_page_pod.g.dart';
 
+// TODO(mloft74): update to use timeout exception
+
 typedef FetchPhotosPageResult = Result<PhotosPage, GeneralHttpError>;
 
 Future<FetchPhotosPageResult> _fetchPhotosPage(

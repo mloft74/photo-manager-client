@@ -12,6 +12,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'test_connection_pod.g.dart';
 
+// TODO(mloft74): update to use timeout exception
+
 typedef TestConnectionResult = Result<(), GeneralHttpError>;
 
 Future<TestConnectionResult> _testConnection(

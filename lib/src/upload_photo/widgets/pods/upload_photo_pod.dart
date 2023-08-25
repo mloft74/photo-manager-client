@@ -14,6 +14,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'upload_photo_pod.freezed.dart';
 part 'upload_photo_pod.g.dart';
 
+// TODO(mloft74): update to use timeout exception
+
 typedef UploadPhotoResult = Result<(), UploadPhotoError>;
 
 Future<UploadPhotoResult> _uploadPhoto(

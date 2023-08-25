@@ -14,6 +14,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'rename_photo_pod.g.dart';
 
+// TODO(mloft74): update to use timeout exception
+
 typedef RenamePhotoResult = Result<(), BasicHttpError>;
 
 Future<RenamePhotoResult> _renamePhoto(
