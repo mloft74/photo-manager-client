@@ -29,19 +29,25 @@ class Home extends ConsumerWidget {
       bottomAppBar: PhotoManagerBottomAppBar(
         titleText: 'Home',
         actions: [
-          IconButton(
-            onPressed: () {
-              const Settings().pushMaterialRouteUnawaited(context);
-            },
-            icon: const Icon(Icons.settings),
-          ),
           if (currentServer case AsyncData(value: Some())) ...[
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.sort),
+            ),
             IconButton(
               onPressed: () async {
                 await _onUpdateCanonPressed(context, ref);
               },
               icon: const Icon(Icons.refresh),
             ),
+          ],
+          IconButton(
+            onPressed: () {
+              const Settings().pushMaterialRouteUnawaited(context);
+            },
+            icon: const Icon(Icons.settings),
+          ),
+          if (currentServer case AsyncData(value: Some()))
             IconButton(
               onPressed: () async {
                 final response = await const UploadPhoto()
@@ -53,7 +59,6 @@ class Home extends ConsumerWidget {
               },
               icon: const Icon(Icons.add),
             ),
-          ],
         ],
       ),
       child: AsyncValueBuilder(
