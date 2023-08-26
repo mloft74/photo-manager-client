@@ -4,9 +4,9 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/build_timed_out_error_msg.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
+import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/pods/update_canon_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/home/widgets/update_canon_dialog.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
@@ -84,13 +84,16 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
           SnackBar(content: Text('Error: $error')),
         );
       case Ok(value: final updateCanon):
-        await runWithToasts(
+        final res = await runWithToasts(
           messenger: messenger,
           op: updateCanon,
           startingMsg: 'Updating canon',
           finishedMsg: 'Canon updated',
           errorBuilder: buildBasicTimedOutErrorMsg,
         );
+        if (res case Ok()) {
+          ref.invalidate(paginatedPhotosPod);
+        }
     }
   }
 

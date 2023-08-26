@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod.dart';
+import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
 import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 

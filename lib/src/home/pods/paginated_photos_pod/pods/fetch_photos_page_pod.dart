@@ -10,7 +10,7 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
-import 'package:photo_manager_client/src/home/widgets/photo_view/pods/paginated_photos_pod/models/photos_page.dart';
+import 'package:photo_manager_client/src/home/pods/paginated_photos_pod/models/photos_page.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
