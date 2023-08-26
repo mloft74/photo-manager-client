@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
@@ -67,7 +68,7 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Error removing ${widget.server.name}: ${error.error}',
+                          'Error removing ${widget.server.name}:\n${error.toDisplayJoined()}',
                         ),
                       ),
                     );
@@ -83,7 +84,7 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
                           content: Text(
-                            'Error selecting ${widget.server.name}: $error',
+                            'Error selecting ${widget.server.name}:\n${error.toDisplayJoined()}',
                           ),
                         ),
                       );

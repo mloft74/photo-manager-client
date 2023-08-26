@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/home/pods/models/paginated_photos_state.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/widgets/photo_view_photo.dart';
-import 'package:photo_manager_client/src/http/errors/general_http_error.dart'
-    as ghe;
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
-    as csrp;
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
 class NewPhotoView extends ConsumerStatefulWidget {
@@ -92,31 +89,7 @@ class _NewPhotoViewState extends ConsumerState<NewPhotoView> {
                     sliver: SliverToBoxAdapter(
                       child: Center(
                         child: Text(
-                          switch (error) {
-                            CurrentServerError(
-                              error: csrp.ErrorOccurred(:final errorTrace)
-                            ) ||
-                            HttpError(
-                              error: ghe.ErrorOccurred(:final errorTrace)
-                            ) =>
-                              'Error occurred:\n'
-                                  '${errorTrace.error}\n'
-                                  'Stack trace:\n'
-                                  '${errorTrace.stackTrace}',
-                            CurrentServerError(
-                              error: csrp.NoServerSelected()
-                            ) =>
-                              'No server selected',
-                            CurrentServerError(error: csrp.Loading()) =>
-                              'Loading current server',
-                            HttpError(error: ghe.NotOk(:final reason)) =>
-                              'Http call failed; reason: $reason',
-                            HttpError(error: ghe.TimedOut()) =>
-                              'Call timed out. Are you on the right network?',
-                            HttpError(error: ghe.UnknownBody(:final body)) =>
-                              'Unknown http response body:\n'
-                                  '$body',
-                          },
+                          error.toDisplayJoined(),
                         ),
                       ),
                     ),

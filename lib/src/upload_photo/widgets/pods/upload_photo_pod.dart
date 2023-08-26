@@ -6,7 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
+import 'package:photo_manager_client/src/http/errors/displayable_impls.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -60,11 +62,22 @@ Result<UploadPhotoFn, CurrentServerResultError> uploadPhoto(
 }
 
 @freezed
-sealed class UploadPhotoError with _$UploadPhotoError {
+sealed class UploadPhotoError with _$UploadPhotoError implements Displayable {
+  const UploadPhotoError._();
+
   const factory UploadPhotoError.unknownBody(String body) = UnknownBody;
 
   const factory UploadPhotoError.imageAlreadyExists() = ImageAlreadyExists;
 
   const factory UploadPhotoError.errorOccurred(ErrorTrace<Object> errorTrace) =
       ErrorOccurred;
+
+  @override
+  Iterable<String> toDisplay() => switch (this) {
+        UnknownBody(:final body) => unknownBody(body),
+        ImageAlreadyExists() => const [
+            'An image with that name already exists',
+          ],
+        ErrorOccurred(:final errorTrace) => errorTrace.toDisplay(),
+      };
 }
