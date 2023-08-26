@@ -10,6 +10,7 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
+import 'package:photo_manager_client/src/home/pods/date_sorting_pod.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod/models/photos_page.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
@@ -25,13 +26,20 @@ typedef FetchPhotosPageResult = Result<PhotosPage, GeneralHttpError>;
 Future<FetchPhotosPageResult> _fetchPhotosPage(
   http.Client client,
   Server server,
+  DateSortingState sorting,
   Option<int> after,
 ) async {
   try {
     const countParam = 'count=50';
+    final sortingValue = switch (sorting) {
+      DateSortingState.newToOld => 'NewToOld',
+      DateSortingState.oldToNew => 'OldToNew',
+    };
+    final sortingParam = 'order=$sortingValue';
+    final alwaysParams = '$countParam&$sortingParam';
     final params = after.mapOr(
-      map: (value) => '$countParam&after=$value',
-      or: countParam,
+      map: (value) => '$alwaysParams&after=$value',
+      or: alwaysParams,
     );
     final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
 
@@ -89,7 +97,9 @@ FetchPhotosPagePodResult fetchPhotosPage(
 ) {
   final client = ref.watch(httpClientPod);
   final server = ref.watch(currentServerResultPod);
+  final sorting = ref.watch(dateSortingPod);
   return server.map(
-    (value) => (after) async => await _fetchPhotosPage(client, value, after),
+    (value) =>
+        (after) async => await _fetchPhotosPage(client, value, sorting, after),
   );
 }
