@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
@@ -10,7 +10,7 @@ import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/
 import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 
-class ManagePhotoBody extends HookConsumerWidget {
+class ManagePhotoBody extends ConsumerWidget {
   final HostedImage initialImage;
 
   const ManagePhotoBody({

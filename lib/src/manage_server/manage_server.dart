@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -12,7 +11,7 @@ import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-class ManageServer extends HookConsumerWidget {
+class ManageServer extends ConsumerStatefulWidget {
   final Server? server;
 
   const ManageServer({
@@ -21,19 +20,38 @@ class ManageServer extends HookConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(GlobalKey<FormState>.new);
-    final nameTextController = useTextEditingController(text: server?.name);
-    final uriTextController =
-        useTextEditingController(text: server?.uri.toString());
+  ConsumerState<ManageServer> createState() => _ManageServerState();
+}
 
+class _ManageServerState extends ConsumerState<ManageServer> {
+  final _formKey = GlobalKey<FormState>();
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _uriController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.server?.name);
+    _uriController = TextEditingController(text: widget.server?.uri.toString());
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _uriController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return PhotoManagerScaffold(
       bottomAppBar: const PhotoManagerBottomAppBar(
         leading: BackButton(),
         titleText: 'Manage Server',
       ),
       child: Form(
-        key: formKey,
+        key: _formKey,
         child: ListView(
           padding: edgeInsetsForRoutePadding,
           reverse: true,
@@ -41,9 +59,9 @@ class ManageServer extends HookConsumerWidget {
             FilledButton(
               onPressed: () async {
                 final data = _validateForm(
-                  formKey: formKey,
-                  nameTextController: nameTextController,
-                  uriTextController: uriTextController,
+                  formKey: _formKey,
+                  nameController: _nameController,
+                  uriController: _uriController,
                 );
                 if (data case Some(:final value)) {
                   await _onSave(
@@ -58,9 +76,9 @@ class ManageServer extends HookConsumerWidget {
             FilledButton(
               onPressed: () async {
                 final data = _validateForm(
-                  formKey: formKey,
-                  nameTextController: nameTextController,
-                  uriTextController: uriTextController,
+                  formKey: _formKey,
+                  nameController: _nameController,
+                  uriController: _uriController,
                 );
                 if (data case Some(:final value)) {
                   await _onTestConnection(
@@ -73,7 +91,7 @@ class ManageServer extends HookConsumerWidget {
               child: const Text('Test connection'),
             ),
             TextFormField(
-              controller: uriTextController,
+              controller: _uriController,
               decoration: const InputDecoration(
                 helperText: '',
                 hintText: 'Server uri',
@@ -82,8 +100,8 @@ class ManageServer extends HookConsumerWidget {
                   value.toOption().pipe(_validateServerUri).toNullable(),
             ),
             TextFormField(
-              enabled: server == null,
-              controller: nameTextController,
+              enabled: widget.server == null,
+              controller: _nameController,
               decoration: const InputDecoration(
                 helperText: '',
                 hintText: 'Server name',
@@ -114,8 +132,8 @@ Option<String> _validateServerName(Option<String> value) =>
 
 Option<Server> _validateForm({
   required GlobalKey<FormState> formKey,
-  required TextEditingController nameTextController,
-  required TextEditingController uriTextController,
+  required TextEditingController nameController,
+  required TextEditingController uriController,
 }) {
   final valid = formKey.currentState
       .toOption()
@@ -124,8 +142,8 @@ Option<Server> _validateForm({
     return const None();
   }
 
-  final name = nameTextController.text;
-  final uri = Uri.parse(uriTextController.text);
+  final name = nameController.text;
+  final uri = Uri.parse(uriController.text);
   return Some(
     Server(name: name, uri: uri),
   );

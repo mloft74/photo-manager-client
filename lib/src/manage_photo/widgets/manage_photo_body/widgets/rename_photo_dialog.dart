@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-class RenamePhotoDialog extends HookWidget {
+class RenamePhotoDialog extends StatefulWidget {
   final String currentFileName;
 
   const RenamePhotoDialog({
@@ -10,12 +9,30 @@ class RenamePhotoDialog extends HookWidget {
   });
 
   @override
+  State<RenamePhotoDialog> createState() => _RenamePhotoDialogState();
+}
+
+class _RenamePhotoDialogState extends State<RenamePhotoDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.currentFileName);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController(text: currentFileName);
     return AlertDialog(
       title: const Text('Rename photo'),
       content: TextField(
-        controller: controller,
+        controller: _controller,
       ),
       actions: [
         TextButton(
@@ -26,8 +43,8 @@ class RenamePhotoDialog extends HookWidget {
         ),
         TextButton(
           onPressed: () {
-            final text = controller.text;
-            if (currentFileName != text) {
+            final text = _controller.text;
+            if (widget.currentFileName != text) {
               Navigator.pop(context, text);
             } else {
               Navigator.pop(context);

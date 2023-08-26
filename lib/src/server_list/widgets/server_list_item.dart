@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
@@ -12,7 +11,7 @@ import 'package:photo_manager_client/src/persistence/server/pods/set_current_ser
 import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/delete_server_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
-class ServerListItem extends HookConsumerWidget {
+class ServerListItem extends ConsumerStatefulWidget {
   final Server server;
 
   const ServerListItem({
@@ -21,25 +20,32 @@ class ServerListItem extends HookConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final removingServer = useState(false);
+  ConsumerState<ServerListItem> createState() => _ServerListItemState();
+}
+
+class _ServerListItemState extends ConsumerState<ServerListItem> {
+  var _removingServer = false;
+
+  @override
+  Widget build(BuildContext context) {
     final currentServer = ref.watch(currentServerPod);
 
-    return removingServer.value
+    return _removingServer
         ? const SizedBox.shrink()
         : AsyncValueBuilder(
             asyncValue: currentServer,
             builder: (context, value) {
-              final selected = value.isSomeAnd((value) => value == server);
+              final selected =
+                  value.isSomeAnd((value) => value == widget.server);
               return Dismissible(
-                key: ValueKey(server),
+                key: ValueKey(widget.server),
                 background: ColoredBox(
                   color: Theme.of(context).colorScheme.error,
                 ),
                 confirmDismiss: (direction) async {
                   final response = await showDialog<DeleteServerResponse>(
                     context: context,
-                    builder: (context) => DeleteServerDialog(server),
+                    builder: (context) => DeleteServerDialog(widget.server),
                   ).toFutureOption();
                   final shouldDelete = response
                       .andThen(
@@ -52,14 +58,16 @@ class ServerListItem extends HookConsumerWidget {
                 },
                 onDismissed: (direction) async {
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  removingServer.value = true;
+                  setState(() {
+                    _removingServer = true;
+                  });
 
-                  final res = await ref.read(removeServerPod)(server);
+                  final res = await ref.read(removeServerPod)(widget.server);
                   if (res case Err(:final error)) {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Error removing ${server.name}: ${error.error}',
+                          'Error removing ${widget.server.name}: ${error.error}',
                         ),
                       ),
                     );
@@ -69,21 +77,23 @@ class ServerListItem extends HookConsumerWidget {
                   selected: selected,
                   onTap: () async {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    final res = await ref.read(setCurrentServerPod)(server);
+                    final res =
+                        await ref.read(setCurrentServerPod)(widget.server);
                     if (res case Err(:final error)) {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
-                          content:
-                              Text('Error selecting ${server.name}: $error'),
+                          content: Text(
+                            'Error selecting ${widget.server.name}: $error',
+                          ),
                         ),
                       );
                     }
                   },
-                  title: Text(server.name),
-                  subtitle: Text('${server.uri}'),
+                  title: Text(widget.server.name),
+                  subtitle: Text('${widget.server.uri}'),
                   trailing: IconButton(
                     onPressed: () {
-                      ManageServer(server: server)
+                      ManageServer(server: widget.server)
                           .pushMaterialRouteUnawaited(context);
                     },
                     icon: const Icon(Icons.edit),
