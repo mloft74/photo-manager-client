@@ -36,7 +36,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
     );
     final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
 
-    final response = await client.get(uri);
+    final response = await client.get(uri).timeout(const Duration(seconds: 10));
     if (response.statusCode != 200) {
       return Err(NotOk(response.reasonPhraseNonNull));
     }
@@ -70,6 +70,8 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
     } else {
       return Err(UnknownBody(bodyStr));
     }
+  } on TimeoutException {
+    return const Err(TimedOut());
   } catch (ex, st) {
     return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }

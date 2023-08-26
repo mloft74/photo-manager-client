@@ -63,7 +63,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
           stateData,
         );
       case Err(:final error):
-        return stateData.copyWith(loading: Err('$error'));
+        return stateData.copyWith(loading: Err(CurrentServerError(error)));
     }
   }
 
@@ -83,7 +83,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       case Err(:final error):
         _hasNextPage = false;
 
-        return stateData.copyWith(loading: Err('$error'));
+        return stateData.copyWith(loading: Err(HttpError(error)));
     }
   }
 }
