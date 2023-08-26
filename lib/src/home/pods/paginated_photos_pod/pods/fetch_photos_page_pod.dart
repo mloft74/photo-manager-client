@@ -13,6 +13,7 @@ import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod/models/photos_page.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
+import 'package:photo_manager_client/src/http/timeout.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
     hide ErrorOccurred;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -34,7 +35,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
     );
     final uri = Uri.parse('${server.uri}/api/image/paginated?$params');
 
-    final response = await client.get(uri).timeout(const Duration(seconds: 10));
+    final response = await client.get(uri).timeout(mediumTimeout);
     if (response.statusCode != 200) {
       return Err(NotOk(response.reasonPhraseNonNull));
     }

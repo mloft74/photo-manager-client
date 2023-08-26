@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -8,11 +9,10 @@ import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
+import 'package:photo_manager_client/src/http/timeout.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'test_connection_pod.g.dart';
-
-// TODO(mloft74): update to use timeout exception
 
 typedef TestConnectionResult = Result<(), GeneralHttpError>;
 
@@ -22,7 +22,7 @@ Future<TestConnectionResult> _testConnection(
 ) async {
   try {
     final uri = Uri.parse('${server.uri}/api/ping');
-    final response = await client.get(uri);
+    final response = await client.get(uri).timeout(shortTimeout);
     if (response.statusCode != 200) {
       return Err(NotOk(response.reasonPhraseNonNull));
     }
@@ -34,6 +34,8 @@ Future<TestConnectionResult> _testConnection(
     } else {
       return Err(UnknownBody(bodyStr));
     }
+  } on TimeoutException {
+    return const Err(TimedOut());
   } catch (ex, st) {
     return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }

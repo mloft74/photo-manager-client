@@ -96,7 +96,7 @@ Future<Result<(), ()>> _renamePhoto(
   final renamePhotoRes = ref.read(renamePhotoPod);
   switch (renamePhotoRes) {
     case Err(:final error):
-      messenger.showSnackBar(SnackBar(content: Text('Error: $error')));
+      messenger.showSnackBar(SnackBar(content: Text(error.toDisplayJoined())));
       return const Err(());
     case Ok(value: final renamePhoto):
       final res = await runWithToasts(

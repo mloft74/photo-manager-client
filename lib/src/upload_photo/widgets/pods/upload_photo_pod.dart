@@ -10,13 +10,12 @@ import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/http/errors/displayable_impls.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
+import 'package:photo_manager_client/src/http/timeout.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'upload_photo_pod.freezed.dart';
 part 'upload_photo_pod.g.dart';
-
-// TODO(mloft74): update to use timeout exception
 
 typedef UploadPhotoResult = Result<(), UploadPhotoError>;
 
@@ -29,7 +28,7 @@ Future<UploadPhotoResult> _uploadPhoto(
     final uploadUri = Uri.parse('${server.uri}/api/image/upload');
     final request = http.MultipartRequest('POST', uploadUri)
       ..files.add(await http.MultipartFile.fromPath('', imagePath));
-    final response = await client.send(request);
+    final response = await client.send(request).timeout(shortTimeout);
     if (response.statusCode == 200) {
       return const Ok(());
     } else {
@@ -40,6 +39,8 @@ Future<UploadPhotoResult> _uploadPhoto(
         _ => Err(UnknownBody(bodyString)),
       };
     }
+  } on TimeoutException {
+    return const Err(TimedOut());
   } catch (ex, st) {
     return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }
@@ -72,6 +73,8 @@ sealed class UploadPhotoError with _$UploadPhotoError implements Displayable {
   const factory UploadPhotoError.errorOccurred(ErrorTrace<Object> errorTrace) =
       ErrorOccurred;
 
+  const factory UploadPhotoError.timedOuter() = TimedOut;
+
   @override
   Iterable<String> toDisplay() => switch (this) {
         UnknownBody(:final body) => unknownBody(body),
@@ -79,5 +82,6 @@ sealed class UploadPhotoError with _$UploadPhotoError implements Displayable {
             'An image with that name already exists',
           ],
         ErrorOccurred(:final errorTrace) => errorTrace.toDisplay(),
+        TimedOut() => timedOut,
       };
 }
