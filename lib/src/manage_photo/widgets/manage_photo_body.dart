@@ -80,7 +80,7 @@ Future<()> _onRenamePressed(
     if (res case Ok()) {
       ref
           .read(managePhotoImagePod(initialImage: initialImage).notifier)
-          .fileName = newName;
+          .updateFileName(newName);
     }
   }
 

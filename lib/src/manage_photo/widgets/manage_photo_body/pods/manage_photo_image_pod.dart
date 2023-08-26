@@ -13,9 +13,7 @@ class ManagePhotoImage extends _$ManagePhotoImage {
     return ManagePhotoImageState(image: initialImage);
   }
 
-  // The pod is the setter.
-  // ignore: avoid_setters_without_getters
-  set fileName(String value) {
+  void updateFileName(String value) {
     state = ManagePhotoImageState(
       image: state.image.copyWith(fileName: value),
       renamed: true,
