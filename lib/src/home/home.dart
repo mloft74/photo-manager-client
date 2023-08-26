@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/errors/build_timed_out_error_msg.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/pods/update_canon_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
@@ -88,6 +89,7 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
           op: updateCanon,
           startingMsg: 'Updating canon',
           finishedMsg: 'Canon updated',
+          errorBuilder: buildBasicTimedOutErrorMsg,
         );
     }
   }

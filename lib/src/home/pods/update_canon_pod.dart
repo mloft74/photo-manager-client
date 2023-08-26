@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -12,8 +14,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'update_canon_pod.g.dart';
 
-// TODO(mloft74): update to use timeout exception
-
 typedef UpdateCanonResult = Result<(), BasicHttpError>;
 
 Future<UpdateCanonResult> _updateCanon(
@@ -23,12 +23,15 @@ Future<UpdateCanonResult> _updateCanon(
   try {
     final uri = Uri.parse('${server.uri}/api/image/update_canon');
 
-    final response = await client.post(uri);
+    final response =
+        await client.post(uri).timeout(const Duration(seconds: 30));
     if (response.statusCode != 200) {
       return Err(NotOk(response.reasonPhraseNonNull));
     }
 
     return const Ok(());
+  } on TimeoutException {
+    return const Err(TimedOut());
   } catch (ex, st) {
     return Err(ErrorOccurred(ErrorTrace(ex, Some(st))));
   }
