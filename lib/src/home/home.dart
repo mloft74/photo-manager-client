@@ -4,11 +4,13 @@ import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
+import 'package:photo_manager_client/src/home/pods/date_sorting_pod.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/pods/update_canon_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/home/widgets/update_canon_dialog.dart';
+import 'package:photo_manager_client/src/home/widgets/update_date_sorting_dialog.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
@@ -31,7 +33,17 @@ class Home extends ConsumerWidget {
         actions: [
           if (currentServer case AsyncData(value: Some())) ...[
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                final currentSorting = ref.read(dateSortingPod);
+                final newSorting = await showDialog<DateSortingState>(
+                  context: context,
+                  builder: (context) =>
+                      UpdateDateSortingDialog(currentSorting: currentSorting),
+                ).toFutureOption();
+                if (newSorting case Some(:final value)) {
+                  ref.read(dateSortingPod.notifier).sorting = value;
+                }
+              },
               icon: const Icon(Icons.sort),
             ),
             IconButton(
