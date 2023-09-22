@@ -78,7 +78,7 @@ class Home extends ConsumerWidget {
         builder: (context, value) {
           return switch (value) {
             None() => const ServerNotSelected(),
-            Some() => const NewPhotoView(),
+            Some() => const PhotoView(),
           };
         },
       ),
