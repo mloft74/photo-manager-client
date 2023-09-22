@@ -32,8 +32,8 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
   try {
     const countParam = 'count=50';
     final sortingValue = switch (sorting) {
-      DateSortingState.newToOld => 'NewToOld',
-      DateSortingState.oldToNew => 'OldToNew',
+      DateSortingState.newToOld => 'newToOld',
+      DateSortingState.oldToNew => 'oldToNew',
     };
     final sortingParam = 'order=$sortingValue';
     final alwaysParams = '$countParam&$sortingParam';
@@ -59,7 +59,7 @@ Future<FetchPhotosPageResult> _fetchPhotosPage(
           .map(
             (e) => HostedImage(
               // ignore: avoid_dynamic_calls
-              fileName: e['file_name'] as String,
+              fileName: e['fileName'] as String,
               // ignore: avoid_dynamic_calls
               width: e['width'] as int,
               // ignore: avoid_dynamic_calls

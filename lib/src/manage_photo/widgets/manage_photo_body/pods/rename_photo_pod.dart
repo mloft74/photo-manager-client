@@ -31,8 +31,8 @@ Future<RenamePhotoResult> _renamePhoto(
           uri,
           headers: {'content-type': 'application/json'},
           body: jsonEncode({
-            'old_name': oldName,
-            'new_name': newName,
+            'oldName': oldName,
+            'newName': newName,
           }),
         )
         .timeout(shortTimeout);

@@ -31,7 +31,7 @@ Future<DeletePhotoResult> _deletePhoto(
           uri,
           headers: {'content-type': 'application/json'},
           body: jsonEncode({
-            'file_name': hostedImage.fileName,
+            'fileName': hostedImage.fileName,
           }),
         )
         .timeout(shortTimeout);
