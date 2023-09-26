@@ -11,12 +11,12 @@ part 'paginated_photos_pod.g.dart';
 
 typedef PaginatedPhotosState = Result<PhotosState, PhotosError>;
 
+const Option<int> _defaultCursor = None();
+const _defaultHasNextPage = true;
 const _defaultState = PhotosState(
   loadingState: PhotosLoadingState.loading,
   images: IListConst([]),
 );
-const Option<int> _defaultCursor = None();
-const _defaultHasNextPage = true;
 
 @riverpod
 class PaginatedPhotos extends _$PaginatedPhotos {
