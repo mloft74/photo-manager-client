@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:photo_manager_client/src/home/pods/models/paginated_photos_state.dart';
+import 'package:photo_manager_client/src/home/pods/models/photos_state.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/widgets/photo_view_list.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/widgets/photo_view_no_images.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
-import 'package:photo_manager_client/src/home/pods/models/paginated_photos_state.dart';
+import 'package:photo_manager_client/src/home/pods/models/photos_state.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/widgets/photo_view_list/widgets/photo_view_photo.dart';
 

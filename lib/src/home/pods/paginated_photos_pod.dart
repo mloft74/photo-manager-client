@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/home/pods/models/paginated_photos_state.dart';
+import 'package:photo_manager_client/src/home/pods/models/photos_state.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod/pods/fetch_photos_page_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'paginated_photos_pod.g.dart';
+
+typedef PaginatedPhotosState = Result<PhotosState, PhotosError>;
 
 @riverpod
 class PaginatedPhotos extends _$PaginatedPhotos {
@@ -22,24 +24,24 @@ class PaginatedPhotos extends _$PaginatedPhotos {
     final fetchPhotosPageRes = ref.watch(fetchPhotosPagePod);
     return await _fetchPhotosPageSafe(
       fetchPhotosPageRes,
-      const PaginatedPhotosState(
-        loading: Ok(PaginatedPhotosLoadingState.loading),
+      const PhotosState(
+        loadingState: PhotosLoadingState.loading,
         images: IListConst([]),
       ),
     );
   }
 
   Future<()> nextPage() async {
-    if (state case AsyncData(value: final stateData)) {
-      final shouldShortCircuitLoading = stateData.loading
-          .map((value) => value == PaginatedPhotosLoadingState.loading)
-          .unwrapOr(true);
-      if (shouldShortCircuitLoading || !_hasNextPage) {
+    if (state case AsyncData(value: Ok(value: final stateData))) {
+      final isLoading = stateData.loadingState == PhotosLoadingState.loading;
+      if (isLoading || !_hasNextPage) {
         return ();
       }
       state = AsyncData(
-        stateData.copyWith(
-          loading: const Ok(PaginatedPhotosLoadingState.loading),
+        Ok(
+          stateData.copyWith(
+            loadingState: PhotosLoadingState.loading,
+          ),
         ),
       );
 
@@ -53,7 +55,7 @@ class PaginatedPhotos extends _$PaginatedPhotos {
 
   Future<PaginatedPhotosState> _fetchPhotosPageSafe(
     FetchPhotosPagePodResult podRes,
-    PaginatedPhotosState stateData,
+    PhotosState stateData,
   ) async {
     switch (podRes) {
       case Ok(value: final fetchPhotosPage):
@@ -63,27 +65,29 @@ class PaginatedPhotos extends _$PaginatedPhotos {
           stateData,
         );
       case Err(:final error):
-        return stateData.copyWith(loading: Err(CurrentServerError(error)));
+        return Err(CurrentServerError(error));
     }
   }
 
   PaginatedPhotosState _stateFromResult(
     FetchPhotosPageResult res,
-    PaginatedPhotosState stateData,
+    PhotosState stateData,
   ) {
     switch (res) {
       case Ok(:final value):
         _cursor = value.cursor;
         _hasNextPage = _cursor.isSome;
 
-        return stateData.copyWith(
-          loading: const Ok(PaginatedPhotosLoadingState.ready),
-          images: stateData.images + value.images,
+        return Ok(
+          stateData.copyWith(
+            loadingState: PhotosLoadingState.ready,
+            images: stateData.images + value.images,
+          ),
         );
       case Err(:final error):
         _hasNextPage = false;
 
-        return stateData.copyWith(loading: Err(HttpError(error)));
+        return Err(HttpError(error));
     }
   }
 }
