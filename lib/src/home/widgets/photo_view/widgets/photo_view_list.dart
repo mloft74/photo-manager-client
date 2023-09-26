@@ -49,9 +49,11 @@ class _PhotoViewState extends ConsumerState<PhotoViewList> {
     const maxCrossAxisExtent = 256.0;
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(paginatedPhotosPod);
+        await ref.read(paginatedPhotosPod.notifier).reset();
       },
       child: CustomScrollView(
+        // These physics ensure that the RefreshIndicator will always work.
+        physics: const AlwaysScrollableScrollPhysics(),
         controller: _controller,
         slivers: [
           SliverPadding(

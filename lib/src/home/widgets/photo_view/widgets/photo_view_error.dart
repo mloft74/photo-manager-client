@@ -20,8 +20,8 @@ class PhotoViewError extends ConsumerWidget {
       padding: edgeInsetsForRoutePadding,
       children: [
         FilledButton(
-          onPressed: () {
-            ref.invalidate(paginatedPhotosPod);
+          onPressed: () async {
+            await ref.read(paginatedPhotosPod.notifier).reset();
           },
           child: const Text('Try again'),
         ),

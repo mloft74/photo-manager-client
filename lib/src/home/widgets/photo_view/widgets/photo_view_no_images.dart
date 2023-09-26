@@ -20,7 +20,7 @@ class PhotoViewNoImages extends ConsumerWidget {
             final response = await const UploadPhoto()
                 .pushMaterialRoute<UploadPhotoResponse>(context);
             if (response case Some(value: UploadPhotoResponse.photoUploaded)) {
-              ref.invalidate(paginatedPhotosPod);
+              await ref.read(paginatedPhotosPod.notifier).reset();
             }
           },
           icon: const Icon(Icons.add),

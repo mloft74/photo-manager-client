@@ -11,26 +11,37 @@ part 'paginated_photos_pod.g.dart';
 
 typedef PaginatedPhotosState = Result<PhotosState, PhotosError>;
 
+const _defaultState = PhotosState(
+  loadingState: PhotosLoadingState.loading,
+  images: IListConst([]),
+);
+const Option<int> _defaultCursor = None();
+const _defaultHasNextPage = true;
+
 @riverpod
 class PaginatedPhotos extends _$PaginatedPhotos {
-  var _cursor = const Option<int>.none();
-  var _hasNextPage = true;
+  var _cursor = _defaultCursor;
+  var _hasNextPage = _defaultHasNextPage;
+
+  () _initMembers() {
+    _cursor = _defaultCursor;
+    _hasNextPage = _defaultHasNextPage;
+
+    return ();
+  }
 
   @override
   Future<PaginatedPhotosState> build() async {
-    _cursor = const None();
-    _hasNextPage = true;
+    _initMembers();
 
     final fetchPhotosPageRes = ref.watch(fetchPhotosPagePod);
     return await _fetchPhotosPageSafe(
       fetchPhotosPageRes,
-      const PhotosState(
-        loadingState: PhotosLoadingState.loading,
-        images: IListConst([]),
-      ),
+      _defaultState,
     );
   }
 
+  /// Load the next page given the internal state.
   Future<()> nextPage() async {
     if (state case AsyncData(value: Ok(value: final stateData))) {
       final isLoading = stateData.loadingState == PhotosLoadingState.loading;
@@ -49,6 +60,34 @@ class PaginatedPhotos extends _$PaginatedPhotos {
       state =
           AsyncData(await _fetchPhotosPageSafe(fetchPhotosPageRes, stateData));
     }
+
+    return ();
+  }
+
+  /// Reset the state back to defaults and load the first page again.
+  Future<()> reset() async {
+    if (state
+        case AsyncData(
+          value: Ok(
+            value: PhotosState(
+              loadingState: PhotosLoadingState.loading,
+            ),
+          )
+        )) {
+      return ();
+    }
+
+    state = const AsyncLoading();
+
+    _initMembers();
+
+    final fetchPhotosPageRes = ref.read(fetchPhotosPagePod);
+    state = AsyncData(
+      await _fetchPhotosPageSafe(
+        fetchPhotosPageRes,
+        _defaultState,
+      ),
+    );
 
     return ();
   }
