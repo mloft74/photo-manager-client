@@ -191,7 +191,7 @@ sealed class Option<T extends Object> with _$Option<T> {
   @useResult
   Iterable<T> toIterable() => switch (this) {
         Some(:final value) => [value],
-        None() => [],
+        None() => <T>[],
       };
 
   /// Returns [None] if the option is [None], otherwise returns [other].
