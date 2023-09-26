@@ -40,8 +40,8 @@ sealed class CurrentServerResultError
 
   @override
   Iterable<String> toDisplay() => switch (this) {
-        NoServerSelected() => ['No server selected'],
+        NoServerSelected() => const ['No server selected'],
         ErrorOccurred(:final errorTrace) => errorTrace.toDisplay(),
-        Loading() => ['Loading current server'],
+        Loading() => const ['Loading current server'],
       };
 }

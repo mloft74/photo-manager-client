@@ -35,7 +35,7 @@ class PhotoViewPhoto extends ConsumerWidget {
                 value: ManagePhotoResponse.photoDeleted ||
                     ManagePhotoResponse.photoRenamed
               )) {
-            ref.invalidate(paginatedPhotosPod);
+            await ref.read(paginatedPhotosPod.notifier).reset();
           }
         },
         child: CachedNetworkImage(

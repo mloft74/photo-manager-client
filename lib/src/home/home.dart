@@ -66,7 +66,7 @@ class Home extends ConsumerWidget {
                     .pushMaterialRoute<UploadPhotoResponse>(context);
                 if (response
                     case Some(value: UploadPhotoResponse.photoUploaded)) {
-                  ref.invalidate(paginatedPhotosPod);
+                  await ref.read(paginatedPhotosPod.notifier).reset();
                 }
               },
               icon: const Icon(Icons.add),
@@ -108,7 +108,7 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
           finishedMsg: 'Canon updated',
         );
         if (res case Ok()) {
-          ref.invalidate(paginatedPhotosPod);
+          await ref.read(paginatedPhotosPod.notifier).reset();
         }
     }
   }

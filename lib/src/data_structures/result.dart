@@ -147,7 +147,7 @@ sealed class Result<T extends Object, E extends Object> with _$Result<T, E> {
   @useResult
   Iterable<T> toIterable() => switch (this) {
         Ok(:final value) => [value],
-        Err() => [],
+        Err() => <T>[],
       };
 
   /// Returns the contained [Ok] value.

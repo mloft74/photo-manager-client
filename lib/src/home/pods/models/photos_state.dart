@@ -1,39 +1,34 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
 
-part 'paginated_photos_state.freezed.dart';
+part 'photos_state.freezed.dart';
 
 @freezed
-class PaginatedPhotosState with _$PaginatedPhotosState {
-  const factory PaginatedPhotosState({
-    required Result<PaginatedPhotosLoadingState, PaginatedPhotosStateError>
-        loading,
+class PhotosState with _$PhotosState {
+  const factory PhotosState({
+    required PhotosLoadingState loadingState,
     required IList<HostedImage> images,
-  }) = _PaginatedPhotosState;
+  }) = _PhotosState;
 }
 
-enum PaginatedPhotosLoadingState {
+enum PhotosLoadingState {
   ready,
   loading,
 }
 
 @freezed
-sealed class PaginatedPhotosStateError
-    with _$PaginatedPhotosStateError
-    implements Displayable {
-  const PaginatedPhotosStateError._();
+sealed class PhotosError with _$PhotosError implements Displayable {
+  const PhotosError._();
 
-  const factory PaginatedPhotosStateError.currentServer(
+  const factory PhotosError.currentServer(
     CurrentServerResultError error,
   ) = CurrentServerError;
 
-  const factory PaginatedPhotosStateError.http(GeneralHttpError error) =
-      HttpError;
+  const factory PhotosError.http(GeneralHttpError error) = HttpError;
 
   @override
   Iterable<String> toDisplay() => switch (this) {
