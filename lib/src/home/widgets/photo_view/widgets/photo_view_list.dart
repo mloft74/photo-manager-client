@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
-import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/home/pods/models/photos_state.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/home/widgets/photo_view/widgets/photo_view_list/widgets/photo_view_photo.dart';
 
 class PhotoViewList extends ConsumerStatefulWidget {
-  final PaginatedPhotosState state;
+  final PhotosState state;
 
   const PhotoViewList({
     required this.state,
@@ -71,31 +69,18 @@ class _PhotoViewState extends ConsumerState<PhotoViewList> {
               },
             ),
           ),
-          switch (widget.state.loading) {
-            Ok(value: PaginatedPhotosLoadingState.ready) =>
-              const SliverPadding(padding: EdgeInsets.zero),
-            Ok(value: PaginatedPhotosLoadingState.loading) => SliverPadding(
-                padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
-                sliver: const SliverToBoxAdapter(
-                  child: Center(
-                    child: SizedBox.square(
-                      dimension: maxCrossAxisExtent,
-                      child: CircularProgressIndicator(),
-                    ),
+          if (widget.state.loadingState == PhotosLoadingState.loading)
+            SliverPadding(
+              padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
+              sliver: const SliverToBoxAdapter(
+                child: Center(
+                  child: SizedBox.square(
+                    dimension: maxCrossAxisExtent,
+                    child: CircularProgressIndicator(),
                   ),
                 ),
               ),
-            Err(:final error) => SliverPadding(
-                padding: edgeInsetsForRoutePadding.copyWith(top: 8.0),
-                sliver: SliverToBoxAdapter(
-                  child: Center(
-                    child: Text(
-                      error.toDisplayJoined(),
-                    ),
-                  ),
-                ),
-              ),
-          },
+            ),
           SliverPadding(
             padding: edgeInsetsForRoutePadding.copyWith(top: 0.0),
           ),
