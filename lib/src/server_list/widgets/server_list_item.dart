@@ -8,7 +8,6 @@ import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/remove_server_pod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/set_current_server_pod.dart';
 import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/delete_server_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
@@ -78,8 +77,9 @@ class _ServerListItemState extends ConsumerState<ServerListItem> {
                   selected: selected,
                   onTap: () async {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    final res =
-                        await ref.read(setCurrentServerPod)(widget.server);
+                    final res = await ref
+                        .read(currentServerPod.notifier)
+                        .setServer(widget.server);
                     if (res case Err(:final error)) {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
