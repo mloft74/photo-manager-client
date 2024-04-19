@@ -50,9 +50,7 @@
 	},
 	"Part.g.file": {
 		"prefix": "partg",
-		"body": 
-
-			"part '$TM_FILENAME_BASE.g.dart';",
-			"scope": "dart",
+		"body": "part '$TM_FILENAME_BASE.g.dart';",
+		"scope": "dart",
 	}
 }
