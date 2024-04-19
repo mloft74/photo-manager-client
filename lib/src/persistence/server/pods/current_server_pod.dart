@@ -28,13 +28,16 @@ final class CurrentServer extends _$CurrentServer {
   }
 
   final _setServerLock = Lock();
-  Future<SetCurrentServerResult> setServer(Server server) async {
+  Future<SetCurrentServerResult> setServer(Option<Server> server) async {
     return await _setServerLock.synchronized(() async {
       final oldState = state;
-      state = AsyncData(Some(server));
+      state = AsyncData(server);
 
       final isar = ref.read(isarPod);
-      final res = await _setCurrentServer(isar, server);
+      final res = switch (server) {
+        Some(:final value) => await _setCurrentServer(isar, value),
+        None() => await _unsetCurrentServer(isar)
+      };
 
       if (res.isErr) {
         state = oldState;
@@ -62,6 +65,26 @@ Future<SetCurrentServerResult> _setCurrentServer(
       final innerSelected = selected ?? SelectedServerDB();
       await isar.selectedServerDBs.put(innerSelected);
       innerSelected.server.value = serverDb;
+      await innerSelected.server.save();
+    });
+
+    return const Ok(());
+  } catch (ex, st) {
+    return Err(ErrorTrace(ex, Some(st)));
+  }
+}
+
+Future<SetCurrentServerResult> _unsetCurrentServer(
+  Isar isar,
+) async {
+  try {
+    final selected =
+        await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
+
+    await isar.writeTxn(() async {
+      final innerSelected = selected ?? SelectedServerDB();
+      await isar.selectedServerDBs.put(innerSelected);
+      innerSelected.server.value = null;
       await innerSelected.server.save();
     });
 
