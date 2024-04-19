@@ -28,6 +28,7 @@ final class Servers extends _$Servers {
   }
 
   final _saveServerLock = Lock();
+  // TODO(mloft74): reset state on failure
   Future<SaveServerResult> saveServer(Server server) async {
     return await _saveServerLock.synchronized(() async {
       final isar = ref.read(isarPod);
@@ -52,6 +53,7 @@ final class Servers extends _$Servers {
   }
 
   final _removeServerLock = Lock();
+  // TODO(mloft74): reset state on failure
   Future<RemoveServerResult> removeServer(Server server) async {
     return await _removeServerLock.synchronized(() async {
       final isar = ref.read(isarPod);

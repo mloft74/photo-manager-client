@@ -6,7 +6,7 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/manage_server/pods/test_connection_pod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/save_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/servers_pod.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -159,7 +159,7 @@ Future<()> _onSave({
 
   final res = await runWithToasts(
     messenger: messenger,
-    op: () => ref.read(saveServerPod)(server),
+    op: () => ref.read(serversPod.notifier).saveServer(server),
     startingMsg: 'Saving ${server.name}',
     finishedMsg: '${server.name} saved',
   );
