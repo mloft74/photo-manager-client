@@ -10,64 +10,58 @@ import 'package:photo_manager_client/src/persistence/server/models/server_db.dar
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/remove_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/save_server_error.dart';
+import 'package:photo_manager_client/src/state_management/async_notifier_async_rollback_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:synchronized/synchronized.dart';
 
 part 'servers_pod.g.dart';
 
+typedef ServersState = IMap<String, Server>;
 typedef SaveServerResult = Result<(), SaveServerError>;
 typedef _SaveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
 typedef RemoveServerResult = Result<(), RemoveServerError>;
 typedef _RemoveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
 
 @riverpod
-final class Servers extends _$Servers {
+final class Servers extends _$Servers
+    with AsyncNotifierAsyncRollbackUpdate<ServersState> {
   @override
-  Future<IList<Server>> build() async {
+  Future<ServersState> build() async {
     final isar = ref.watch(isarPod);
     final dbs = await isar.serverDBs.where().findAll();
-    return dbs.map((element) => element.toDomain()).whereSome().toIList();
+    final domains = dbs.map((element) => element.toDomain()).whereSome();
+    return Map.fromEntries(domains.map((e) => MapEntry(e.name, e))).toIMap();
   }
 
   final _saveServerLock = Lock();
   Future<SaveServerResult> saveServer(Server server) async {
     return await _saveServerLock.synchronized(() async {
-      final oldState = state;
-      final servers = oldState.value;
-      if (servers == null) {
-        return const Err(SaveNoData());
-      }
-      state = AsyncData(servers.add(server));
-
-      final res = await _handleSave(ref, server);
-      if (res.isErr) {
-        state = oldState;
-      }
-      return res;
+      return await updateWithRollback(
+        onNoData: const SaveNoData(),
+        update: (value) async {
+          state = AsyncData(value.add(server.name, server));
+          return await _handleSave(ref, server);
+        },
+      );
     });
   }
 
   final _removeServerLock = Lock();
   Future<RemoveServerResult> removeServer(Server server) async {
     return await _removeServerLock.synchronized(() async {
-      final oldState = state;
-      final servers = oldState.value;
-      if (servers == null) {
-        return const Err(RemoveNoData());
-      }
-      state = AsyncData(servers.remove(server));
-
-      final res = await _handleRemove(ref, server);
-      if (res.isErr) {
-        state = oldState;
-      }
-      return res;
+      return await updateWithRollback(
+        onNoData: const RemoveNoData(),
+        update: (value) async {
+          state = AsyncData(value.remove(server.name));
+          return await _handleRemove(ref, server);
+        },
+      );
     });
   }
 }
 
 Future<SaveServerResult> _handleSave(
-  AutoDisposeAsyncNotifierProviderRef<IList<Server>> ref,
+  AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
   Server server,
 ) async {
   final isar = ref.read(isarPod);
@@ -118,7 +112,7 @@ Future<_SaveServerResult> _saveServer(
 }
 
 Future<RemoveServerResult> _handleRemove(
-  AutoDisposeAsyncNotifierProviderRef<IList<Server>> ref,
+  AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
   Server server,
 ) async {
   final isar = ref.read(isarPod);

@@ -9,6 +9,7 @@ import 'package:photo_manager_client/src/persistence/isar_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/models/selected_server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
+import 'package:photo_manager_client/src/state_management/async_notifier_async_rollback_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -19,7 +20,8 @@ typedef SetCurrentServerResult = Result<(), SetCurrentServerError>;
 typedef _SetCurrentServerResult = Result<(), ErrorTrace<Object>>;
 
 @riverpod
-final class CurrentServer extends _$CurrentServer {
+final class CurrentServer extends _$CurrentServer
+    with AsyncNotifierAsyncRollbackUpdate<CurrentServerState> {
   @override
   Future<CurrentServerState> build() async {
     final isar = ref.watch(isarPod);
@@ -32,24 +34,18 @@ final class CurrentServer extends _$CurrentServer {
   final _setServerLock = Lock();
   Future<SetCurrentServerResult> setServer(Option<Server> server) async {
     return await _setServerLock.synchronized(() async {
-      final oldState = state;
-      if (oldState.value == null) {
-        return const Err(NoData());
-      }
-      state = AsyncData(server);
-
-      final isar = ref.read(isarPod);
-      final res = switch (server) {
-        Some(:final value) => await _setCurrentServer(isar, value),
-        None() => await _unsetCurrentServer(isar)
-      }
-          .mapErr(ErrorOccurred.new);
-
-      if (res.isErr) {
-        state = oldState;
-      }
-
-      return res;
+      return await updateWithRollback(
+        onNoData: const NoData(),
+        update: (value) async {
+          state = AsyncData(server);
+          final isar = ref.read(isarPod);
+          return switch (server) {
+            Some(:final value) => await _setCurrentServer(isar, value),
+            None() => await _unsetCurrentServer(isar),
+          }
+              .mapErr(ErrorOccurred.new);
+        },
+      );
     });
   }
 }
