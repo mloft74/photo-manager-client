@@ -32,35 +32,38 @@ final class Servers extends _$Servers {
   final _saveServerLock = Lock();
   Future<SaveServerResult> saveServer(Server server) async {
     return await _saveServerLock.synchronized(() async {
-      final oldState = state.value;
-      if (oldState == null) {
-        return const Err(NoData());
+      final oldState = state;
+      final lifted = Ok<Server, SaveServerError>(server);
+      final x = await lifted
+          .andThen(
+        (server) => state.value
+            .toOption()
+            .map((servers) => (server, servers))
+            .okOr(const NoData()),
+      )
+          .andThenAsync((env) async {
+        state = AsyncData(env.$2.add(env.$1));
+        final isar = ref.read(isarPod);
+        final res = await _saveServer(isar, env.$1);
+        return res
+            .map((affected) => (env.$1, env.$2, affected))
+            .mapErr(ErrorSaving.new);
+      });
+      final y = await x.andThenAsync((env) async {
+        switch (env.$3) {
+          case _AffectedSelected.selectedNotAffected:
+            return const Ok(());
+          case _AffectedSelected.selectedAffected:
+            final res = await ref
+                .read(currentServerPod.notifier)
+                .setServer(Some(env.$1));
+            return res.mapErr(ErrorSettingServer.new);
+        }
+      });
+      if (y.isErr) {
+        state = oldState;
       }
-      state = AsyncData(oldState.add(server));
-
-      final isar = ref.read(isarPod);
-      final res = await _saveServer(isar, server);
-      switch (res) {
-        case Err(:final error):
-          state = AsyncData(oldState);
-          return Err(ErrorSaving(error));
-        case Ok(:final value):
-          switch (value) {
-            case _AffectedSelected.selectedNotAffected:
-              return const Ok(());
-            case _AffectedSelected.selectedAffected:
-              final res = await ref
-                  .read(currentServerPod.notifier)
-                  .setServer(Some(server));
-              switch (res) {
-                case Ok():
-                  return const Ok(());
-                case Err(:final error):
-                  state = AsyncData(oldState);
-                  return Err(ErrorSettingServer(error));
-              }
-          }
-      }
+      return y;
     });
   }
 
