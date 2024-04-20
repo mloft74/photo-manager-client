@@ -1,4 +1,5 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:isar/isar.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -11,9 +12,10 @@ import 'package:photo_manager_client/src/persistence/server/pods/current_server_
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:synchronized/synchronized.dart';
 
+part 'servers_pod.freezed.dart';
 part 'servers_pod.g.dart';
 
-typedef SaveServerResult = Result<(), ErrorTrace<Object>>;
+typedef SaveServerResult = Result<(), SaveServerError>;
 typedef _SaveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
 typedef RemoveServerResult = Result<(), ErrorTrace<Object>>;
 typedef _RemoveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
@@ -28,12 +30,20 @@ final class Servers extends _$Servers {
   }
 
   final _saveServerLock = Lock();
-  // TODO(mloft74): reset state on failure
   Future<SaveServerResult> saveServer(Server server) async {
     return await _saveServerLock.synchronized(() async {
+      final oldState = state.value;
+      if (oldState == null) {
+        return const Err(NoData());
+      }
+      state = AsyncData(oldState.add(server));
+
       final isar = ref.read(isarPod);
       final res = await _saveServer(isar, server);
       switch (res) {
+        case Err(:final error):
+          state = AsyncData(oldState);
+          return Err(ErrorSaving(error));
         case Ok(:final value):
           switch (value) {
             case _AffectedSelected.selectedNotAffected:
@@ -42,12 +52,14 @@ final class Servers extends _$Servers {
               final res = await ref
                   .read(currentServerPod.notifier)
                   .setServer(Some(server));
-              // TODO(mloft74): make dedicated error type for saving
-              return res;
+              switch (res) {
+                case Ok():
+                  return const Ok(());
+                case Err(:final error):
+                  state = AsyncData(oldState);
+                  return Err(ErrorSettingServer(error));
+              }
           }
-        case Err(:final error):
-          // TODO(mloft74): make dedicated error type for saving
-          return Err(error);
       }
     });
   }
@@ -139,4 +151,16 @@ Future<_RemoveServerResult> _removeServer(Isar isar, Server server) async {
 enum _AffectedSelected {
   selectedAffected,
   selectedNotAffected,
+}
+
+@freezed
+sealed class SaveServerError with _$SaveServerError {
+  const factory SaveServerError.noData() = NoData;
+
+  const factory SaveServerError.errorSaving(ErrorTrace<Object> errorTrace) =
+      ErrorSaving;
+
+  const factory SaveServerError.errorSettingServer(
+    ErrorTrace<Object> errorTrace,
+  ) = ErrorSettingServer;
 }
