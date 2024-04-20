@@ -9,24 +9,24 @@ part 'save_server_error.freezed.dart';
 sealed class SaveServerError with _$SaveServerError implements Displayable {
   const SaveServerError._();
 
-  const factory SaveServerError.noData() = SaveNoData;
+  const factory SaveServerError.noData() = NoDataSave;
 
   const factory SaveServerError.errorSaving(ErrorTrace<Object> errorTrace) =
       ErrorSaving;
 
   const factory SaveServerError.errorSettingServer(
     SetCurrentServerError error,
-  ) = ErrorSettingServer;
+  ) = ErrorSettingServerSave;
 
   const factory SaveServerError.serverNameInUse() = ServerNameInUse;
 
   @override
   Iterable<String> toDisplay() => switch (this) {
-        SaveNoData() => const ['No data when saving.'],
+        NoDataSave() => const ['No data when saving.'],
         ErrorSaving(:final errorTrace) => errorTrace.toDisplay(),
-        ErrorSettingServer(:final error) => error.toDisplay(),
+        ErrorSettingServerSave(:final error) => error.toDisplay(),
         ServerNameInUse() => const [
-            'This server name given is already used. Please edit that server to update its url',
+            'This server name given is already used. Please edit that server to update its url.',
           ],
       };
 }
