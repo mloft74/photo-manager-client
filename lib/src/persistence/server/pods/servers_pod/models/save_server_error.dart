@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
 
 part 'save_server_error.freezed.dart';
 
@@ -14,17 +15,13 @@ sealed class SaveServerError with _$SaveServerError implements Displayable {
       ErrorSaving;
 
   const factory SaveServerError.errorSettingServer(
-    ErrorTrace<Object> errorTrace,
+    SetCurrentServerError error,
   ) = ErrorSettingServer;
 
   @override
-  Iterable<String> toDisplay() {
-    switch (this) {
-      case SaveNoData():
-        return const ['No data when saving.'];
-      case ErrorSaving(:final errorTrace):
-      case ErrorSettingServer(:final errorTrace):
-        return errorTrace.toDisplay();
-    }
-  }
+  Iterable<String> toDisplay() => switch (this) {
+        SaveNoData() => const ['No data when saving.'],
+        ErrorSaving(:final errorTrace) => errorTrace.toDisplay(),
+        ErrorSettingServer(:final error) => error.toDisplay()
+      };
 }

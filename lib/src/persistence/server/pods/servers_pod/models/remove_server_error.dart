@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
 
 part 'remove_server_error.freezed.dart';
 
@@ -14,17 +15,13 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
       ErrorRemoving;
 
   const factory RemoveServerError.errorUnsettingServer(
-    ErrorTrace<Object> errorTrace,
+    SetCurrentServerError error,
   ) = ErrorUnsettingServer;
 
   @override
-  Iterable<String> toDisplay() {
-    switch (this) {
-      case RemoveNoData():
-        return const ['No data when removing.'];
-      case ErrorRemoving(:final errorTrace):
-      case ErrorUnsettingServer(:final errorTrace):
-        return errorTrace.toDisplay();
-    }
-  }
+  Iterable<String> toDisplay() => switch (this) {
+        RemoveNoData() => const ['No data when removing.'],
+        ErrorRemoving(:final errorTrace) => errorTrace.toDisplay(),
+        ErrorUnsettingServer(:final error) => error.toDisplay()
+      };
 }
