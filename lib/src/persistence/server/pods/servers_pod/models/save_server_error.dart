@@ -18,10 +18,15 @@ sealed class SaveServerError with _$SaveServerError implements Displayable {
     SetCurrentServerError error,
   ) = ErrorSettingServer;
 
+  const factory SaveServerError.serverNameInUse() = ServerNameInUse;
+
   @override
   Iterable<String> toDisplay() => switch (this) {
         SaveNoData() => const ['No data when saving.'],
         ErrorSaving(:final errorTrace) => errorTrace.toDisplay(),
-        ErrorSettingServer(:final error) => error.toDisplay()
+        ErrorSettingServer(:final error) => error.toDisplay(),
+        ServerNameInUse() => const [
+            'This server name given is already used. Please edit that server to update its url',
+          ],
       };
 }

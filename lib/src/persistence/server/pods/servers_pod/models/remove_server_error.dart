@@ -18,10 +18,13 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
     SetCurrentServerError error,
   ) = ErrorUnsettingServer;
 
+  const factory RemoveServerError.serverNotFound() = ServerNotFound;
+
   @override
   Iterable<String> toDisplay() => switch (this) {
         RemoveNoData() => const ['No data when removing.'],
         ErrorRemoving(:final errorTrace) => errorTrace.toDisplay(),
-        ErrorUnsettingServer(:final error) => error.toDisplay()
+        ErrorUnsettingServer(:final error) => error.toDisplay(),
+        ServerNotFound() => const ['No server with that name was found.'],
       };
 }

@@ -39,6 +39,9 @@ final class Servers extends _$Servers
       return await updateWithRollback(
         onNoData: const SaveNoData(),
         update: (value) async {
+          if (value.containsKey(server.name)) {
+            return const Err(ServerNameInUse());
+          }
           state = AsyncData(value.add(server.name, server));
           return await _handleSave(ref, server);
         },
@@ -52,6 +55,9 @@ final class Servers extends _$Servers
       return await updateWithRollback(
         onNoData: const RemoveNoData(),
         update: (value) async {
+          if (!value.containsKey(server.name)) {
+            return const Err(ServerNotFound());
+          }
           state = AsyncData(value.remove(server.name));
           return await _handleRemove(ref, server);
         },
