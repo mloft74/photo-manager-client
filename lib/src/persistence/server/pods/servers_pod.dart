@@ -1,5 +1,4 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:isar/isar.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -9,15 +8,16 @@ import 'package:photo_manager_client/src/persistence/isar_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/models/selected_server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/remove_server_error.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/save_server_error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:synchronized/synchronized.dart';
 
-part 'servers_pod.freezed.dart';
 part 'servers_pod.g.dart';
 
 typedef SaveServerResult = Result<(), SaveServerError>;
 typedef _SaveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
-typedef RemoveServerResult = Result<(), ErrorTrace<Object>>;
+typedef RemoveServerResult = Result<(), RemoveServerError>;
 typedef _RemoveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
 
 @riverpod
@@ -35,7 +35,7 @@ final class Servers extends _$Servers {
       final oldState = state;
       final servers = oldState.value;
       if (servers == null) {
-        return const Err(NoData());
+        return const Err(SaveNoData());
       }
       state = AsyncData(servers.add(server));
 
@@ -48,27 +48,20 @@ final class Servers extends _$Servers {
   }
 
   final _removeServerLock = Lock();
-  // TODO(mloft74): reset state on failure
   Future<RemoveServerResult> removeServer(Server server) async {
     return await _removeServerLock.synchronized(() async {
-      final isar = ref.read(isarPod);
-      final res = await _removeServer(isar, server);
-      switch (res) {
-        case Ok(:final value):
-          switch (value) {
-            case _AffectedSelected.selectedNotAffected:
-              return const Ok(());
-            case _AffectedSelected.selectedAffected:
-              final res = await ref
-                  .read(currentServerPod.notifier)
-                  .setServer(const None());
-              // TODO(mloft74): make dedicated error type for removing
-              return res;
-          }
-        case Err(:final error):
-          // TODO(mloft74): make dedicated error type for removing
-          return Err(error);
+      final oldState = state;
+      final servers = oldState.value;
+      if (servers == null) {
+        return const Err(RemoveNoData());
       }
+      state = AsyncData(servers.remove(server));
+
+      final res = await _handleRemove(ref, server);
+      if (res.isErr) {
+        state = oldState;
+      }
+      return res;
     });
   }
 }
@@ -124,6 +117,27 @@ Future<_SaveServerResult> _saveServer(
   }
 }
 
+Future<RemoveServerResult> _handleRemove(
+  AutoDisposeAsyncNotifierProviderRef<IList<Server>> ref,
+  Server server,
+) async {
+  final isar = ref.read(isarPod);
+  final removeRes = await _removeServer(isar, server);
+
+  return await removeRes
+      .mapErr(RemoveServerError.errorRemoving)
+      .andThenAsync((value) async {
+    switch (value) {
+      case _AffectedSelected.selectedNotAffected:
+        return const Ok(());
+      case _AffectedSelected.selectedAffected:
+        final res =
+            await ref.read(currentServerPod.notifier).setServer(const None());
+        return res.mapErr(ErrorUnsettingServer.new);
+    }
+  });
+}
+
 Future<_RemoveServerResult> _removeServer(Isar isar, Server server) async {
   try {
     final selected =
@@ -155,16 +169,4 @@ Future<_RemoveServerResult> _removeServer(Isar isar, Server server) async {
 enum _AffectedSelected {
   selectedAffected,
   selectedNotAffected,
-}
-
-@freezed
-sealed class SaveServerError with _$SaveServerError {
-  const factory SaveServerError.noData() = NoData;
-
-  const factory SaveServerError.errorSaving(ErrorTrace<Object> errorTrace) =
-      ErrorSaving;
-
-  const factory SaveServerError.errorSettingServer(
-    ErrorTrace<Object> errorTrace,
-  ) = ErrorSettingServer;
 }
