@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
-import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/manage_server/pods/test_connection_pod.dart';
@@ -68,6 +67,7 @@ class _ManageServerState extends ConsumerState<ManageServer> {
                     context: context,
                     ref: ref,
                     server: value,
+                    newServer: widget.server == null,
                   );
                 }
               },
@@ -153,17 +153,23 @@ Future<()> _onSave({
   required BuildContext context,
   required WidgetRef ref,
   required Server server,
+  required bool newServer,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
   final res = await runWithToasts(
     messenger: messenger,
-    op: () => ref.read(serversPod.notifier).saveServer(server),
+    op: () {
+      final notifier = ref.read(serversPod.notifier);
+      return newServer
+          ? notifier.saveServer(server)
+          : notifier.updateServer(server);
+    },
     startingMsg: 'Saving ${server.name}',
     finishedMsg: '${server.name} saved',
   );
-  if (res case Ok()) {
+  if (res.isOk) {
     navigator.pop();
   }
 

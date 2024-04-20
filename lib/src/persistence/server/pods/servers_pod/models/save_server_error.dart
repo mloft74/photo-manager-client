@@ -26,7 +26,7 @@ sealed class SaveServerError with _$SaveServerError implements Displayable {
         ErrorSaving(:final errorTrace) => errorTrace.toDisplay(),
         ErrorSettingServerSave(:final error) => error.toDisplay(),
         ServerNameInUse() => const [
-            'This server name given is already used. Please edit that server to update its url.',
+            'This server name is already used. Please edit the existing server to update its url, or choose a new name for this server.',
           ],
       };
 }
