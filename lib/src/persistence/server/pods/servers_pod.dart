@@ -39,7 +39,7 @@ final class Servers extends _$Servers {
       }
       state = AsyncData(servers.add(server));
 
-      final res = await _handleSave(server, ref);
+      final res = await _handleSave(ref, server);
       if (res.isErr) {
         state = oldState;
       }
@@ -74,29 +74,24 @@ final class Servers extends _$Servers {
 }
 
 Future<SaveServerResult> _handleSave(
-  Server server,
   AutoDisposeAsyncNotifierProviderRef<IList<Server>> ref,
+  Server server,
 ) async {
   final isar = ref.read(isarPod);
-  final res = await _saveServer(isar, server);
-  switch (res) {
-    case Err(:final error):
-      return Err(ErrorSaving(error));
-    case Ok(:final value):
-      switch (value) {
-        case _AffectedSelected.selectedNotAffected:
-          return const Ok(());
-        case _AffectedSelected.selectedAffected:
-          final res =
-              await ref.read(currentServerPod.notifier).setServer(Some(server));
-          switch (res) {
-            case Ok():
-              return const Ok(());
-            case Err(:final error):
-              return Err(ErrorSettingServer(error));
-          }
-      }
-  }
+  final saveRes = await _saveServer(isar, server);
+
+  return await saveRes
+      .mapErr(SaveServerError.errorSaving)
+      .andThenAsync((value) async {
+    switch (value) {
+      case _AffectedSelected.selectedNotAffected:
+        return const Ok(());
+      case _AffectedSelected.selectedAffected:
+        final res =
+            await ref.read(currentServerPod.notifier).setServer(Some(server));
+        return res.mapErr(ErrorSettingServer.new);
+    }
+  });
 }
 
 Future<_SaveServerResult> _saveServer(
