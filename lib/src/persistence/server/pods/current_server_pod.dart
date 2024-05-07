@@ -11,7 +11,6 @@ import 'package:photo_manager_client/src/persistence/server/models/server_db.dar
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
 import 'package:photo_manager_client/src/state_management/async_notifier_async_rollback_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:synchronized/synchronized.dart';
 
 part 'current_server_pod.g.dart';
 
@@ -31,10 +30,8 @@ final class CurrentServer extends _$CurrentServer
     return res.andThen((value) => value.toDomain());
   }
 
-  final _setServerLock = Lock();
-  Future<SetCurrentServerResult> setServer(Option<Server> server) async {
-    return await _setServerLock.synchronized(() async {
-      return await updateWithRollback(
+  Future<SetCurrentServerResult> setServer(Option<Server> server) async =>
+      await updateWithRollbackSynchronized(
         onNoData: const NoData(),
         update: (value) async {
           state = AsyncData(server);
@@ -46,8 +43,6 @@ final class CurrentServer extends _$CurrentServer
               .mapErr(ErrorOccurred.new);
         },
       );
-    });
-  }
 }
 
 Future<_SetCurrentServerResult> _setCurrentServer(

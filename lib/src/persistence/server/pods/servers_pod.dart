@@ -13,7 +13,6 @@ import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/mod
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/update_server_error.dart';
 import 'package:photo_manager_client/src/state_management/async_notifier_async_rollback_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:synchronized/synchronized.dart';
 
 part 'servers_pod.g.dart';
 
@@ -35,10 +34,8 @@ final class Servers extends _$Servers
     return Map.fromEntries(domains.map((e) => MapEntry(e.name, e))).toIMap();
   }
 
-  final _saveServerLock = Lock();
-  Future<SaveServerResult> saveServer(Server server) async {
-    return await _saveServerLock.synchronized(() async {
-      return await updateWithRollback(
+  Future<SaveServerResult> saveServer(Server server) async =>
+      await updateWithRollbackSynchronized(
         onNoData: const NoDataSave(),
         update: (value) async {
           if (value.containsKey(server.name)) {
@@ -48,13 +45,9 @@ final class Servers extends _$Servers
           return await _handleSave(ref, server);
         },
       );
-    });
-  }
 
-  final _updateServerLock = Lock();
-  Future<UpdateServerResult> updateServer(Server server) async {
-    return await _updateServerLock.synchronized(() async {
-      return await updateWithRollback(
+  Future<UpdateServerResult> updateServer(Server server) async =>
+      await updateWithRollbackSynchronized(
         onNoData: const NoDataUpdate(),
         update: (value) async {
           if (!value.containsKey(server.name)) {
@@ -64,13 +57,9 @@ final class Servers extends _$Servers
           return await _handleUpdate(ref, server);
         },
       );
-    });
-  }
 
-  final _removeServerLock = Lock();
-  Future<RemoveServerResult> removeServer(Server server) async {
-    return await _removeServerLock.synchronized(() async {
-      return await updateWithRollback(
+  Future<RemoveServerResult> removeServer(Server server) async =>
+      await updateWithRollbackSynchronized(
         onNoData: const NoDataRemove(),
         update: (value) async {
           if (!value.containsKey(server.name)) {
@@ -80,8 +69,6 @@ final class Servers extends _$Servers
           return await _handleRemove(ref, server);
         },
       );
-    });
-  }
 }
 
 Future<SaveServerResult> _handleSave(

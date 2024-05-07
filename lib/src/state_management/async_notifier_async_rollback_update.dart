@@ -1,12 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:synchronized/synchronized.dart';
+
+typedef UpdateRes<T extends Object, E extends Object> = FutureOr<Result<T, E>>;
+typedef UpdateFn<TResVal extends Object, TResErr extends Object, TState>
+    = UpdateRes<TResVal, TResErr> Function(TState value);
 
 mixin AsyncNotifierAsyncRollbackUpdate<TState>
     on AutoDisposeAsyncNotifier<TState> {
-  FutureOr<Result<T, E>>
-      updateWithRollback<T extends Object, E extends Object>({
-    required E onNoData,
-    required FutureOr<Result<T, E>> Function(TState value) update,
+  @protected
+  UpdateRes<TResVal, TResErr>
+      updateWithRollback<TResVal extends Object, TResErr extends Object>({
+    required TResErr onNoData,
+    required UpdateFn<TResVal, TResErr, TState> update,
   }) async {
     final oldState = state;
     final value = oldState.value;
@@ -15,7 +22,7 @@ mixin AsyncNotifierAsyncRollbackUpdate<TState>
     }
 
     final res = update(value);
-    final Result<T, E> awaited;
+    final Result<TResVal, TResErr> awaited;
     if (res is Future) {
       awaited = await res;
     } else {
@@ -27,4 +34,18 @@ mixin AsyncNotifierAsyncRollbackUpdate<TState>
     }
     return awaited;
   }
+
+  final _stateLock = Lock();
+  @protected
+  Future<Result<TResVal, TResErr>> updateWithRollbackSynchronized<
+          TResVal extends Object, TResErr extends Object>({
+    required TResErr onNoData,
+    required UpdateFn<TResVal, TResErr, TState> update,
+  }) async =>
+      await _stateLock.synchronized(
+        () async => await updateWithRollback(
+          onNoData: onNoData,
+          update: update,
+        ),
+      );
 }
