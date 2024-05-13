@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
@@ -23,6 +25,10 @@ Future<Result<R, E>> runWithToasts<R extends Object, E extends Displayable>({
         ),
       ),
     );
+
+  if (res case Err(:final error)) {
+    log('error: ', name: 'general', error: error.toDisplayJoined());
+  }
 
   return res;
 }
