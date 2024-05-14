@@ -45,23 +45,26 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
     if (_disposed) {
       socket.destroy();
     } else {
-      _sub = socket.map(utf8.decode).listen((event) {
-        setState(() {
-          _msgs.add(event);
-        });
-      }, onError: (Object? ex, StackTrace? st) {
-        if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(ex.toString())));
-        } else {
-          log(
-            'error in stream map',
-            name: 'live_debug',
-            error: ex,
-            stackTrace: st,
-          );
-        }
-      });
+      _sub = socket.map(utf8.decode).listen(
+        (event) {
+          setState(() {
+            _msgs.add(event);
+          });
+        },
+        onError: (Object? ex, StackTrace? st) {
+          if (mounted) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(ex.toString())));
+          } else {
+            log(
+              'error in stream map',
+              name: 'live_debug',
+              error: ex,
+              stackTrace: st,
+            );
+          }
+        },
+      );
       _socket = socket;
       setState(() {
         _state = 'socket connected';
@@ -100,7 +103,7 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
           if (_socket case final socket?) ...[
             FilledButton(
               onPressed: () {
-                socket.add(utf8.encode('test message EOF'));
+                socket.add(utf8.encode('test message\n'));
                 unawaited(socket.flush());
               },
               child: const Text('Send test message'),
