@@ -1,14 +1,14 @@
-import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'photo_url_pod.g.dart';
 
 @riverpod
-Result<String, CurrentServerResultError> photoUrl(
+Option<String> photoUrl(
   PhotoUrlRef ref, {
   required String fileName,
 }) {
-  final server = ref.watch(currentServerResultPod);
+  final server = ref.watch(selectedServerPod);
   return server.map((value) => '${value.uri}/image/$fileName');
 }

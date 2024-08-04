@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
-import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/pods/date_sorting_pod.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
@@ -15,7 +14,6 @@ import 'package:photo_manager_client/src/persistence/server/pods/selected_server
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
-import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -26,12 +24,12 @@ class Home extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentServer = ref.watch(currentServerPod);
+    final selectedServer = ref.watch(selectedServerPod);
     return PhotoManagerScaffold(
       bottomAppBar: PhotoManagerBottomAppBar(
         titleText: 'Home',
         actions: [
-          if (currentServer case AsyncData(value: Some())) ...[
+          if (selectedServer case AsyncData(value: Some())) ...[
             IconButton(
               onPressed: () async {
                 final currentSorting = ref.read(dateSortingPod);
@@ -59,7 +57,7 @@ class Home extends ConsumerWidget {
             },
             icon: const Icon(Icons.settings),
           ),
-          if (currentServer case AsyncData(value: Some()))
+          if (selectedServer case AsyncData(value: Some()))
             IconButton(
               onPressed: () async {
                 final response = await const UploadPhoto()
@@ -73,10 +71,9 @@ class Home extends ConsumerWidget {
             ),
         ],
       ),
-      child: AsyncValueBuilder(
-        asyncValue: currentServer,
-        builder: (context, value) {
-          return switch (value) {
+      child: Builder(
+        builder: (context) {
+          return switch (selectedServer) {
             None() => const ServerNotSelected(),
             Some() => const PhotoView(),
           };
@@ -94,13 +91,13 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
     builder: (context) => const UpdateCanonDialog(),
   ).toFutureOption();
   if (response case Some(value: UpdateCanonResponse.update)) {
-    final updateCanonRes = ref.read(updateCanonPod);
-    switch (updateCanonRes) {
-      case Err(:final error):
+    final updateCanon = ref.read(updateCanonPod);
+    switch (updateCanon) {
+      case None():
         messenger.showSnackBar(
-          SnackBar(content: Text(error.toDisplayJoined())),
+          const SnackBar(content: Text('No server selected')),
         );
-      case Ok(value: final updateCanon):
+      case Some(value: final updateCanon):
         final res = await runWithToasts(
           messenger: messenger,
           op: updateCanon,

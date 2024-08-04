@@ -11,7 +11,7 @@ import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/http/errors/displayable_impls.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'upload_photo_pod.freezed.dart';
@@ -51,12 +51,12 @@ typedef UploadPhotoFn = Future<Result<(), UploadPhotoError>> Function(
 );
 
 @riverpod
-Result<UploadPhotoFn, CurrentServerResultError> uploadPhoto(
+Option<UploadPhotoFn> uploadPhoto(
   UploadPhotoRef ref,
 ) {
   final client = ref.watch(httpClientPod);
-  final serverRes = ref.watch(currentServerResultPod);
-  return serverRes.map(
+  final server = ref.watch(selectedServerPod);
+  return server.map(
     (value) =>
         (imagePath) async => await _uploadPhoto(client, value, imagePath),
   );

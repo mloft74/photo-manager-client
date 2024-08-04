@@ -5,7 +5,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -30,12 +31,12 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
   void initState() {
     super.initState();
 
-    final serverRes = ref.read(currentServerResultPod);
-    if (serverRes.isErr) {
-      _state = 'error: no server selected';
-    } else {
-      final server = serverRes.unwrap();
-      unawaited(_createSocket(server.uri.host));
+    final server = ref.read(selectedServerPod);
+    switch (server) {
+      case Some(value: final server):
+        unawaited(_createSocket(server.uri.host));
+      case None():
+        _state = 'error: no server selected';
     }
   }
 
@@ -51,6 +52,8 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
             _msgs.add(event);
           });
         },
+        // onError needs types.
+        // ignore: avoid_types_on_closure_parameters
         onError: (Object? ex, StackTrace? st) {
           if (mounted) {
             ScaffoldMessenger.of(context)

@@ -4,7 +4,6 @@ import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
-import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/manage_photo/pods/delete_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/confirm_delete_photo_dialog.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body.dart';
@@ -91,9 +90,10 @@ Future<()> _onDeletePressed(
 
   final deletePhotoRes = ref.read(deletePhotoPod);
   switch (deletePhotoRes) {
-    case Err(:final error):
-      messenger.showSnackBar(SnackBar(content: Text(error.toDisplayJoined())));
-    case Ok(value: final deletePhoto):
+    case None():
+      messenger
+          .showSnackBar(const SnackBar(content: Text('No server selected')));
+    case Some(value: final deletePhoto):
       final res = await runWithToasts(
         messenger: messenger,
         op: () => deletePhoto(image),

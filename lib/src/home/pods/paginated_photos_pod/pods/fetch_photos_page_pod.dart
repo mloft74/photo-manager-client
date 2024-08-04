@@ -15,8 +15,7 @@ import 'package:photo_manager_client/src/home/pods/paginated_photos_pod/models/p
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart'
-    hide ErrorOccurred;
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fetch_photos_page_pod.g.dart';
@@ -88,15 +87,14 @@ typedef FetchPhotosPageFn = Future<FetchPhotosPageResult> Function(
   Option<int> after,
 );
 
-typedef FetchPhotosPagePodResult
-    = Result<FetchPhotosPageFn, CurrentServerResultError>;
+typedef FetchPhotosPagePodOption = Option<FetchPhotosPageFn>;
 
 @riverpod
-FetchPhotosPagePodResult fetchPhotosPage(
+Option<FetchPhotosPageFn> fetchPhotosPage(
   FetchPhotosPageRef ref,
 ) {
   final client = ref.watch(httpClientPod);
-  final server = ref.watch(currentServerResultPod);
+  final server = ref.watch(selectedServerPod);
   final sorting = ref.watch(dateSortingPod);
   return server.map(
     (value) =>

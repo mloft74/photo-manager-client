@@ -17,7 +17,7 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
       ErrorRemoving;
 
   const factory RemoveServerError.errorUnsettingServer(
-    SetSelectedServerNameError error,
+    SetSelectedServerError error,
   ) = ErrorUnsettingServer;
 
   @override

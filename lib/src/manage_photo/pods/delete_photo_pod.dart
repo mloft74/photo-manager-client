@@ -11,8 +11,7 @@ import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/http/errors/basic_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart'
-    hide ErrorOccurred;
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'delete_photo_pod.g.dart';
@@ -53,12 +52,12 @@ typedef DeletePhotoFn = Future<DeletePhotoResult> Function(
 );
 
 @riverpod
-Result<DeletePhotoFn, CurrentServerResultError> deletePhoto(
+Option<DeletePhotoFn> deletePhoto(
   DeletePhotoRef ref,
 ) {
   final client = ref.watch(httpClientPod);
-  final serverRes = ref.watch(currentServerResultPod);
-  return serverRes.map(
+  final server = ref.watch(selectedServerPod);
+  return server.map(
     (value) =>
         (hostedImage) async => await _deletePhoto(client, value, hostedImage),
   );

@@ -9,8 +9,7 @@ import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/http/errors/basic_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart'
-    hide ErrorOccurred;
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'update_canon_pod.g.dart';
@@ -40,11 +39,10 @@ Future<UpdateCanonResult> _updateCanon(
 typedef UpdateCanonFn = Future<UpdateCanonResult> Function();
 
 @riverpod
-Result<UpdateCanonFn, CurrentServerResultError> updateCanon(
+Option<UpdateCanonFn> updateCanon(
   UpdateCanonRef ref,
 ) {
   final client = ref.watch(httpClientPod);
-  final serverRes = ref.watch(currentServerResultPod);
-  return serverRes
-      .map((value) => () async => await _updateCanon(client, value));
+  final server = ref.watch(selectedServerPod);
+  return server.map((value) => () async => await _updateCanon(client, value));
 }

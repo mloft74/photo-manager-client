@@ -15,7 +15,7 @@ sealed class SaveServerError with _$SaveServerError implements Displayable {
       ErrorSaving;
 
   const factory SaveServerError.errorSettingServer(
-    SetSelectedServerNameError error,
+    SetSelectedServerError error,
   ) = ErrorSettingServerSave;
 
   const factory SaveServerError.serverNameInUse() = ServerNameInUse;
