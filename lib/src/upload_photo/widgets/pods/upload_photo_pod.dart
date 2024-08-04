@@ -11,7 +11,7 @@ import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/http/errors/displayable_impls.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'upload_photo_pod.freezed.dart';

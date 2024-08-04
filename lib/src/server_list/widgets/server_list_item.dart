@@ -6,7 +6,7 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_name_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod.dart';
 import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/delete_server_dialog.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';

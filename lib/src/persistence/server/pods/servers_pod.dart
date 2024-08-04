@@ -6,9 +6,8 @@ import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/schemas/server.dart'
     as server_schema;
-import 'package:photo_manager_client/src/persistence/server/models/selected_server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_name_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/remove_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/save_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/update_server_error.dart';
@@ -20,10 +19,8 @@ part 'servers_pod.g.dart';
 
 typedef ServersState = IMap<String, Server>;
 typedef SaveServerResult = Result<(), SaveServerError>;
-typedef _PersistServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
 typedef UpdateServerResult = Result<(), UpdateServerError>;
 typedef RemoveServerResult = Result<(), RemoveServerError>;
-typedef _RemoveServerResult = Result<_AffectedSelected, ErrorTrace<Object>>;
 
 @riverpod
 final class Servers extends _$Servers
@@ -80,55 +77,12 @@ Future<SaveServerResult> _handleSave(
   Server server,
 ) async {
   final db = ref.read(dbPod);
-  final persistRes = await _persistServer(db, server);
+  final insertRes = await _insertServer(db, server);
 
-  return await persistRes
-      .mapErr(SaveServerError.errorSaving)
-      .andThenAsync((value) async {
-    switch (value) {
-      case _AffectedSelected.selectedNotAffected:
-        return const Ok(());
-      case _AffectedSelected.selectedAffected:
-        final res =
-            await ref.read(currentServerPod.notifier).setServer(Some(server));
-        return res.mapErr(ErrorSettingServerSave.new);
-    }
-  });
+  return insertRes.mapErr(SaveServerError.errorSaving);
 }
 
-Future<_PersistServerResult> _persistServer(
-  Database db,
-  Server server,
-) async {
-  try {
-    final currentServer = ();
-    // await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
-    // This load needs to be performed outside of the transaction,
-    // because Isar does not support nested transactions.
-    await currentServer?.server.load();
-    // final affected = await isar.writeTxn(
-    //   () async {
-    final serverDb = ServerDB.fromDomain(server);
-    await isar.serverDBs.put(serverDb);
-    if (currentServer != null &&
-        currentServer.server.value?.name == server.name) {
-      await isar.selectedServerDBs.put(currentServer);
-      currentServer.server.value = serverDb;
-      await currentServer.server.save();
-      return _AffectedSelected.selectedAffected;
-    } else {
-      return _AffectedSelected.selectedNotAffected;
-    }
-    //   },
-    // );
-
-    return Ok(affected);
-  } catch (ex, st) {
-    return Err(ErrorTrace(ex, Some(st)));
-  }
-}
-
-Future<_PersistServerResult> _insertServer(
+Future<Result<(), ErrorTrace<Object>>> _insertServer(
   Database db,
   Server server,
 ) async {
@@ -139,20 +93,7 @@ Future<_PersistServerResult> _insertServer(
       serverDb.toDBMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    await isar.serverDBs.put(serverDb);
-    if (currentServer != null &&
-        currentServer.server.value?.name == server.name) {
-      await isar.selectedServerDBs.put(currentServer);
-      currentServer.server.value = serverDb;
-      await currentServer.server.save();
-      return _AffectedSelected.selectedAffected;
-    } else {
-      return _AffectedSelected.selectedNotAffected;
-    }
-    //   },
-    // );
-
-    return Ok(affected);
+    return const Ok(());
   } catch (ex, st) {
     return Err(ErrorTrace(ex, Some(st)));
   }
@@ -162,73 +103,66 @@ Future<UpdateServerResult> _handleUpdate(
   AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
   Server server,
 ) async {
-  final isar = ref.read(isarPod);
-  final persistRes = await _persistServer(isar, server);
+  final db = ref.read(dbPod);
+  final updateRes = await _updateServer(db, server);
 
-  return await persistRes
-      .mapErr(UpdateServerError.errorUpdating)
-      .andThenAsync((value) async {
-    switch (value) {
-      case _AffectedSelected.selectedNotAffected:
-        return const Ok(());
-      case _AffectedSelected.selectedAffected:
-        final res =
-            await ref.read(currentServerPod.notifier).setServer(Some(server));
-        return res.mapErr(ErrorSettingServerUpdate.new);
-    }
-  });
+  return updateRes.mapErr(UpdateServerError.errorUpdating);
+}
+
+Future<Result<(), ErrorTrace<Object>>> _updateServer(
+  Database db,
+  Server server,
+) async {
+  try {
+    final serverDb = ServerDB.fromDomain(server);
+    await db.update(
+      server_schema.tableName,
+      serverDb.toDBMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+      where: '${server_schema.nameCol} = ?',
+      whereArgs: [serverDb.name],
+    );
+    return const Ok(());
+  } catch (ex, st) {
+    return Err(ErrorTrace(ex, Some(st)));
+  }
 }
 
 Future<RemoveServerResult> _handleRemove(
   AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
   Server server,
 ) async {
-  final isar = ref.read(isarPod);
-  final removeRes = await _removeServer(isar, server);
+  final db = ref.read(dbPod);
+  final removeRes = await _deleteServer(db, server);
 
   return await removeRes
       .mapErr(RemoveServerError.errorRemoving)
       .andThenAsync((value) async {
-    switch (value) {
-      case _AffectedSelected.selectedNotAffected:
-        return const Ok(());
-      case _AffectedSelected.selectedAffected:
-        final res =
-            await ref.read(currentServerPod.notifier).setServer(const None());
-        return res.mapErr(ErrorUnsettingServer.new);
+    final selectedName = ref.read(selectedServerNamePod).toNullable();
+    if (selectedName == server.name) {
+      final res = await ref
+          .read(selectedServerNamePod.notifier)
+          .setServerName(const None());
+      return res.mapErr(ErrorUnsettingServer.new);
+    } else {
+      return const Ok(());
     }
   });
 }
 
-Future<_RemoveServerResult> _removeServer(Isar isar, Server server) async {
+Future<Result<(), ErrorTrace<Object>>> _deleteServer(
+  Database db,
+  Server server,
+) async {
   try {
-    final selected =
-        await isar.selectedServerDBs.get(SelectedServerDB.selectedId);
-    // This load needs to be performed outside of the transaction,
-    // because Isar does not support nested transactions.
-    await selected?.server.load();
-    final affected = await isar.writeTxn(() async {
-      final innerSelected = selected ?? SelectedServerDB();
-      final _AffectedSelected affected;
-      if (innerSelected.server.value?.name == server.name) {
-        await isar.selectedServerDBs.put(innerSelected);
-        innerSelected.server.value = null;
-        await innerSelected.server.save();
-        affected = _AffectedSelected.selectedAffected;
-      } else {
-        affected = _AffectedSelected.selectedNotAffected;
-      }
-      await isar.serverDBs.deleteByName(server.name);
-      return affected;
-    });
-
-    return Ok(affected);
+    final serverDb = ServerDB.fromDomain(server);
+    await db.delete(
+      server_schema.tableName,
+      where: '${server_schema.nameCol} = ?',
+      whereArgs: [serverDb.name],
+    );
+    return const Ok(());
   } catch (ex, st) {
     return Err(ErrorTrace(ex, Some(st)));
   }
-}
-
-enum _AffectedSelected {
-  selectedAffected,
-  selectedNotAffected,
 }

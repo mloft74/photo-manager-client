@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart';
 
 part 'photos_state.freezed.dart';
 

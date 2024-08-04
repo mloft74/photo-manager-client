@@ -15,7 +15,7 @@ import 'package:photo_manager_client/src/home/pods/paginated_photos_pod/models/p
 import 'package:photo_manager_client/src/http/errors/general_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_result_pod.dart'
     hide ErrorOccurred;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

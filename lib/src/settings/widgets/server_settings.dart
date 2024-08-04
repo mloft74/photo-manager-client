@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_name_pod.dart';
 import 'package:photo_manager_client/src/server_list/server_list.dart';
 import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 

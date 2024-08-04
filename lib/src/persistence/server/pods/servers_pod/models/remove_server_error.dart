@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod/models/set_selected_server_name_error.dart';
 
 part 'remove_server_error.freezed.dart';
 
@@ -17,7 +17,7 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
       ErrorRemoving;
 
   const factory RemoveServerError.errorUnsettingServer(
-    SetCurrentServerError error,
+    SetSelectedServerNameError error,
   ) = ErrorUnsettingServer;
 
   @override

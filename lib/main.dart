@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/migrations/v1.dart';
+import 'package:photo_manager_client/src/persistence/shared_prefs_pod.dart';
 import 'package:photo_manager_client/src/photo_manager_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<()> main() async {
@@ -23,6 +25,12 @@ Future<()> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
+  final sharedPrefs = await SharedPreferencesWithCache.create(
+    cacheOptions: const SharedPreferencesWithCacheOptions(
+      allowList: {'selected_server'},
+    ),
+  );
+
   final db = await openDatabase(
     'photo_manager.db',
     version: 1,
@@ -38,6 +46,7 @@ Future<()> main() async {
     ProviderScope(
       overrides: [
         dbPod.overrideWithValue(db),
+        sharedPrefsPod.overrideWithValue(sharedPrefs),
       ],
       child: const PhotoManagerApp(),
     ),

@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod/models/set_selected_server_name_error.dart';
 
 part 'update_server_error.freezed.dart';
 
@@ -17,14 +17,14 @@ sealed class UpdateServerError with _$UpdateServerError implements Displayable {
       ErrorUpdating;
 
   const factory UpdateServerError.errorUnsettingServer(
-    SetCurrentServerError error,
+    SetSelectedServerNameError error,
   ) = ErrorSettingServerUpdate;
 
   @override
   Iterable<String> toDisplay() => switch (this) {
         NoDataUpdate() => const ['No data when updating.'],
         ServerNotFoundUpdate() => const ['No server with that name was found.'],
-        ErrorUpdating() => throw UnimplementedError(),
-        ErrorSettingServerUpdate() => throw UnimplementedError(),
+        ErrorUpdating(:final errorTrace) => errorTrace.toDisplay(),
+        ErrorSettingServerUpdate(:final error) => error.toDisplay(),
       };
 }
