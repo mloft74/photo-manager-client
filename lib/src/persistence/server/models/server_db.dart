@@ -1,21 +1,37 @@
-import 'package:isar/isar.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/persistence/schemas/server.dart'
+    as server;
 
-part 'server_db.g.dart';
+part 'server_db.freezed.dart';
 
-@collection
-class ServerDB {
-  Id id = Isar.autoIncrement;
+@freezed
+class ServerDB with _$ServerDB {
+  const ServerDB._();
 
-  @Index(unique: true, replace: true)
-  String name;
-  String uri;
+  const factory ServerDB({
+    required String name,
+    required String uri,
+  }) = _ServerDB;
 
-  ServerDB({required this.name, required this.uri});
+  factory ServerDB.fromDomain(Server server) =>
+      ServerDB(name: server.name, uri: server.uri.toString());
 
-  ServerDB.fromDomain(Server server)
-      : this(name: server.name, uri: server.uri.toString());
+  factory ServerDB.fromDBMap(Map<String, dynamic> json) {
+    final {
+      server.nameCol: String name,
+      server.uriCol: String uri,
+    } = json;
+    return ServerDB(name: name, uri: uri);
+  }
+
+  Map<String, dynamic> toDBMap() {
+    return {
+      server.nameCol: name,
+      server.uriCol: uri,
+    };
+  }
 
   Option<Server> toDomain() {
     return Uri.tryParse(uri)

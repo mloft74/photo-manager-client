@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:isar/isar.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
-import 'package:photo_manager_client/src/persistence/isar_pod.dart';
+import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/models/selected_server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod/models/set_current_server_error.dart';
@@ -23,8 +22,8 @@ final class CurrentServer extends _$CurrentServer
     with AsyncNotifierAsyncRollbackUpdate<CurrentServerState> {
   @override
   Future<CurrentServerState> build() async {
-    final isar = ref.watch(isarPod);
-    final res = await isar.selectedServerDBs
+    final db = ref.watch(dbPod);
+    final res = await db.selectedServerDBs
         .get(SelectedServerDB.selectedId)
         .toFutureOption();
     return res.andThen((value) => value.toDomain());
