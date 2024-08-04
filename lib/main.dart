@@ -52,7 +52,5 @@ Future<()> main() async {
     ),
   );
 
-  await db.close();
-
   return ();
 }

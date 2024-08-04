@@ -33,7 +33,7 @@ class AsyncValueBuilder<T> extends StatelessWidget {
             final theme = Theme.of(context);
             return Center(
               child: Text(
-                'Error occurred: $error',
+                'Error occurred: $error\n$stackTrace',
                 style: theme.textTheme.bodyLarge
                     ?.copyWith(color: theme.colorScheme.error),
               ),
