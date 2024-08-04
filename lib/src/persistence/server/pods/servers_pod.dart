@@ -7,7 +7,7 @@ import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/schemas/server.dart'
     as server_schema;
 import 'package:photo_manager_client/src/persistence/server/models/server_db.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_name_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/remove_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/save_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/update_server_error.dart';
@@ -79,7 +79,18 @@ Future<SaveServerResult> _handleSave(
   final db = ref.read(dbPod);
   final insertRes = await _insertServer(db, server);
 
-  return insertRes.mapErr(SaveServerError.errorSaving);
+  return insertRes.mapErr(SaveServerError.errorSaving).andThenAsync(
+    (value) async {
+      final selectedServer = ref.read(selectedServerPod);
+      if (selectedServer.isNone) {
+        final res =
+            await ref.read(selectedServerPod.notifier).setServer(Some(server));
+        return res.mapErr(ErrorSettingServerSave.new);
+      } else {
+        return const Ok(());
+      }
+    },
+  );
 }
 
 Future<Result<(), ErrorTrace<Object>>> _insertServer(
@@ -106,7 +117,18 @@ Future<UpdateServerResult> _handleUpdate(
   final db = ref.read(dbPod);
   final updateRes = await _updateServer(db, server);
 
-  return updateRes.mapErr(UpdateServerError.errorUpdating);
+  return updateRes.mapErr(UpdateServerError.errorUpdating).andThenAsync(
+    (value) async {
+      final selectedServer = ref.read(selectedServerPod).toNullable();
+      if (selectedServer?.name == server.name) {
+        final res =
+            await ref.read(selectedServerPod.notifier).setServer(Some(server));
+        return res.mapErr(ErrorSettingServerUpdate.new);
+      } else {
+        return const Ok(());
+      }
+    },
+  );
 }
 
 Future<Result<(), ErrorTrace<Object>>> _updateServer(
@@ -138,11 +160,10 @@ Future<RemoveServerResult> _handleRemove(
   return await removeRes
       .mapErr(RemoveServerError.errorRemoving)
       .andThenAsync((value) async {
-    final selectedName = ref.read(selectedServerNamePod).toNullable();
-    if (selectedName == server.name) {
-      final res = await ref
-          .read(selectedServerNamePod.notifier)
-          .setServerName(const None());
+    final selectedServer = ref.read(selectedServerPod).toNullable();
+    if (selectedServer?.name == server.name) {
+      final res =
+          await ref.read(selectedServerPod.notifier).setServer(const None());
       return res.mapErr(ErrorUnsettingServer.new);
     } else {
       return const Ok(());

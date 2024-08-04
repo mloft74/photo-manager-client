@@ -2,17 +2,17 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 
-part 'set_selected_server_name_error.freezed.dart';
+part 'set_selected_server_error.freezed.dart';
 
 @freezed
-sealed class SetSelectedServerNameError
-    with _$SetSelectedServerNameError
+sealed class SetSelectedServerError
+    with _$SetSelectedServerError
     implements Displayable {
-  const SetSelectedServerNameError._();
+  const SetSelectedServerError._();
 
-  const factory SetSelectedServerNameError.noData() = NoData;
+  const factory SetSelectedServerError.noData() = NoData;
 
-  const factory SetSelectedServerNameError.errorOccurred(
+  const factory SetSelectedServerError.errorOccurred(
     ErrorTrace<Object> errorTrace,
   ) = ErrorOccurred;
 

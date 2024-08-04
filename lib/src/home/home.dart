@@ -11,7 +11,7 @@ import 'package:photo_manager_client/src/home/widgets/photo_view.dart';
 import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/home/widgets/update_canon_dialog.dart';
 import 'package:photo_manager_client/src/home/widgets/update_date_sorting_dialog.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/selected_server_name_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
