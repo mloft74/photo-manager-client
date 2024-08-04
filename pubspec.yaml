@@ -19,42 +19,36 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.3.2
 
 environment:
-  sdk: ^3.3.4
-  flutter: ^3.19.6
+  sdk: ^3.4.4
+  flutter: ^3.22.3
 
 dependencies:
-  cached_network_image: ^3.2.3
-  collection: ^1.17.1
-  fast_immutable_collections: ^10.2.2
-  file_picker: ^8.0.1
+  cached_network_image: ^3.4.0
+  collection: ^1.18.0
+  fast_immutable_collections: ^10.2.4
+  file_picker: ^8.0.6
   flutter:
     sdk: flutter
-  flutter_riverpod: ^2.3.7
-  freezed_annotation: ^2.2.0
-  http: ^1.1.0
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
-  json_annotation: ^4.8.1
-  path_provider: ^2.0.15
-  riverpod_annotation: ^2.1.2
+  flutter_riverpod: ^2.5.1
+  freezed_annotation: ^2.4.4
+  http: ^1.2.2
+  json_annotation: ^4.9.0
+  path_provider: ^2.1.4
+  riverpod_annotation: ^2.3.5
   rxdart: ^0.27.7
+  sqflite: ^2.3.3+1
   synchronized: ^3.1.0+1
 
 dev_dependencies:
-  build_runner: ^2.4.6
-  custom_lint: ^0.5.2
-  flutter_lints: ^3.0.2
+  build_runner: ^2.4.11
+  custom_lint: ^0.6.4
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
-  freezed: ^2.3.4
-  isar_generator: ^3.1.0+1
-  json_serializable: ^6.7.0
-  riverpod_generator: ^2.2.6
-  riverpod_lint: ^2.0.1
-
-dependency_overrides:
-  # isar_generator doesn't yet support 6+
-  analyzer: ^6.4.1
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.4.0
+  riverpod_lint: ^2.3.10
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
