@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/live_debug/debug_connection.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -22,7 +21,7 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
 
   final _msgs = <String>[];
 
-  Socket? _socket;
+  DebugConnection? _connection;
   // Cancelled under an alias
   // ignore: cancel_subscriptions
   StreamSubscription<String>? _sub;
@@ -34,19 +33,19 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
     final server = ref.read(selectedServerPod);
     switch (server) {
       case Some(value: final server):
-        unawaited(_createSocket(server.uri.host));
+        unawaited(_createConnection(server.uri.host));
       case None():
         _state = 'error: no server selected';
     }
   }
 
-  Future<()> _createSocket(String host) async {
+  Future<()> _createConnection(String host) async {
     log('host: $host', name: 'live_debug');
-    final socket = await Socket.connect(host, 4000);
+    final connection = await DebugConnection.connect(host, 4000);
     if (_disposed) {
-      socket.destroy();
+      connection.close();
     } else {
-      _sub = socket.map(utf8.decode).listen(
+      _sub = connection.events.listen(
         (event) {
           setState(() {
             _msgs.add(event);
@@ -68,9 +67,9 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
           }
         },
       );
-      _socket = socket;
+      _connection = connection;
       setState(() {
-        _state = 'socket connected';
+        _state = 'connected';
       });
     }
     return ();
@@ -81,9 +80,9 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
   void dispose() {
     _disposed = true;
 
-    final socket = _socket;
-    _socket = null;
-    socket?.destroy();
+    final connection = _connection;
+    _connection = null;
+    connection?.close();
 
     final sub = _sub;
     _sub = null;
@@ -103,21 +102,12 @@ class _LiveDebugState extends ConsumerState<LiveDebug> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(_state),
-          if (_socket case final socket?) ...[
-            FilledButton(
-              onPressed: () {
-                socket.add(utf8.encode('test message\n'));
-                unawaited(socket.flush());
-              },
-              child: const Text('Send test message'),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _msgs.length,
+              itemBuilder: (context, index) => Text(_msgs[index]),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _msgs.length,
-                itemBuilder: (context, index) => Text(_msgs[index]),
-              ),
-            ),
-          ],
+          ),
         ],
       ),
     );
