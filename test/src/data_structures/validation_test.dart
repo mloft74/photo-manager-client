@@ -42,20 +42,6 @@ void main() {
     expect(actual).toEqual(expected);
   });
 
-  // final fdata = IterableFP([
-  //   ((int? age, String? name, double? money) => {
-  //         'age': age,
-  //         'name': name,
-  //         'money': money,
-  //       }).curry(),
-  // ]);
-  // const fages = IterableFP([-50, -7, 12, 19, 74, 127, 1000, null]);
-  // const fnames = IterableFP(['John', 'Sarah', null]);
-  // const fmoneys = IterableFP([-26.0, 0.0, 100.7, 7008473202.5, null]);
-
-  // final data =
-  //     fdata.apply(fages).apply(fnames).apply(fmoneys).fix().value.toIList();
-  // for (final datum in data) {}
   group('Applicative laws', () {
     runIdentityLawTestsWithPure(pure);
 
@@ -102,14 +88,20 @@ void main() {
       }
     });
 
-    // test('Homomorphism', () {
-    //   homomorphismLaw();
-    //   homomorphismLaw();
-    // });
+    runHomomorphismLawTestsWithPure(pure);
 
-    // test('Interchange', () {
-    //   interchangeLaw();
-    // });
+    test('Interchange', () {
+      interchangeLaw(
+        pure,
+        succeed((int a) => '$a'),
+        17,
+      );
+      interchangeLaw(
+        pure,
+        fail<String Function(int)>(['int -> String failure']),
+        17,
+      );
+    });
   });
 }
 

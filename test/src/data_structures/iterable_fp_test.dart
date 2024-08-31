@@ -54,14 +54,7 @@ void main() {
       );
     });
 
-    test('Homomorphism', () {
-      homomorphismLaw(
-        IterableFP.pure,
-        (String a) => a.length,
-        'Hello there!',
-      );
-      homomorphismLaw(IterableFP.pure, (int a) => a.isEven, 12);
-    });
+    runHomomorphismLawTestsWithPure(IterableFP.pure);
 
     test('Interchange', () {
       interchangeLaw(
