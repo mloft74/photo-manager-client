@@ -376,6 +376,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  glados:
+    dependency: "direct dev"
+    description:
+      path: glados
+      ref: "1.1.7-spec"
+      resolved-ref: a19535dbf44ea4cc76a5094cd21a1fa2c4f00ba3
+      url: "https://github.com/mloft74/glados_spec.git"
+    source: git
+    version: "1.1.7"
   glob:
     dependency: transitive
     description:
