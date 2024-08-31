@@ -2,10 +2,26 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/fp/functor.dart';
 import 'package:photo_manager_client/src/data_structures/fp/monad.dart';
 import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
+import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/flatmap_extension.dart';
 import 'package:photo_manager_client/src/mixins/delegating_iterable.dart';
 
 part 'iterable_fp.freezed.dart';
+
+typedef ValidationWithIterableErr<T, E>
+    = Validation<T, _IterableFPBrand, E, IterableFP<E>>;
+
+ValidationWithIterableErr<T, E> succeed<T, E>(T val) => Validation.success(val);
+ValidationWithIterableErr<T, E> fail<T, E>(Iterable<E> err) =>
+    Validation.failure(IterableFP(err));
+
+/// `I` stands for inference, inferring [E].
+ValidationWithIterableErr<T, E> succeedI<T, E>(T val, E errEx) =>
+    Validation.success(val);
+
+/// `I` stands for inference, inferring [T].
+ValidationWithIterableErr<T, E> failI<T, E>(Iterable<E> err, T valEx) =>
+    Validation.failure(IterableFP(err));
 
 abstract final class _IterableFPBrand {}
 

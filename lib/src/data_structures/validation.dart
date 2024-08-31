@@ -30,7 +30,7 @@ sealed class Validation<TVal, TErrSB, TErrSV,
       };
 
   @override
-  Validation<TNewVal, TErrSB, TErrSV, TErr> apply<TNewVal>(
+  Validation<TNewVal, TErrSB, TErrSV, TErr> rapply<TNewVal>(
     Validation<TNewVal Function(TVal val), TErrSB, TErrSV, TErr> app,
   ) {
     return switch ((this, app)) {
