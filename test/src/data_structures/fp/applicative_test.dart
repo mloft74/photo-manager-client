@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_types_on_closure_parameters
+// ignore_for_file: avoid_types_on_closure_parameters, unreachable_from_main
 
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/fp/fp.dart';
