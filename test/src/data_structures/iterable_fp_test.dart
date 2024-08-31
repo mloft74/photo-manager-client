@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_types_on_closure_parameters
 
+import 'package:glados/glados.dart' hide expect;
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
 import 'package:photo_manager_client/src/extensions/curry_extension.dart';
 import 'package:spec/spec.dart';
 
+import '../util.dart';
 import 'fp/applicative_test.dart';
 
 const pure = IterableFP.pure;
@@ -53,7 +55,10 @@ void main() {
   group('Applicative laws', () {
     runIdentityLawTestsWithPure(pure);
 
-    test('Composition', () {
+    Glados2<List<int>, String>(
+      null,
+      keyboardString,
+    ).test('Composition', (ints, s) {
       compositionLaw(
         pure,
         IterableFP([
@@ -64,11 +69,9 @@ void main() {
           (String a) => a.length,
           (String a) => int.tryParse(a) ?? -1000,
         ]),
-        const IterableFP([
-          'Hello there!',
-          '12',
-          '142',
-          '-17',
+        IterableFP([
+          s,
+          ...ints.map((e) => '$e'),
         ]),
       );
     });
