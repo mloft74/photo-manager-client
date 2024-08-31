@@ -61,3 +61,14 @@ import 'package:spec/spec.dart';
 
   return ();
 }
+
+() runIdentityLawTestsWithPure<TBrand>(ApplicativePure<TBrand> pure) {
+  test('Identity', () {
+    identityLaw(pure, 12);
+    identityLaw(pure, true);
+    identityLaw(pure, 0.58736278393736);
+    identityLaw(pure, 'Nice looking string here!');
+  });
+
+  return ();
+}

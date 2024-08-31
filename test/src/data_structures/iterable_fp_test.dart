@@ -32,12 +32,7 @@ void main() {
   });
 
   group('Applicative laws', () {
-    test('Identity', () {
-      identityLaw(IterableFP.pure, 12);
-      identityLaw(IterableFP.pure, true);
-      identityLaw(IterableFP.pure, 0.58736278393736);
-      identityLaw(IterableFP.pure, 'Nice looking string here!');
-    });
+    runIdentityLawTestsWithPure(IterableFP.pure);
 
     test('Composition', () {
       compositionLaw(

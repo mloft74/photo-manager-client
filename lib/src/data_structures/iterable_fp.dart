@@ -12,17 +12,30 @@ part 'iterable_fp.freezed.dart';
 typedef ValidationWithIterableErr<T, E>
     = Validation<T, _IterableFPBrand, E, IterableFP<E>>;
 
-ValidationWithIterableErr<T, E> succeed<T, E>(T val) => Validation.success(val);
-ValidationWithIterableErr<T, E> fail<T, E>(Iterable<E> err) =>
-    Validation.failure(IterableFP(err));
+final class ValidationWithIterableErrPure<E>
+    implements ValidationPure<_IterableFPBrand, E, IterableFP<E>> {
+  const ValidationWithIterableErrPure._();
 
-/// `I` stands for inference, inferring [E].
-ValidationWithIterableErr<T, E> succeedI<T, E>(T val, E errEx) =>
-    Validation.success(val);
+  @override
+  ValidationWithIterableErr<TVal, E> call<TVal>(TVal val) {
+    return Validation.success(val);
+  }
+}
 
-/// `I` stands for inference, inferring [T].
-ValidationWithIterableErr<T, E> failI<T, E>(Iterable<E> err, T valEx) =>
+({
+  ValidationWithIterableErrPure<E> pure,
+  ValidationWithIterableErr<T, E> Function<T>(Iterable<E>) fail,
+}) makeValidationCtors<E>() {
+  final pure = ValidationWithIterableErrPure<E>._();
+  return (pure: pure, fail: _makeFail());
+}
+
+ValidationWithIterableErr<T, E> _fail<T, E>(Iterable<E> err) =>
     Validation.failure(IterableFP(err));
+ValidationWithIterableErr<T, E> Function<T>(Iterable<E>) _makeFail<E>() {
+  ValidationWithIterableErr<T, E> inner<T>(Iterable<E> err) => _fail(err);
+  return inner;
+}
 
 abstract final class _IterableFPBrand {}
 
@@ -71,4 +84,10 @@ sealed class IterableFP<T>
   ) {
     return IterableFP(app.flatMap(fmap));
   }
+}
+
+typedef IterableApplicative<T> = Applicative<_IterableFPBrand, T>;
+
+extension FixApply<T> on IterableApplicative<T> {
+  IterableFP<T> fix() => this as IterableFP<T>;
 }

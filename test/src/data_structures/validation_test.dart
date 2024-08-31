@@ -1,11 +1,22 @@
+// ignore_for_file: avoid_types_on_closure_parameters
+
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
+import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/curry_extension.dart';
 import 'package:spec/spec.dart';
+
+import 'fp/applicative_test.dart';
 
 typedef Record = (int, String, double);
 
 typedef ValidationT<T> = ValidationWithIterableErr<T, String>;
+
+final ctors = makeValidationCtors<String>();
+final pure = ctors.pure;
+final succeed = pure;
+final fail = ctors.fail;
 
 void main() {
   test('All data is acceptable', () {
@@ -13,12 +24,12 @@ void main() {
     const age = 20;
     const name = 'Naomi';
     const money = 12.34;
-    final data = <String, dynamic>{
+    final data = <String, Object?>{
       'age': age,
       'name': name,
       'money': money,
     };
-    final sut = succeedI(makeRecord.curry(), '');
+    final sut = succeed(makeRecord.curry());
 
     // Act
     final parseAgeV = parseAge(data);
@@ -27,12 +38,82 @@ void main() {
     final actual = sut.apply(parseAgeV).apply(parseNameV).apply(parseMoneyV);
 
     // Assert
-    final expected = succeedI(makeRecord(age, name, money), '');
+    final expected = succeed(makeRecord(age, name, money));
     expect(actual).toEqual(expected);
+  });
+
+  // final fdata = IterableFP([
+  //   ((int? age, String? name, double? money) => {
+  //         'age': age,
+  //         'name': name,
+  //         'money': money,
+  //       }).curry(),
+  // ]);
+  // const fages = IterableFP([-50, -7, 12, 19, 74, 127, 1000, null]);
+  // const fnames = IterableFP(['John', 'Sarah', null]);
+  // const fmoneys = IterableFP([-26.0, 0.0, 100.7, 7008473202.5, null]);
+
+  // final data =
+  //     fdata.apply(fages).apply(fnames).apply(fmoneys).fix().value.toIList();
+  // for (final datum in data) {}
+  group('Applicative laws', () {
+    runIdentityLawTestsWithPure(pure);
+
+    group('Composition', () {
+      final builder = IterableFP([
+        ((
+          ValidationT<String Function(int)> u,
+          ValidationT<int Function(String)> v,
+          ValidationT<String> w,
+        ) =>
+            (u: u, v: v, w: w)).curry(),
+      ]);
+      final us = IterableFP([
+        succeed((int a) => '$a'),
+        fail<String Function(int)>(['int -> String failure']),
+      ]);
+      final vs = IterableFP([
+        succeed((String a) => a.length),
+        fail<int Function(String)>(['String -> int failure']),
+      ]);
+      final ws = IterableFP([
+        succeed('Hello there!'),
+        fail<String>(['String failure']),
+      ]);
+      final data = builder.apply(us).apply(vs).apply(ws).fix().toIList();
+
+      for (final datum in data) {
+        String type<T>(ValidationT<T> v) => switch (v) {
+              Success() => 'Success',
+              Failure() => 'Failure',
+            };
+        final u = type(datum.u);
+        final v = type(datum.v);
+        final w = type(datum.w);
+
+        test('with u: $u, v: $v, w: $w', () {
+          compositionLaw(
+            pure,
+            datum.u,
+            datum.v,
+            datum.w,
+          );
+        });
+      }
+    });
+
+    // test('Homomorphism', () {
+    //   homomorphismLaw();
+    //   homomorphismLaw();
+    // });
+
+    // test('Interchange', () {
+    //   interchangeLaw();
+    // });
   });
 }
 
-ValidationT<int> parseAge(Map<String, dynamic> json) {
+ValidationT<int> parseAge(Map<String, Object?> json) {
   final age = json['age'] as int?;
   if (age == null) {
     return fail(['"age" key is missing']);
@@ -46,7 +127,7 @@ ValidationT<int> parseAge(Map<String, dynamic> json) {
   };
 }
 
-ValidationT<String> parseName(Map<String, dynamic> json) {
+ValidationT<String> parseName(Map<String, Object?> json) {
   final name = json['name'] as String?;
   if (name == null) {
     return fail(['"name" key is missing']);
@@ -54,7 +135,7 @@ ValidationT<String> parseName(Map<String, dynamic> json) {
   return succeed(name);
 }
 
-ValidationT<double> parseMoney(Map<String, dynamic> json) {
+ValidationT<double> parseMoney(Map<String, Object?> json) {
   final money = json['money'] as double?;
   if (money == null) {
     return fail(['"money" key is missing']);
