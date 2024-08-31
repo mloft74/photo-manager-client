@@ -68,7 +68,7 @@ sealed class IterableFP<T>
 
   @override
   IterableFP<T> combine(IterableFP<T> other) =>
-      IterableFP(value.followedBy(other));
+      IterableFP(other.followedBy(value));
 
   @override
   IterableFP<TNewVal> bind<TNewVal>(IterableFP<TNewVal> Function(T val) fn) =>

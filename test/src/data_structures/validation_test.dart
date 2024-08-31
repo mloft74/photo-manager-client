@@ -55,16 +55,16 @@ void main() {
             (u: u, v: v, w: w)).curry(),
       ]);
       final us = IterableFP([
-        succeed((int a) => '$a'),
         fail<String Function(int)>(['int -> String failure']),
+        succeed((int a) => '$a'),
       ]);
       final vs = IterableFP([
-        succeed((String a) => a.length),
         fail<int Function(String)>(['String -> int failure']),
+        succeed((String a) => a.length),
       ]);
       final ws = IterableFP([
-        succeed('Hello there!'),
         fail<String>(['String failure']),
+        succeed('Hello there!'),
       ]);
       final data = builder.apply(us).apply(vs).apply(ws).fix().toIList();
 

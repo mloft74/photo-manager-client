@@ -4,6 +4,10 @@ import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/fp/fp.dart';
 import 'package:spec/spec.dart';
 
+void main() {
+  // Don't write tests here, just use the functions below in other files.
+}
+
 () identityLaw<TBrand, TVal>(ApplicativePure<TBrand> pure, TVal value) {
   final fv = pure(value);
   final fid = pure(id<TVal>);

@@ -7,17 +7,25 @@ import 'package:spec/spec.dart';
 
 import 'fp/applicative_test.dart';
 
+const pure = IterableFP.pure;
+
 void main() {
   test('General usage', () {
     const ints = [8, 16, 32];
     const strings = ['Hello', 'there'];
     const bools = [true, false];
 
-    final sut = IterableFP([interpolate.curry()]);
+    // Needs to be positional for currying to work.
+    // ignore: avoid_positional_boolean_parameters
+    String interpolate(int first, String second, bool third) {
+      return 'first: $first, second: $second, third: $third';
+    }
+
+    final sut = pure(interpolate.curry());
     final actual = sut
-        .apply(const IterableFP([8, 16, 32]))
-        .apply(const IterableFP(['Hello', 'there']))
-        .apply(const IterableFP([true, false]));
+        .apply(const IterableFP(ints))
+        .apply(const IterableFP(strings))
+        .apply(const IterableFP(bools));
     final expected = IterableFP([
       for (final i in ints) ...[
         for (final s in strings) ...[
@@ -31,12 +39,23 @@ void main() {
     expect(actual).toEqual(expected);
   });
 
+  test('Cards', () {
+    final fcard = pure(_Card.new.curry());
+    const fsuits = IterableFP(_Suit.values);
+    const ffaces = IterableFP(_Face.values);
+    final cards = fcard.apply(fsuits).apply(ffaces).fix();
+    for (final card in cards) {
+      // ignore: avoid_print
+      print(card);
+    }
+  });
+
   group('Applicative laws', () {
-    runIdentityLawTestsWithPure(IterableFP.pure);
+    runIdentityLawTestsWithPure(pure);
 
     test('Composition', () {
       compositionLaw(
-        IterableFP.pure,
+        pure,
         IterableFP([
           (int a) => '$a',
           (int a) => '${a.isEven}',
@@ -54,11 +73,11 @@ void main() {
       );
     });
 
-    runHomomorphismLawTestsWithPure(IterableFP.pure);
+    runHomomorphismLawTestsWithPure(pure);
 
     test('Interchange', () {
       interchangeLaw(
-        IterableFP.pure,
+        pure,
         IterableFP([
           (int a) => '$a',
           (int a) => '${a.isEven}',
@@ -69,8 +88,40 @@ void main() {
   });
 }
 
-// Needs to be positional for currying to work.
-// ignore: avoid_positional_boolean_parameters
-String interpolate(int first, String second, bool third) {
-  return 'first: $first, second: $second, third: $third';
+enum _Suit {
+  spades,
+  clubs,
+  hearts,
+  diamonds,
+}
+
+enum _Face {
+  ace,
+  two,
+  three,
+  four,
+  five,
+  six,
+  seven,
+  eight,
+  nine,
+  ten,
+  jack,
+  queen,
+  king,
+}
+
+final class _Card {
+  final _Suit suit;
+  final _Face face;
+
+  const _Card(
+    this.suit,
+    this.face,
+  );
+
+  @override
+  String toString() {
+    return '_Card(suit: ${suit.name}, face: ${face.name})';
+  }
 }
