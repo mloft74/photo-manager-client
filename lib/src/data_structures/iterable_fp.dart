@@ -26,6 +26,15 @@ ValidationWithIterableErr<T, E> failI<T, E>(Iterable<E> err, T valEx) =>
 
 abstract final class _IterableFPBrand {}
 
+final class IterableFpPure implements ApplicativePure<_IterableFPBrand> {
+  const IterableFpPure._();
+
+  @override
+  IterableFP<TVal> call<TVal>(TVal value) {
+    return IterableFP([value]);
+  }
+}
+
 @freezed
 sealed class IterableFP<T>
     with _$IterableFP<T>, DelegatingIterable<T>
@@ -38,6 +47,8 @@ sealed class IterableFP<T>
   const IterableFP._();
 
   const factory IterableFP(Iterable<T> value) = _IterableFP;
+
+  static const pure = IterableFpPure._();
 
   @override
   Iterable<T> get delegate => value;
