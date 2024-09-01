@@ -5,15 +5,15 @@ abstract interface class ApplicativePure<TBrand> {
 }
 
 abstract interface class Applicative<TBrand, TVal> {
-  /// This is <*> with the arguments reversed. That way, [ApplicativeExtension.apply] has the arguments the right way around.
-  /// Example: [rapply] corresponds to `app <*> this`, but is written in dart like `this.rapply(app)`.
-  Applicative<TBrand, TNewVal> rapply<TNewVal>(
+  /// This is <*> with the arguments reversed. That way, [ApplicativeExtension.applyF] has the arguments the right way around.
+  /// Example: [applyR] corresponds to `app <*> this`, but is written in dart like `this.rapply(app)`.
+  Applicative<TBrand, TNewVal> applyR<TNewVal>(
     covariant Applicative<TBrand, TNewVal Function(TVal val)> app,
   );
 }
 
 extension ApplicativeExtension<TBrand, TVal, TNewVal>
     on Applicative<TBrand, TNewVal Function(TVal val)> {
-  Applicative<TBrand, TNewVal> apply(Applicative<TBrand, TVal> val) =>
-      val.rapply(this);
+  Applicative<TBrand, TNewVal> applyF(Applicative<TBrand, TVal> val) =>
+      val.applyR(this);
 }

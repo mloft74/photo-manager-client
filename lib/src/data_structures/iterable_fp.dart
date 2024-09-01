@@ -79,15 +79,14 @@ sealed class IterableFP<T>
       IterableFP(value.map(fn));
 
   @override
-  IterableFP<TNewVal> rapply<TNewVal>(
+  IterableFP<TNewVal> applyR<TNewVal>(
     IterableFP<TNewVal Function(T val)> app,
   ) {
     return IterableFP(app.flatMap(fmap));
   }
 }
 
-typedef IterableApplicative<T> = Applicative<_IterableFPBrand, T>;
-
-extension FixApply<T> on IterableApplicative<T> {
-  IterableFP<T> fix() => this as IterableFP<T>;
+extension ApplyExtension<TVal, TNewVal>
+    on IterableFP<TNewVal Function(TVal val)> {
+  IterableFP<TNewVal> apply(IterableFP<TVal> val) => val.applyR(this);
 }

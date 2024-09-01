@@ -12,7 +12,7 @@ void main() {
   final fv = pure(value);
   final fid = pure(id<TVal>);
 
-  final actual = fid.apply(fv);
+  final actual = fid.applyF(fv);
   final expected = pure(value);
 
   expect(actual).toEqual(expected);
@@ -28,8 +28,8 @@ void main() {
 ) {
   final fc = pure(comp<A, B, C>);
 
-  final actual = fc.apply(u).apply(v).apply(w);
-  final expected = u.apply(v.apply(w));
+  final actual = fc.applyF(u).applyF(v).applyF(w);
+  final expected = u.applyF(v.applyF(w));
 
   expect(actual).toEqual(expected);
 
@@ -44,7 +44,7 @@ void main() {
   final ff = pure(f);
   final fx = pure(x);
 
-  final actual = ff.apply(fx);
+  final actual = ff.applyF(fx);
   final expected = pure(f(x));
 
   expect(actual).toEqual(expected);
@@ -60,8 +60,8 @@ void main() {
   final fy = pure(y);
   final f$y = pure((B Function(A) a) => a(y));
 
-  final actual = u.apply(fy);
-  final expected = f$y.apply(u);
+  final actual = u.applyF(fy);
+  final expected = f$y.applyF(u);
 
   expect(actual).toEqual(expected);
 

@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_types_on_closure_parameters
 
 import 'package:glados/glados.dart' hide expect;
-import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
 import 'package:photo_manager_client/src/extensions/curry_extension.dart';
 import 'package:spec/spec.dart';
@@ -45,7 +44,7 @@ void main() {
     final fcard = pure(_Card.new.curry());
     const fsuits = IterableFP(_Suit.values);
     const ffaces = IterableFP(_Face.values);
-    final cards = fcard.apply(fsuits).apply(ffaces).fix();
+    final cards = fcard.apply(fsuits).apply(ffaces);
     for (final card in cards) {
       // ignore: avoid_print
       print(card);

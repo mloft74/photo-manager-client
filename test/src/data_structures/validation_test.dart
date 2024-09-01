@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_types_on_closure_parameters
 
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
@@ -35,7 +34,7 @@ void main() {
     final parseAgeV = parseAge(data);
     final parseNameV = parseName(data);
     final parseMoneyV = parseMoney(data);
-    final actual = sut.apply(parseAgeV).apply(parseNameV).apply(parseMoneyV);
+    final actual = sut.applyF(parseAgeV).applyF(parseNameV).applyF(parseMoneyV);
 
     // Assert
     final expected = succeed(makeRecord(age, name, money));
@@ -66,7 +65,7 @@ void main() {
         fail<String>(['String failure']),
         succeed('Hello there!'),
       ]);
-      final data = builder.apply(us).apply(vs).apply(ws).fix().toIList();
+      final data = builder.apply(us).apply(vs).apply(ws);
 
       for (final datum in data) {
         String type<T>(ValidationT<T> v) => switch (v) {
