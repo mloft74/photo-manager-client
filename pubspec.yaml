@@ -33,6 +33,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   http: ^1.2.2
   json_annotation: ^4.9.0
+  macros: ^0.1.2-main.4
   path_provider: ^2.1.4
   riverpod_annotation: ^2.3.5
   rxdart: ^0.28.0
