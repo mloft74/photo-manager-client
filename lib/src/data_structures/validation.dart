@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
-import 'package:photo_manager_client/src/data_structures/fp/functor.dart';
 import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
 
 part 'validation.freezed.dart';
@@ -15,9 +14,7 @@ abstract interface class ValidationPure<TErrSB, TErrSV,
 sealed class Validation<TVal, TErrSB, TErrSV,
         TErr extends Semigroup<TErrSB, TErrSV, TErr>>
     with _$Validation<TVal, TErrSB, TErrSV, TErr>
-    implements
-        Functor<_ValidationBrand, TVal>,
-        Applicative<_ValidationBrand, TVal> {
+    implements Applicative<_ValidationBrand, TVal> {
   const Validation._();
 
   const factory Validation.success(TVal val) = Success;

@@ -11,7 +11,8 @@ abstract interface class Monad<TBrand, TVal>
   );
 }
 
-// Create some annotation for code-genning a mixin like this:
+// Eventually, a macro/code-gen tool would generate this for every Monad.
+// However, macros seem fairly broken at the moment, so this is here for reference.
 mixin MonadDefaults<TBrand, TVal> on Monad<TBrand, TVal> {
   Monad<TBrand, T> Function<T>(T val) get $return;
 
@@ -25,26 +26,3 @@ mixin MonadDefaults<TBrand, TVal> on Monad<TBrand, TVal> {
   ) =>
       bind((val) => other.bind((fn) => $return(fn(val))));
 }
-
-// Example of a way to use MonadDefaults
-/*
-class _X {}
-
-class _Y<TVal> with MonadDefaults<_X, TVal> implements Monad<_X, TVal> {
-  TVal tval;
-  _Y(this.tval);
-
-  @override
-  _Y<T> Function<T>(T val) get $return => _Y.new;
-
-  @override
-  Monad<_X, TNewVal> bind<TNewVal>(_Y<TNewVal> Function(TVal val) fn) =>
-      fn(tval);
-}
-
-void x() {
-  _Y<T> foo<T>(T v) => _Y(v);
-  final MonadReturn<_X> bar = foo;
-  final MonadReturn<_X> x = _Y.new;
-}
-*/

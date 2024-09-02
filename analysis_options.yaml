@@ -4,8 +4,6 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  enable-experiment:
-    - macros
   exclude:
     - 'build/**'
     - '**.g.dart'

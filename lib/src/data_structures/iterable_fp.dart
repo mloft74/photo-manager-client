@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
-import 'package:photo_manager_client/src/data_structures/fp/functor.dart';
 import 'package:photo_manager_client/src/data_structures/fp/monad.dart';
 import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
@@ -54,9 +53,7 @@ sealed class IterableFP<T>
     implements
         Iterable<T>,
         Semigroup<_IterableFPBrand, T, IterableFP<T>>,
-        Functor<_IterableFPBrand, T>,
-        Monad<_IterableFPBrand, T>,
-        Applicative<_IterableFPBrand, T> {
+        Monad<_IterableFPBrand, T> {
   const IterableFP._();
 
   const factory IterableFP(Iterable<T> value) = _IterableFP;
@@ -86,7 +83,7 @@ sealed class IterableFP<T>
   }
 }
 
-extension ApplyExtension<TVal, TNewVal>
+extension IterableFPApply<TVal, TNewVal>
     on IterableFP<TNewVal Function(TVal val)> {
   IterableFP<TNewVal> apply(IterableFP<TVal> val) => val.applyR(this);
 }
