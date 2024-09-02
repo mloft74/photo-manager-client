@@ -6,9 +6,9 @@ part 'validation.freezed.dart';
 
 abstract final class _ValidationBrand {}
 
-abstract interface class ValidationPure<TErrSB, TErrSV,
+typedef ValidationPure<TErrSB, TErrSV,
         TErr extends Semigroup<TErrSB, TErrSV, TErr>>
-    implements ApplicativePure<_ValidationBrand> {}
+    = Validation<TVal, TErrSB, TErrSV, TErr> Function<TVal>(TVal val);
 
 @freezed
 sealed class Validation<TVal, TErrSB, TErrSV,

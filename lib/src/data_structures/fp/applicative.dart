@@ -2,11 +2,7 @@
 
 import 'package:photo_manager_client/src/data_structures/fp/functor.dart';
 
-abstract interface class ApplicativePure<TBrand> {
-  Applicative<TBrand, TVal> call<TVal>(TVal val);
-}
-
-typedef ApplicativePureFn<TBrand> = Applicative<TBrand, TVal> Function<TVal>(
+typedef ApplicativePure<TBrand> = Applicative<TBrand, TVal> Function<TVal>(
   TVal val,
 );
 
