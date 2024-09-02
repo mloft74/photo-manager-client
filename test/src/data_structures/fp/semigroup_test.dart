@@ -7,6 +7,7 @@ void main() {
   // Don't write tests here, just use the functions below in other files.
 }
 
+/// If this complains about type inference, try using [AssociativityExt.associativityLawExt].
 () associativityLaw<TBrand, TVal, TImpl extends Semigroup<TBrand, TVal, TImpl>>(
   TImpl a,
   TImpl b,
@@ -18,4 +19,11 @@ void main() {
   expect(actual).toEqual(expected);
 
   return ();
+}
+
+extension AssociativityExt<TBrand, TVal,
+    TImpl extends Semigroup<TBrand, TVal, TImpl>> on TImpl {
+  /// Extension version of [associativityLaw] to fix type inference.
+  () associativityLawExt(TImpl b, TImpl c) =>
+      associativityLaw<TBrand, TVal, TImpl>(this, b, c);
 }
