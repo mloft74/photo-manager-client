@@ -4,7 +4,7 @@ import 'package:photo_manager_client/src/data_structures/fp/fp.dart';
 import 'package:photo_manager_client/src/data_structures/fp/type_classes/monoid.dart';
 import 'package:spec/spec.dart';
 
-export './semigroup_test.dart' hide main;
+export 'semigroup_test.dart' hide main;
 
 void main() {
   // Don't write tests here, just use the functions below in other files.

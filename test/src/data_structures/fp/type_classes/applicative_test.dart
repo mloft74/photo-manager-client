@@ -2,6 +2,7 @@
 
 import 'package:photo_manager_client/src/data_structures/fp/fp.dart';
 import 'package:photo_manager_client/src/data_structures/fp/type_classes/applicative.dart';
+import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
 void main() {
@@ -26,7 +27,7 @@ void main() {
   Applicative<TBrand, B Function(A)> v,
   Applicative<TBrand, A> w,
 ) {
-  final fc = pure(comp<A, B, C>);
+  final fc = pure(comp<A, B, C>.curry());
 
   final actual = fc.applyF(u).applyF(v).applyF(w);
   final expected = u.applyF(v.applyF(w));

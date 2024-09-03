@@ -6,8 +6,8 @@ import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
 import '../util.dart';
-import 'fp/applicative_test.dart';
-import 'fp/monoid_test.dart';
+import 'fp/type_classes/applicative_test.dart';
+import 'fp/type_classes/monoid_test.dart';
 
 const pure = IterableFP.pure;
 
@@ -83,6 +83,8 @@ void main() {
       });
     });
 
+    // TODO(mloft74): Test functor laws
+
     group(r'Applicative laws $', () {
       runIdentityLawTestsWithPure(pure);
 
@@ -120,6 +122,8 @@ void main() {
         );
       });
     });
+
+    // TODO(mloft74): Test monad laws
   });
 }
 

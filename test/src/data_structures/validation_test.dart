@@ -6,7 +6,7 @@ import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
-import 'fp/applicative_test.dart';
+import 'fp/type_classes/applicative_test.dart';
 
 typedef Record = (int, String, double);
 
@@ -42,6 +42,8 @@ void main() {
       final expected = succeed(makeRecord(age, name, money));
       expect(actual).toEqual(expected);
     });
+
+    // TODO(mloft74): Test functor laws
 
     group(r'Applicative laws $', () {
       runIdentityLawTestsWithPure(pure);
