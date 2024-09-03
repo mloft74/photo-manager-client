@@ -1,7 +1,7 @@
 // ignore_for_file: unreachable_from_main
 
 import 'package:photo_manager_client/src/data_structures/fp/fp.dart';
-import 'package:photo_manager_client/src/data_structures/fp/monoid.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/monoid.dart';
 import 'package:spec/spec.dart';
 
 export './semigroup_test.dart' hide main;

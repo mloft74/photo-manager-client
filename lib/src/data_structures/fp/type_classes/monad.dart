@@ -1,6 +1,6 @@
 // ignore: one_member_abstracts
-import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
-import 'package:photo_manager_client/src/data_structures/fp/functor.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/applicative.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/functor.dart';
 
 typedef MonadReturn<TBrand> = Monad<TBrand, TVal> Function<TVal>(TVal val);
 

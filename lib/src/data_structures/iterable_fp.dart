@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:photo_manager_client/src/data_structures/fp/monad.dart';
-import 'package:photo_manager_client/src/data_structures/fp/monoid.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/monad.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/monoid.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/flatmap_extension.dart';
 import 'package:photo_manager_client/src/mixins/delegating_iterable.dart';

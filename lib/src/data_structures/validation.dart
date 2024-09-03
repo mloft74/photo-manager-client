@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
-import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/applicative.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/semigroup.dart';
 
 part 'validation.freezed.dart';
 

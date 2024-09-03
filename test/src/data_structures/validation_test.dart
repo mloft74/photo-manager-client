@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_types_on_closure_parameters
 
-import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/function_extension.dart';

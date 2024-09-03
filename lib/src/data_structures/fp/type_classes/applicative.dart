@@ -1,6 +1,6 @@
 // ignore_for_file: one_member_abstracts
 
-import 'package:photo_manager_client/src/data_structures/fp/functor.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/functor.dart';
 
 typedef ApplicativePure<TBrand> = Applicative<TBrand, TVal> Function<TVal>(
   TVal val,

@@ -1,6 +1,6 @@
 // ignore_for_file: unreachable_from_main
 
-import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/semigroup.dart';
 import 'package:spec/spec.dart';
 
 void main() {

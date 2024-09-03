@@ -1,5 +1,5 @@
 import 'package:photo_manager_client/src/data_structures/fp/fp.dart';
-import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
+import 'package:photo_manager_client/src/data_structures/fp/type_classes/semigroup.dart';
 
 abstract interface class Monoid<TBrand, TVal,
         TImpl extends Monoid<TBrand, TVal, TImpl>>
