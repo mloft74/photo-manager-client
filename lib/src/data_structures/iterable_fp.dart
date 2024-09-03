@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/data_structures/fp/monad.dart';
-import 'package:photo_manager_client/src/data_structures/fp/semigroup.dart';
+import 'package:photo_manager_client/src/data_structures/fp/monoid.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/flatmap_extension.dart';
 import 'package:photo_manager_client/src/mixins/delegating_iterable.dart';
@@ -36,13 +36,19 @@ sealed class IterableFP<TVal>
     with _$IterableFP<TVal>, DelegatingIterable<TVal>
     implements
         Iterable<TVal>,
-        Semigroup<_IterableFPBrand, TVal, IterableFP<TVal>>,
+        Monoid<_IterableFPBrand, TVal, IterableFP<TVal>>,
         Monad<_IterableFPBrand, TVal> {
   const IterableFP._();
 
   const factory IterableFP(Iterable<TVal> value) = _IterableFP;
 
-  static IterableFP<T> pure<T>(T val) => IterableFP([val]);
+  static IterableFP<T> pure<T>(T val) => IterableFP<T>([val]);
+  static IterableFP<T> mempty<T>() => IterableFP<T>([]);
+  static IterableFP<T> mconcat<T>(
+    List<IterableFP<T>> list,
+    IterableFP<T> mempty,
+  ) =>
+      list.mconcatExt(mempty);
 
   @override
   Iterable<TVal> get delegate => value;

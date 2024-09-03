@@ -2,12 +2,12 @@
 
 import 'package:glados/glados.dart' hide expect;
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
-import 'package:photo_manager_client/src/extensions/curry_extension.dart';
+import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
 import '../util.dart';
 import 'fp/applicative_test.dart';
-import 'fp/semigroup_test.dart';
+import 'fp/monoid_test.dart';
 
 const pure = IterableFP.pure;
 
@@ -53,14 +53,33 @@ void main() {
       }
     });
 
-    group(r'Semigroup laws $', () {
-      Glados3<List<int>, List<int>, List<int>>().test('Associativity law',
+    group(r'Monoid laws $', () {
+      Glados<List<int>>().test('Right identity', (input) {
+        IterableFP(input).rightIdentityLawExt(const IterableFP([]));
+      });
+
+      Glados<List<int>>().test('Left identity', (input) {
+        IterableFP(input).leftIdentityLawExt(const IterableFP([]));
+      });
+
+      Glados3<List<int>, List<int>, List<int>>().test('Associativity',
           (aRaw, bRaw, cRaw) {
         final a = IterableFP(aRaw);
         final b = IterableFP(bRaw);
         final c = IterableFP(cRaw);
 
         a.associativityLawExt(b, c);
+      });
+
+      Glados3<List<int>, List<int>, List<int>>().test('Concatenation',
+          (aRaw, bRaw, cRaw) {
+        final a = IterableFP(aRaw);
+        final b = IterableFP(bRaw);
+        final c = IterableFP(cRaw);
+        [a, b, c].concatenationLawExt(
+          const IterableFP([]),
+          IterableFP.mconcat,
+        );
       });
     });
 

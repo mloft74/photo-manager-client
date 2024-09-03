@@ -3,7 +3,7 @@
 import 'package:photo_manager_client/src/data_structures/fp/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
-import 'package:photo_manager_client/src/extensions/curry_extension.dart';
+import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
 import 'fp/applicative_test.dart';
