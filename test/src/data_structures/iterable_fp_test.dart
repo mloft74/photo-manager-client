@@ -6,8 +6,9 @@ import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
 import '../util.dart';
-import 'fp/type_classes/applicative_test.dart';
-import 'fp/type_classes/monoid_test.dart';
+import 'fp/type_classes/applicative_test.dart' as applicative;
+import 'fp/type_classes/functor_test.dart' as functor;
+import 'fp/type_classes/monoid_test.dart' as monoid;
 
 const pure = IterableFP.pure;
 
@@ -83,16 +84,27 @@ void main() {
       });
     });
 
-    // TODO(mloft74): Test functor laws
+    group(r'Functor laws $', () {
+      test('Identity', () {
+        functor.identityLaw(const IterableFP([12]));
+        functor.identityLaw(const IterableFP([true]));
+        functor.identityLaw(const IterableFP([0.58736278393736]));
+        functor.identityLaw(const IterableFP(['Nice looking string here!']));
+      });
+
+      Glados<List<int>>().test('Composition', (ints) {
+        functor.compositionLaw(IterableFP(ints), (b) => '$b', (i) => i.isEven);
+      });
+    });
 
     group(r'Applicative laws $', () {
-      runIdentityLawTestsWithPure(pure);
+      applicative.runIdentityLawTestsWithPure(pure);
 
       Glados2<List<int>, String>(
         null,
         keyboardString,
       ).test('Composition', (ints, s) {
-        compositionLaw(
+        applicative.compositionLaw(
           pure,
           IterableFP([
             (int a) => '$a',
@@ -109,10 +121,10 @@ void main() {
         );
       });
 
-      runHomomorphismLawTestsWithPure(pure);
+      applicative.runHomomorphismLawTestsWithPure(pure);
 
       test('Interchange', () {
-        interchangeLaw(
+        applicative.interchangeLaw(
           pure,
           IterableFP([
             (int a) => '$a',

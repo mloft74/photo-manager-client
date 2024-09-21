@@ -1,12 +1,14 @@
 // ignore_for_file: avoid_types_on_closure_parameters
 
+import 'package:glados/glados.dart' hide expect;
 import 'package:photo_manager_client/src/data_structures/fp/type_classes/applicative.dart';
 import 'package:photo_manager_client/src/data_structures/iterable_fp.dart';
 import 'package:photo_manager_client/src/data_structures/validation.dart';
 import 'package:photo_manager_client/src/extensions/function_extension.dart';
 import 'package:spec/spec.dart';
 
-import 'fp/type_classes/applicative_test.dart';
+import 'fp/type_classes/applicative_test.dart' as applicative;
+import 'fp/type_classes/functor_test.dart' as functor;
 
 typedef Record = (int, String, double);
 
@@ -43,10 +45,21 @@ void main() {
       expect(actual).toEqual(expected);
     });
 
-    // TODO(mloft74): Test functor laws
+    group(r'Functor laws $', () {
+      test('Identity', () {
+        functor.identityLaw(succeed(12));
+        functor.identityLaw(succeed(true));
+        functor.identityLaw(succeed(0.58736278393736));
+        functor.identityLaw(succeed('Nice looking string here!'));
+      });
+
+      Glados<int>().test('Composition', (val) {
+        functor.compositionLaw(succeed(val), (b) => '$b', (i) => i.isEven);
+      });
+    });
 
     group(r'Applicative laws $', () {
-      runIdentityLawTestsWithPure(pure);
+      applicative.runIdentityLawTestsWithPure(pure);
 
       group(r'Composition $', () {
         final builder = IterableFP([
@@ -81,7 +94,7 @@ void main() {
           final w = type(datum.w);
 
           test('with u: $u, v: $v, w: $w', () {
-            compositionLaw(
+            applicative.compositionLaw(
               pure,
               datum.u,
               datum.v,
@@ -91,15 +104,15 @@ void main() {
         }
       });
 
-      runHomomorphismLawTestsWithPure(pure);
+      applicative.runHomomorphismLawTestsWithPure(pure);
 
       test('Interchange', () {
-        interchangeLaw(
+        applicative.interchangeLaw(
           pure,
           succeed((int a) => '$a'),
           17,
         );
-        interchangeLaw(
+        applicative.interchangeLaw(
           pure,
           fail<String Function(int)>(['int -> String failure']),
           17,
