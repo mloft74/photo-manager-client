@@ -8,13 +8,15 @@ import 'package:spec/spec.dart';
 import '../util.dart';
 import 'fp/type_classes/applicative_test.dart' as applicative;
 import 'fp/type_classes/functor_test.dart' as functor;
+import 'fp/type_classes/monad_test.dart' as monad;
 import 'fp/type_classes/monoid_test.dart' as monoid;
 
 const pure = IterableFP.pure;
+const $return = IterableFP.pure;
 
 void main() {
   group('${IterableFP<()>} \$', () {
-    test('General usage', () {
+    test('General applicative usage', () {
       const ints = [8, 16, 32];
       const strings = ['Hello', 'there'];
       const bools = [true, false];
@@ -135,7 +137,59 @@ void main() {
       });
     });
 
-    // TODO(mloft74): Test monad laws
+    group(r'Monad laws $', () {
+      Glados<int>().test('Left identity law', (val) {
+        val = val.abs();
+        monad.leftIdentityLaw(
+          $return,
+          _gen,
+          val,
+        );
+      });
+
+      Glados<int>().test('Right identity law', (val) {
+        monad.rightIdentityLaw($return, $return(val));
+      });
+
+      Glados<int>().test('Associativity law', (val) {
+        val = val.abs();
+        monad.associativityLaw(
+          $return(val),
+          (val) => _gen(val, 'Something'),
+          (val) => IterableFP(val.split(' ')),
+          // Evil hack to fix types
+          bind: <X1, X2>(x1, x2) {
+            final fx1 = x1 as IterableFP<X1>;
+            return fx1.bind(
+              (val) => x2(val) as IterableFP<X2>,
+            );
+          },
+        );
+      });
+
+      Glados<int>().test('Pure is return', (val) {
+        monad.pureIsReturn(pure, $return, val);
+      });
+
+      Glados<List<int>>().test('Apply relates to bind', (val) {
+        val = val.map((e) => e.abs()).toList();
+        monad.applyRelatesToBind(
+          $return,
+          IterableFP([
+            (int val) => _gen(val, 'First'),
+            (int val) => _gen(val, 'Second'),
+          ]),
+          IterableFP(val),
+          // Evil hack to fix types
+          bind: <X1, X2>(x1, x2) {
+            final fx1 = x1 as IterableFP<X1>;
+            return fx1.bind(
+              (val) => x2(val) as IterableFP<X2>,
+            );
+          },
+        );
+      });
+    });
   });
 }
 
@@ -176,3 +230,6 @@ final class _Card {
     return '_Card(suit: ${suit.name}, face: ${face.name})';
   }
 }
+
+IterableFP<String> _gen(int num, [String str = 'Hello']) =>
+    IterableFP(List.generate(num, (num) => '$str $num'));

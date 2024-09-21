@@ -42,11 +42,12 @@ sealed class IterableFP<TVal>
 
   const factory IterableFP(Iterable<TVal> value) = _IterableFP;
 
-  static IterableFP<T> pure<T>(T val) => IterableFP<T>([val]);
-  static IterableFP<T> mempty<T>() => IterableFP<T>([]);
-  static IterableFP<T> mconcat<T>(
-    List<IterableFP<T>> list,
-    IterableFP<T> mempty,
+  factory IterableFP.pure(TVal val) => IterableFP([val]);
+  factory IterableFP.$return(TVal val) => IterableFP([val]);
+  factory IterableFP.mempty() => const IterableFP([]);
+  factory IterableFP.mconcat(
+    List<IterableFP<TVal>> list,
+    IterableFP<TVal> mempty,
   ) =>
       list.mconcatExt(mempty);
 
