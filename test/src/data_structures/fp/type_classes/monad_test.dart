@@ -43,10 +43,10 @@ typedef FixedBind<TBrand> = Monad<TBrand, X2> Function<X1, X2>(
   Monad<TBrand, A> m,
   Monad<TBrand, B> Function(A) k,
   Monad<TBrand, C> Function(B) h, {
-  required FixedBind<TBrand> bind,
+  required FixedBind<TBrand> fixedBind,
 }) {
-  final actual = bind(m, (x) => bind(k(x), h));
-  final expected = bind(bind(m, k), h);
+  final actual = fixedBind(m, (x) => fixedBind(k(x), h));
+  final expected = fixedBind(fixedBind(m, k), h);
 
   expect(actual).toEqual(expected);
 
@@ -70,10 +70,11 @@ typedef FixedBind<TBrand> = Monad<TBrand, X2> Function<X1, X2>(
   MonadReturn<TBrand> $return,
   Monad<TBrand, X1 Function(X2)> m1,
   Monad<TBrand, X2> m2, {
-  required FixedBind<TBrand> bind,
+  required FixedBind<TBrand> fixedBind,
 }) {
   final actual = m1.applyF(m2);
-  final expected = bind(m1, (x1) => bind(m2, (x2) => $return(x1(x2))));
+  final expected =
+      fixedBind(m1, (x1) => fixedBind(m2, (x2) => $return(x1(x2))));
 
   expect(actual).toEqual(expected);
 

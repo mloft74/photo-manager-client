@@ -158,12 +158,9 @@ void main() {
           (val) => _gen(val, 'Something'),
           (val) => IterableFP(val.split(' ')),
           // Evil hack to fix types
-          bind: <X1, X2>(x1, x2) {
-            final fx1 = x1 as IterableFP<X1>;
-            return fx1.bind(
-              (val) => x2(val) as IterableFP<X2>,
-            );
-          },
+          fixedBind: <X1, X2>(x1, x2) => x1.bind(
+            x2.castRet<IterableFP<X2>>(),
+          ),
         );
       });
 
@@ -181,12 +178,9 @@ void main() {
           ]),
           IterableFP(val),
           // Evil hack to fix types
-          bind: <X1, X2>(x1, x2) {
-            final fx1 = x1 as IterableFP<X1>;
-            return fx1.bind(
-              (val) => x2(val) as IterableFP<X2>,
-            );
-          },
+          fixedBind: <X1, X2>(x1, x2) => x1.bind(
+            x2.castRet<IterableFP<X2>>(),
+          ),
         );
       });
     });
