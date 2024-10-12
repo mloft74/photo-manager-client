@@ -18,6 +18,7 @@ sealed class SaveServerError with _$SaveServerError implements Displayable {
     SetSelectedServerError error,
   ) = ErrorSettingServerSave;
 
+  // TODO(mloft74): add name param
   const factory SaveServerError.serverNameInUse() = ServerNameInUse;
 
   @override

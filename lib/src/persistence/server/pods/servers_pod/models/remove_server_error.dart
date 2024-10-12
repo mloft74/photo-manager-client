@@ -11,6 +11,7 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
 
   const factory RemoveServerError.noData() = NoDataRemove;
 
+  // TODO(mloft74): include server name
   const factory RemoveServerError.serverNotFound() = ServerNotFoundRemove;
 
   const factory RemoveServerError.errorRemoving(ErrorTrace<Object> errorTrace) =

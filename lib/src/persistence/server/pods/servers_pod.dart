@@ -30,6 +30,7 @@ final class Servers extends _$Servers
     final db = ref.watch(dbPod);
     final raw = await db.query(server_schema.tableName);
     final dbs = raw.map(ServerDB.fromDBMap);
+    // TODO(mloft74): fix whereSome to log errors somewhere
     final domains = dbs.map((e) => e.toDomain()).whereSome();
 
     return Map.fromEntries(domains.map((e) => MapEntry(e.name, e))).lock;

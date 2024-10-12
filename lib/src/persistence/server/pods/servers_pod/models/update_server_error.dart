@@ -11,6 +11,7 @@ sealed class UpdateServerError with _$UpdateServerError implements Displayable {
 
   const factory UpdateServerError.noData() = NoDataUpdate;
 
+  // TODO(mloft74): add name param
   const factory UpdateServerError.serverNotFound() = ServerNotFoundUpdate;
 
   const factory UpdateServerError.errorUpdating(ErrorTrace<Object> errorTrace) =
