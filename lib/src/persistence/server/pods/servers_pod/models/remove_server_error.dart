@@ -11,8 +11,7 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
 
   const factory RemoveServerError.noData() = NoDataRemove;
 
-  // TODO(mloft74): include server name
-  const factory RemoveServerError.serverNotFound() = ServerNotFoundRemove;
+  const factory RemoveServerError.serverNotFound(String name) = ServerNotFoundRemove;
 
   const factory RemoveServerError.errorRemoving(ErrorTrace<Object> errorTrace) =
       ErrorRemoving;
@@ -26,6 +25,6 @@ sealed class RemoveServerError with _$RemoveServerError implements Displayable {
         NoDataRemove() => const ['No data when removing.'],
         ErrorRemoving(:final errorTrace) => errorTrace.toDisplay(),
         ErrorUnsettingServer(:final error) => error.toDisplay(),
-        ServerNotFoundRemove() => const ['No server with that name was found.'],
+        ServerNotFoundRemove(:final name) => ['No server with the name $name was found.'],
       };
 }

@@ -11,8 +11,7 @@ sealed class UpdateServerError with _$UpdateServerError implements Displayable {
 
   const factory UpdateServerError.noData() = NoDataUpdate;
 
-  // TODO(mloft74): add name param
-  const factory UpdateServerError.serverNotFound() = ServerNotFoundUpdate;
+  const factory UpdateServerError.serverNotFound(String name) = ServerNotFoundUpdate;
 
   const factory UpdateServerError.errorUpdating(ErrorTrace<Object> errorTrace) =
       ErrorUpdating;
@@ -24,7 +23,7 @@ sealed class UpdateServerError with _$UpdateServerError implements Displayable {
   @override
   Iterable<String> toDisplay() => switch (this) {
         NoDataUpdate() => const ['No data when updating.'],
-        ServerNotFoundUpdate() => const ['No server with that name was found.'],
+        ServerNotFoundUpdate(:final name) => ['No server with the name $name was found.'],
         ErrorUpdating(:final errorTrace) => errorTrace.toDisplay(),
         ErrorSettingServerUpdate(:final error) => error.toDisplay(),
       };

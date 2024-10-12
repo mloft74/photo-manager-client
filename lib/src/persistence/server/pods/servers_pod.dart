@@ -41,7 +41,7 @@ final class Servers extends _$Servers
         onNoData: const NoDataSave(),
         update: (value) async {
           if (value.containsKey(server.name)) {
-            return const Err(ServerNameInUse());
+            return Err(ServerNameInUse(server.name));
           }
           state = AsyncData(value.add(server.name, server));
           return await _handleSave(ref, server);
@@ -53,7 +53,7 @@ final class Servers extends _$Servers
         onNoData: const NoDataUpdate(),
         update: (value) async {
           if (!value.containsKey(server.name)) {
-            return const Err(ServerNotFoundUpdate());
+            return Err(ServerNotFoundUpdate(server.name));
           }
           state = AsyncData(value.add(server.name, server));
           return await _handleUpdate(ref, server);
@@ -65,7 +65,7 @@ final class Servers extends _$Servers
         onNoData: const NoDataRemove(),
         update: (value) async {
           if (!value.containsKey(server.name)) {
-            return const Err(ServerNotFoundRemove());
+            return Err(ServerNotFoundRemove(server.name));
           }
           state = AsyncData(value.remove(server.name));
           return await _handleRemove(ref, server);

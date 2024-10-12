@@ -18,16 +18,15 @@ sealed class SaveServerError with _$SaveServerError implements Displayable {
     SetSelectedServerError error,
   ) = ErrorSettingServerSave;
 
-  // TODO(mloft74): add name param
-  const factory SaveServerError.serverNameInUse() = ServerNameInUse;
+  const factory SaveServerError.serverNameInUse(String name) = ServerNameInUse;
 
   @override
   Iterable<String> toDisplay() => switch (this) {
         NoDataSave() => const ['No data when saving.'],
         ErrorSaving(:final errorTrace) => errorTrace.toDisplay(),
         ErrorSettingServerSave(:final error) => error.toDisplay(),
-        ServerNameInUse() => const [
-            'This server name is already used. Please edit the existing server to update its url, or choose a new name for this server.',
+        ServerNameInUse(:final name) => [
+            'This server name $name is already used. Please edit the existing server to update its url, or choose a new name for this server.',
           ],
       };
 }
