@@ -29,7 +29,7 @@ class Home extends ConsumerWidget {
       bottomAppBar: PhotoManagerBottomAppBar(
         titleText: 'Home',
         actions: [
-          if (selectedServer case AsyncData(value: Some())) ...[
+          if (selectedServer.isSome) ...[
             IconButton(
               onPressed: () async {
                 final currentSorting = ref.read(dateSortingPod);
@@ -57,7 +57,7 @@ class Home extends ConsumerWidget {
             },
             icon: const Icon(Icons.settings),
           ),
-          if (selectedServer case AsyncData(value: Some()))
+          if (selectedServer.isSome)
             IconButton(
               onPressed: () async {
                 final response = await const UploadPhoto()
