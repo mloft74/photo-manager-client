@@ -2,22 +2,27 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:photo_manager_client/src/data_structures/option.dart';
-import 'package:photo_manager_client/src/upload_photo/widgets/pods/photo_pod.dart';
-import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
+import 'package:photo_manager_client/src/consts.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_candidates_pod.dart';
 
 class ImageDisplay extends ConsumerWidget {
   const ImageDisplay({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return AsyncValueBuilder(
-      asyncValue: ref.watch(photoPod),
-      builder: (context, value) {
-        return switch (value) {
-          Some(:final value) => Image.file(File(value)),
-          None() => const Text('Select an image'),
-        };
+    final candidates = ref.watch(uploadCandidatesPod).entries.toList();
+    if (candidates.isEmpty) {
+      return const Text('Select an image');
+    }
+
+    return GridView.builder(
+      itemCount: candidates.length,
+      gridDelegate: gridDelegate,
+      itemBuilder: (context, index) {
+        return Image.file(
+          File(candidates[index].key),
+          cacheWidth: 500,
+        );
       },
     );
   }

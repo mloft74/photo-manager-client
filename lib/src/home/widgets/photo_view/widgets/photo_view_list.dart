@@ -46,7 +46,6 @@ class _PhotoViewState extends ConsumerState<PhotoViewList> {
 
   @override
   Widget build(BuildContext context) {
-    const maxCrossAxisExtent = 256.0;
     return RefreshIndicator(
       onRefresh: () async {
         await ref.read(paginatedPhotosPod.notifier).reset();
@@ -60,11 +59,7 @@ class _PhotoViewState extends ConsumerState<PhotoViewList> {
             padding: edgeInsetsForRoutePadding.copyWith(bottom: 0.0),
             sliver: SliverGrid.builder(
               itemCount: widget.state.images.length,
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: maxCrossAxisExtent,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-              ),
+              gridDelegate: gridDelegate,
               itemBuilder: (context, index) {
                 final image = widget.state.images[index];
                 return PhotoViewPhoto(image: image);

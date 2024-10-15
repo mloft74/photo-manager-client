@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
-import 'package:photo_manager_client/src/upload_photo/widgets/pods/photo_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_candidates_pod.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 
@@ -14,21 +16,20 @@ class UploadButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final photoPath =
-        ref.watch(photoPod).asData.toOption().andThen((value) => value.value);
+    final candidates = ref.watch(uploadCandidatesPod);
 
     return FilledButton.icon(
-      onPressed: photoPath
-          .map(
-            (value) => () async {
-              await _onButtonPressed(
-                context: context,
-                ref: ref,
-                photoPath: value,
+      onPressed: candidates.isEmpty
+          ? null
+          : () {
+              unawaited(
+                _onButtonPressed(
+                  context: context,
+                  ref: ref,
+                  photoPath: '',
+                ),
               );
             },
-          )
-          .toNullable(),
       icon: const Icon(Icons.upload),
       label: const Text('Upload'),
     );
@@ -42,6 +43,8 @@ Future<()> _onButtonPressed({
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
+
+  return ();
 
   final uploadPhotoRes = ref.read(uploadPhotoPod);
 
