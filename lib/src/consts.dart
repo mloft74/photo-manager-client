@@ -8,6 +8,7 @@ const edgeInsetsForRoutePadding = EdgeInsets.fromLTRB(
   _listViewBasePaddingValue * 4.0,
 );
 
+const maxGridImageWith = 500;
 const maxCrossAxisExtent = 256.0;
 const gridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
   maxCrossAxisExtent: maxCrossAxisExtent,

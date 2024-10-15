@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
@@ -39,6 +40,8 @@ class PhotoViewPhoto extends ConsumerWidget {
         },
         child: CachedNetworkImage(
           imageUrl: value,
+          width: maxGridImageWith * 1.0,
+          memCacheWidth: maxGridImageWith,
           progressIndicatorBuilder: (context, url, progress) {
             return CircularProgressIndicator(
               value: progress.progress,

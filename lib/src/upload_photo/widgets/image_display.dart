@@ -19,9 +19,36 @@ class ImageDisplay extends ConsumerWidget {
       itemCount: candidates.length,
       gridDelegate: gridDelegate,
       itemBuilder: (context, index) {
-        return Image.file(
-          File(candidates[index].key),
-          cacheWidth: 500,
+        final candidate = candidates[index];
+        final (color, text) = switch (candidate.value) {
+          UploadCandidateStatus.pending => (Colors.grey.shade800, 'Pending'),
+          UploadCandidateStatus.uploading => (
+              Colors.blue.shade800,
+              'Uploading'
+            ),
+          UploadCandidateStatus.uploaded => (Colors.green.shade800, 'Uploaded'),
+          UploadCandidateStatus.error => (
+              Colors.red.shade800,
+              'Error',
+            ),
+        };
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: Image.file(
+                File(candidate.key),
+                cacheWidth: maxGridImageWith,
+              ),
+            ),
+            ColoredBox(
+              color: color,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(text),
+              ),
+            ),
+          ],
         );
       },
     );

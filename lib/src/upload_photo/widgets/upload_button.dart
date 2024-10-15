@@ -26,7 +26,6 @@ class UploadButton extends ConsumerWidget {
                 _onButtonPressed(
                   context: context,
                   ref: ref,
-                  photoPath: '',
                 ),
               );
             },
@@ -39,30 +38,31 @@ class UploadButton extends ConsumerWidget {
 Future<()> _onButtonPressed({
   required BuildContext context,
   required WidgetRef ref,
-  required String photoPath,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
-  return ();
-
-  final uploadPhotoRes = ref.read(uploadPhotoPod);
-
-  switch (uploadPhotoRes) {
-    case None():
-      messenger
-          .showSnackBar(const SnackBar(content: Text('No server selected')));
-    case Some(value: final uploadPhoto):
-      final res = await runWithToasts(
-        messenger: messenger,
-        op: () => uploadPhoto(photoPath),
-        startingMsg: 'Uploading',
-        finishedMsg: 'Upload finished',
-      );
-      if (res case Ok()) {
-        navigator.pop(UploadPhotoResponse.photoUploaded);
-      }
-  }
+  ref.read(uploadCandidatesPod.notifier).upload();
 
   return ();
+
+  //final uploadPhotoRes = ref.read(uploadPhotoPod);
+
+  //switch (uploadPhotoRes) {
+  //  case None():
+  //    messenger
+  //        .showSnackBar(const SnackBar(content: Text('No server selected')));
+  //  case Some(value: final uploadPhoto):
+  //    final res = await runWithToasts(
+  //      messenger: messenger,
+  //      op: () => uploadPhoto(photoPath),
+  //      startingMsg: 'Uploading',
+  //      finishedMsg: 'Upload finished',
+  //    );
+  //    if (res case Ok()) {
+  //      navigator.pop(UploadPhotoResponse.photoUploaded);
+  //    }
+  //}
+
+  //return ();
 }
