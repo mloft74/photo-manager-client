@@ -1,11 +1,29 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flutter/foundation.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/date_time_keep_extension.dart';
 import 'package:photo_manager_client/src/pods/models/log.dart';
 import 'package:photo_manager_client/src/pods/models/log_level.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'logs_pod.g.dart';
+
+() _printLogInDebugMode(Log log) {
+  if (kDebugMode) {
+    _printLog(log);
+  }
+
+  return ();
+}
+
+() _printLog(Log log) {
+  debugPrint(
+    '[${log.level.name}] <${log.topic.name}> {${log.timestamp}} ${log.log.join('\n\t')}',
+  );
+
+  return ();
+}
 
 @Riverpod(keepAlive: true)
 class Logs extends _$Logs {
@@ -16,6 +34,12 @@ class Logs extends _$Logs {
   static () inject(IList<Log> logs) {
     if (_injected) {
       throw StateError('Logs have already been injected');
+    }
+
+    if (kDebugMode) {
+      for (final log in logs) {
+        _printLog(log);
+      }
     }
 
     _startingLogs = logs;
@@ -41,58 +65,63 @@ class Logs extends _$Logs {
     return ();
   }
 
-  () log(LogLevel level, Displayable log) {
-    state = state.add(
-      Log(
-        log: log.toDisplay().toIList(),
-        level: level,
-        timestamp: DateTime.timestamp(),
-      ),
+  () log(LogLevel level, LogTopic topic, Displayable msg) {
+    final log = Log(
+      log: msg.toDisplay().toIList(),
+      topic: topic,
+      level: level,
+      timestamp: DateTime.timestamp(),
     );
+    _printLogInDebugMode(log);
+    state = state.add(log);
     return ();
   }
 
-  () logError(Displayable log) {
-    state = state.add(
-      Log(
-        log: log.toDisplay().toIList(),
-        level: LogLevel.error,
-        timestamp: DateTime.timestamp(),
-      ),
+  () logError(LogTopic topic, Displayable msg) {
+    final log = Log(
+      log: msg.toDisplay().toIList(),
+      topic: topic,
+      level: LogLevel.error,
+      timestamp: DateTime.timestamp(),
     );
+    _printLogInDebugMode(log);
+    state = state.add(log);
     return ();
   }
 
-  () logWarning(Displayable log) {
-    state = state.add(
-      Log(
-        log: log.toDisplay().toIList(),
-        level: LogLevel.warning,
-        timestamp: DateTime.timestamp(),
-      ),
+  () logWarning(LogTopic topic, Displayable msg) {
+    final log = Log(
+      log: msg.toDisplay().toIList(),
+      topic: topic,
+      level: LogLevel.warning,
+      timestamp: DateTime.timestamp(),
     );
+    _printLogInDebugMode(log);
+    state = state.add(log);
     return ();
   }
 
-  () logInfo(Displayable log) {
-    state = state.add(
-      Log(
-        log: log.toDisplay().toIList(),
-        level: LogLevel.info,
-        timestamp: DateTime.timestamp(),
-      ),
+  () logInfo(LogTopic topic, Displayable msg) {
+    final log = Log(
+      log: msg.toDisplay().toIList(),
+      topic: topic,
+      level: LogLevel.info,
+      timestamp: DateTime.timestamp(),
     );
+    _printLogInDebugMode(log);
+    state = state.add(log);
     return ();
   }
 
-  () logDebug(Displayable log) {
-    state = state.add(
-      Log(
-        log: log.toDisplay().toIList(),
-        level: LogLevel.debug,
-        timestamp: DateTime.timestamp(),
-      ),
+  () logDebug(LogTopic topic, Displayable msg) {
+    final log = Log(
+      log: msg.toDisplay().toIList(),
+      topic: topic,
+      level: LogLevel.debug,
+      timestamp: DateTime.timestamp(),
     );
+    _printLogInDebugMode(log);
+    state = state.add(log);
     return ();
   }
 }

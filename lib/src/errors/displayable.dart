@@ -6,6 +6,14 @@ abstract interface class Displayable {
   Iterable<String> toDisplay();
 }
 
+final class DefaultDisplayable implements Displayable {
+  final Iterable<String> display;
+  const DefaultDisplayable(this.display);
+
+  @override
+  Iterable<String> toDisplay() => display;
+}
+
 extension DisplayableExt on Displayable {
   /// Returns a human readable representation of this object.
   ///

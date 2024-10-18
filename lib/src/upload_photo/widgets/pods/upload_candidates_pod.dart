@@ -1,5 +1,8 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/errors/displayable.dart';
+import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -50,7 +53,7 @@ class UploadCandidates extends _$UploadCandidates {
 
   () _startUpload(String from) {
     if (_candidates.isEmpty) {
-      return();
+      return ();
     }
     final candidateOut = Output<String>();
     _candidates = _candidates.removeLast(candidateOut);
@@ -67,7 +70,12 @@ class UploadCandidates extends _$UploadCandidates {
   Future<()> _upload(String candidate) async {
     final maybeUpload = ref.read(uploadPhotoPod);
     if (maybeUpload.isNone) {
-      // TODO(mloft74): log error
+      ref.read(logsPod.notifier).logError(
+            LogTopic.photoUpload,
+            const DefaultDisplayable(
+              ['No server selected when uploading photos'],
+            ),
+          );
       return ();
     }
 
@@ -75,13 +83,20 @@ class UploadCandidates extends _$UploadCandidates {
     //final upload = maybeUpload.expect('Should have checked for None earlier');
     //final res = await upload(candidate);
     await Future<void>.delayed(const Duration(seconds: 2));
-    final res = Result<(), ()>.ok(());
+    final res = Result<(), UploadPhotoError>.ok(());
 
     switch (res) {
       case Ok():
+        ref.read(logsPod.notifier).logInfo(
+              LogTopic.photoUpload,
+              DefaultDisplayable(['Logging test']),
+            );
         state = state.add(candidate, UploadCandidateStatus.uploaded);
-      case Err():
-        // TODO(mloft74): log error
+      case Err(:final error):
+        ref.read(logsPod.notifier).logError(
+              LogTopic.photoUpload,
+              error,
+            );
         state = state.add(candidate, UploadCandidateStatus.error);
     }
 

@@ -10,6 +10,7 @@ import 'package:photo_manager_client/src/extensions/date_time_keep_extension.dar
 import 'package:photo_manager_client/src/persistence/keys.dart';
 import 'package:photo_manager_client/src/persistence/shared_prefs_pod.dart';
 import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 
 final class LogSaver extends ConsumerStatefulWidget {
   final Widget child;
@@ -69,6 +70,7 @@ final class _LogSaverState extends ConsumerState<LogSaver>
             )
             .catchError(
               (Object ex, StackTrace st) => ref.read(logsPod.notifier).logError(
+                    LogTopic.persistence,
                     ErrorTrace<Object>(
                       ex,
                       Some(st),

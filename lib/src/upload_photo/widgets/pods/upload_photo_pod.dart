@@ -50,6 +50,7 @@ typedef UploadPhotoFn = Future<Result<(), UploadPhotoError>> Function(
   String imagePath,
 );
 
+/// Returns [None] if no server is selected.
 @riverpod
 Option<UploadPhotoFn> uploadPhoto(
   UploadPhotoRef ref,

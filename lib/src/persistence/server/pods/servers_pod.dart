@@ -2,7 +2,9 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
+import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
+import 'package:photo_manager_client/src/extensions/partition_extension.dart';
 import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/schemas/server.dart'
     as server_schema;
@@ -11,6 +13,8 @@ import 'package:photo_manager_client/src/persistence/server/pods/selected_server
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/remove_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/save_server_error.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod/models/update_server_error.dart';
+import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:photo_manager_client/src/state_management/async_notifier_async_rollback_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -30,8 +34,27 @@ final class Servers extends _$Servers
     final db = ref.watch(dbPod);
     final raw = await db.query(server_schema.tableName);
     final dbs = raw.map(ServerDB.fromDBMap);
-    // TODO(mloft74): fix whereSome to log errors somewhere
-    final domains = dbs.map((e) => e.toDomain()).whereSome();
+    final (
+      pass: domains,
+      fail: errors
+    ) = dbs.map((e) => e.toDomain()).partitionMap(
+          test: (val) => val.isOk,
+          onPass: (val) =>
+              val.expect('Should have checked for Ok in test for partionMap'),
+          onFail: (val) => val.expectErr(
+            'Should have checked for Ok in test for partionMap (inverted since this is failure path)',
+          ),
+        );
+    final logger = ref.read(logsPod.notifier);
+    for (final e in errors) {
+      logger.logError(
+        LogTopic.parsing,
+        DefaultDisplayable([
+          'Could not parse server',
+          ...e.toDisplay(),
+        ]),
+      );
+    }
 
     return Map.fromEntries(domains.map((e) => MapEntry(e.name, e))).lock;
   }

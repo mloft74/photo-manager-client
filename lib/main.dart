@@ -5,6 +5,8 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/log_saver.dart';
 import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/keys.dart';
@@ -13,6 +15,8 @@ import 'package:photo_manager_client/src/persistence/shared_prefs_pod.dart';
 import 'package:photo_manager_client/src/photo_manager_app.dart';
 import 'package:photo_manager_client/src/pods/logs_pod.dart';
 import 'package:photo_manager_client/src/pods/models/log.dart';
+import 'package:photo_manager_client/src/pods/models/log_level.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -32,15 +36,28 @@ Future<()> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final sharedPrefs = await SharedPreferencesWithCache.create(
-    cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {'selected_server'},
-    ),
+    cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
+
   final rawLogs =
       sharedPrefs.getStringList(logsKeyForDate(DateTime.timestamp()));
-  Logs.inject(
-    rawLogs?.map(_parseLog).toIList() ?? const IListConst([]),
-  );
+  IList<Log> injection;
+  try {
+    injection = rawLogs?.map(_parseLog).toIList() ?? const IListConst([]);
+  } catch (ex, st) {
+    injection = IList([
+      Log(
+        level: LogLevel.warning,
+        topic: LogTopic.parsing,
+        timestamp: DateTime.timestamp(),
+        log: IList([
+          'Failed to parse logs at startup',
+          ...ErrorTrace(ex, Some(st)).toDisplay(),
+        ]),
+      ),
+    ]);
+  }
+  Logs.inject(injection);
 
   final db = await openDatabase(
     'photo_manager.db',

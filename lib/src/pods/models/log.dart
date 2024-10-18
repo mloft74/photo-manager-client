@@ -1,6 +1,7 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:photo_manager_client/src/pods/models/log_level.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 
 part 'log.freezed.dart';
 part 'log.g.dart';
@@ -9,6 +10,7 @@ part 'log.g.dart';
 class Log with _$Log {
   const factory Log({
     required LogLevel level,
+    required LogTopic topic,
     required DateTime timestamp,
     required IList<String> log,
   }) = _Log;
