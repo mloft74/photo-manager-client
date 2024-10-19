@@ -17,9 +17,9 @@ part 'logs_pod.g.dart';
   return ();
 }
 
-() _printLog(Log log) {
+() _printLog(Log log, [String prefix = '']) {
   debugPrint(
-    '[${log.level.name}] <${log.topic.name}> {${log.timestamp}} ${log.log.join('\n\t')}',
+    '$prefix[${log.level.name}] <${log.topic.name}> {${log.timestamp}} ${log.log.join('\n\t')}',
   );
 
   return ();
@@ -38,7 +38,7 @@ class Logs extends _$Logs {
 
     if (kDebugMode) {
       for (final log in logs) {
-        _printLog(log);
+        _printLog(log, '(CACHED) ');
       }
     }
 

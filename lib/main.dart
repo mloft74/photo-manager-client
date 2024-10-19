@@ -6,11 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/log_saver.dart';
 import 'package:photo_manager_client/src/persistence/db_pod.dart';
 import 'package:photo_manager_client/src/persistence/keys.dart';
 import 'package:photo_manager_client/src/persistence/migrations/v1.dart';
+import 'package:photo_manager_client/src/persistence/parse_logs.dart';
 import 'package:photo_manager_client/src/persistence/shared_prefs_pod.dart';
 import 'package:photo_manager_client/src/photo_manager_app.dart';
 import 'package:photo_manager_client/src/pods/logs_pod.dart';
@@ -39,24 +41,21 @@ Future<()> main() async {
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
 
-  final rawLogs =
-      sharedPrefs.getStringList(logsKeyForDate(DateTime.timestamp()));
-  IList<Log> injection;
-  try {
-    injection = rawLogs?.map(_parseLog).toIList() ?? const IListConst([]);
-  } catch (ex, st) {
-    injection = IList([
+  final key = logsKeyForDate(DateTime.timestamp());
+  final parsedLogs = parseLogs(sharedPrefs, key);
+  final injection = parsedLogs.unwrapOrElse(
+    (error) => IList([
       Log(
         level: LogLevel.warning,
         topic: LogTopic.parsing,
         timestamp: DateTime.timestamp(),
         log: IList([
           'Failed to parse logs at startup',
-          ...ErrorTrace(ex, Some(st)).toDisplay(),
+          ...error.toDisplay(),
         ]),
       ),
-    ]);
-  }
+    ]),
+  );
   Logs.inject(injection);
 
   final db = await openDatabase(
@@ -81,11 +80,4 @@ Future<()> main() async {
   );
 
   return ();
-}
-
-Log _parseLog(String value) {
-  final decoded = jsonDecode(value) as Map<dynamic, dynamic>;
-  return Log.fromJson(
-    decoded.cast<String, dynamic>(),
-  );
 }

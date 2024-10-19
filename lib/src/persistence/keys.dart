@@ -1,5 +1,5 @@
 const selectedServerKey = 'selected_server';
-const _logsPrefix = 'logs_';
+const logsPrefix = 'logs_';
 
 /// Converts to UTC first.
 String logsKeyForDate(DateTime date) {
@@ -7,5 +7,5 @@ String logsKeyForDate(DateTime date) {
   final year = utc.year.toString().padLeft(4, '0');
   final month = utc.month.toString().padLeft(2, '0');
   final day = utc.day.toString().padLeft(2, '0');
-  return '$_logsPrefix${year}_${month}_$day';
+  return '$logsPrefix${year}_${month}_$day';
 }
