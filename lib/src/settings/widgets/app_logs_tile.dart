@@ -7,12 +7,14 @@ final class AppLogsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        const AppLogsView().pushMaterialRouteUnawaited(context);
-      },
-      title: const Text('App Logs'),
-      trailing: const Icon(Icons.arrow_forward),
+    return Card(
+      child: ListTile(
+        onTap: () {
+          const AppLogsView().pushMaterialRouteUnawaited(context);
+        },
+        title: const Text('App Logs'),
+        trailing: const Icon(Icons.arrow_forward),
+      ),
     );
   }
 }

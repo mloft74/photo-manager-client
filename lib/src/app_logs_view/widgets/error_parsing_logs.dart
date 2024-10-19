@@ -23,8 +23,10 @@ final class ErrorParsingLogs extends StatelessWidget {
       child: ListView(
         padding: edgeInsetsForRoutePadding,
         children: [
-          ListTile(
-            title: Text(error.toDisplayJoined()),
+          Card(
+            child: ListTile(
+              title: Text(error.toDisplayJoined()),
+            ),
           ),
         ],
       ),

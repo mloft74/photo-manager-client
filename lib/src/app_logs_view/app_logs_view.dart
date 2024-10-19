@@ -35,16 +35,18 @@ final class AppLogsView extends ConsumerWidget {
         reverse: true,
         itemBuilder: (context, index) {
           final key = sorted[index];
-          return ListTile(
-            onTap: () {
-              if (key == _todayText) {
-                const TodayLogs().pushMaterialRouteUnawaited(context);
-              } else {
-                HistoricalLogs(logsKey: key)
-                    .pushMaterialRouteUnawaited(context);
-              }
-            },
-            title: Text(key),
+          return Card(
+            child: ListTile(
+              onTap: () {
+                if (key == _todayText) {
+                  const TodayLogs().pushMaterialRouteUnawaited(context);
+                } else {
+                  HistoricalLogs(logsKey: key)
+                      .pushMaterialRouteUnawaited(context);
+                }
+              },
+              title: Text(key),
+            ),
           );
         },
       ),

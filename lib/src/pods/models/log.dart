@@ -8,6 +8,8 @@ part 'log.g.dart';
 
 @freezed
 class Log with _$Log {
+  const Log._();
+
   const factory Log({
     required LogLevel level,
     required LogTopic topic,
@@ -16,4 +18,8 @@ class Log with _$Log {
   }) = _Log;
 
   factory Log.fromJson(Map<String, dynamic> json) => _$LogFromJson(json);
+
+  String toLogMessage() {
+    return '[${level.name}] <${topic.name}> {$timestamp} ${log.join('\n\t')}';
+  }
 }

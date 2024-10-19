@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/pods/models/log.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
@@ -26,9 +29,17 @@ final class LogsDisplay extends StatelessWidget {
         itemBuilder: (context, index) {
           final log = logs[index];
           final msg = '<${log.topic}> ${log.log.join('\n')}';
-          return ListTile(
-            title: Text(msg),
-            subtitle: Text(log.timestamp.toString()),
+          return Card(
+            child: ListTile(
+              onTap: () {
+                unawaited(
+                  Clipboard.setData(ClipboardData(text: log.toLogMessage())),
+                );
+              },
+              isThreeLine: true,
+              title: Text(msg),
+              subtitle: Text('${log.level}\n${log.timestamp}'),
+            ),
           );
         },
       ),

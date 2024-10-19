@@ -19,7 +19,7 @@ part 'logs_pod.g.dart';
 
 () _printLog(Log log, [String prefix = '']) {
   debugPrint(
-    '$prefix[${log.level.name}] <${log.topic.name}> {${log.timestamp}} ${log.log.join('\n\t')}',
+    '$prefix${log.toLogMessage()}',
   );
 
   return ();
