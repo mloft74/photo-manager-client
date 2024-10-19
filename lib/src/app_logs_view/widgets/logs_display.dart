@@ -32,6 +32,7 @@ final class LogsDisplay extends StatelessWidget {
           return Card(
             child: ListTile(
               onTap: () {
+                // TODO(mloft74): Add snackbar display saying message was copied to clipboard
                 unawaited(
                   Clipboard.setData(ClipboardData(text: log.toLogMessage())),
                 );
