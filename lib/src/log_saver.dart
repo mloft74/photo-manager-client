@@ -106,7 +106,8 @@ final class _LogSaverState extends ConsumerState<LogSaver>
                           CompoundDisplayable(
                             IList([
                               DefaultDisplayable(
-                                  IList(['Error deleting logs $key'])),
+                                IList(['Error deleting logs $key']),
+                              ),
                               ErrorTrace(
                                 ex,
                                 Some(st),

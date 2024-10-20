@@ -20,6 +20,11 @@ class Log with _$Log {
   factory Log.fromJson(Map<String, dynamic> json) => _$LogFromJson(json);
 
   String toLogMessage() {
-    return '[${level.name}] <${topic.name}> {$timestamp} ${log.join('\n\t')}';
+    return '[${level.name}] <${topic.name}> {$timestamp} ${log.map(
+          (s) => s.replaceAllMapped(
+            RegExp(r'(\r?\n)'),
+            (match) => '${match[0]}\t',
+          ),
+        ).join('\n\t')}';
   }
 }

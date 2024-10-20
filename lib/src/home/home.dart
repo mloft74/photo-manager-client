@@ -11,6 +11,8 @@ import 'package:photo_manager_client/src/home/widgets/server_not_selected.dart';
 import 'package:photo_manager_client/src/home/widgets/update_canon_dialog.dart';
 import 'package:photo_manager_client/src/home/widgets/update_date_sorting_dialog.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
+import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:photo_manager_client/src/settings/settings.dart';
 import 'package:photo_manager_client/src/upload_photo/upload_photo.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
@@ -98,11 +100,14 @@ Future<()> _onUpdateCanonPressed(BuildContext context, WidgetRef ref) async {
           const SnackBar(content: Text('No server selected')),
         );
       case Some(value: final updateCanon):
+        final logs = ref.read(logsPod.notifier);
         final res = await runWithToasts(
           messenger: messenger,
+          logs: logs,
           op: updateCanon,
           startingMsg: 'Updating canon',
           finishedMsg: 'Canon updated',
+          topic: LogTopic.photoManagement,
         );
         if (res case Ok()) {
           await ref.read(paginatedPhotosPod.notifier).reset();

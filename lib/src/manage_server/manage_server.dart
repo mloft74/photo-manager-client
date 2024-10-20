@@ -6,6 +6,8 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/extensions/pipe_extension.dart';
 import 'package:photo_manager_client/src/manage_server/pods/test_connection_pod.dart';
 import 'package:photo_manager_client/src/persistence/server/pods/servers_pod.dart';
+import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
@@ -157,17 +159,20 @@ Future<()> _onSave({
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
+  final logs = ref.read(logsPod.notifier);
 
   final res = await runWithToasts(
     messenger: messenger,
+    logs: logs,
     op: () {
       final notifier = ref.read(serversPod.notifier);
       return newServer
           ? notifier.saveServer(server)
           : notifier.updateServer(server);
     },
-    startingMsg: 'Saving ${server.name}',
-    finishedMsg: '${server.name} saved',
+    startingMsg: 'Saving $server',
+    finishedMsg: '$server saved',
+    topic: LogTopic.serverManagement,
   );
   if (res.isOk) {
     navigator.pop();
@@ -182,12 +187,15 @@ Future<()> _onTestConnection({
   required Server server,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
+  final logs = ref.read(logsPod.notifier);
 
   await runWithToasts(
     messenger: messenger,
+    logs: logs,
     op: () => ref.read(testConnectionPod)(server),
-    startingMsg: 'Testing connection',
-    finishedMsg: 'Connection successful',
+    startingMsg: 'Testing connection to $server',
+    finishedMsg: 'Connection to $server successful',
+    topic: LogTopic.serverManagement,
   );
 
   return ();

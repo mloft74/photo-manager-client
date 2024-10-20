@@ -7,6 +7,8 @@ import 'package:photo_manager_client/src/domain/hosted_image.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/rename_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/widgets/rename_photo_dialog.dart';
+import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 
@@ -99,11 +101,14 @@ Future<Result<(), ()>> _renamePhoto(
           .showSnackBar(const SnackBar(content: Text('No server selected')));
       return const Err(());
     case Some(value: final renamePhoto):
+  final logs = ref.read(logsPod.notifier);
       final res = await runWithToasts(
         messenger: messenger,
+        logs: logs,
         op: () => renamePhoto(oldName: oldName, newName: newName),
         startingMsg: 'Renaming $oldName to $newName',
         finishedMsg: 'Renamed $oldName to $newName',
+        topic: LogTopic.photoManagement,
       );
 
       return switch (res) {
