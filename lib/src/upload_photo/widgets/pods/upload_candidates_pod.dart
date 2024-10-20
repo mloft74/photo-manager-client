@@ -73,7 +73,7 @@ class UploadCandidates extends _$UploadCandidates {
       ref.read(logsPod.notifier).logError(
             LogTopic.photoUpload,
             const DefaultDisplayable(
-              ['No server selected when uploading photos'],
+              IListConst(['No server selected when uploading photos']),
             ),
           );
       return ();
@@ -89,7 +89,7 @@ class UploadCandidates extends _$UploadCandidates {
       case Ok():
         ref.read(logsPod.notifier).logInfo(
               LogTopic.photoUpload,
-              DefaultDisplayable(['Logging test']),
+              const DefaultDisplayable(IListConst(['Logging test'])),
             );
         state = state.add(candidate, UploadCandidateStatus.uploaded);
       case Err(:final error):

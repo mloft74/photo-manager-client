@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
@@ -39,10 +40,14 @@ final class SelectedServer extends _$SelectedServer
           final error = domainRes.expectErr('Should have checked for isErr');
           ref.read(logsPod.notifier).logError(
                 LogTopic.parsing,
-                DefaultDisplayable([
-                  'Could not parse server',
-                  ...error.toDisplay(),
-                ]),
+                CompoundDisplayable(
+                  IList([
+                    const DefaultDisplayable(
+                      IListConst(['Could not parse server']),
+                    ),
+                    error,
+                  ]),
+                ),
               );
         }
         return domainRes.okToOption();

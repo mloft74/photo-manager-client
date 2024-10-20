@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
+import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/extensions/date_time_keep_extension.dart';
 import 'package:photo_manager_client/src/persistence/keys.dart';
@@ -43,26 +45,28 @@ final class _LogSaverState extends ConsumerState<LogSaver>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.hidden) {
-      _saveLogs();
+      unawaited(_saveLogs());
     }
   }
 
-  () _saveLogs() {
+  Future<()> _saveLogs() async {
     final logs = ref.read(logsPod);
     if (logs.isEmpty) {
       return ();
     }
-    ref.read(logsPod.notifier).keepLogsWithDay(DateTime.timestamp());
+    final timestamp = DateTime.timestamp().withPrecision(DateTimeComponent.day);
+    ref.read(logsPod.notifier).keepLogsWithDay(timestamp);
+
+    final prefs = ref.read(sharedPrefsPod);
 
     final grouped = groupBy(
       logs,
       (l) => l.timestamp.withPrecision(DateTimeComponent.day),
     );
-
-    final prefs = ref.read(sharedPrefsPod);
+    final setFuts = <Future<void>>[];
     for (final MapEntry(key: date, value: logs) in grouped.entries) {
       final key = logsKeyForDate(date);
-      unawaited(
+      setFuts.add(
         prefs
             .setStringList(
               key,
@@ -71,14 +75,51 @@ final class _LogSaverState extends ConsumerState<LogSaver>
             .catchError(
               (Object ex, StackTrace st) => ref.read(logsPod.notifier).logError(
                     LogTopic.persistence,
-                    ErrorTrace<Object>(
-                      ex,
-                      Some(st),
+                    CompoundDisplayable(
+                      IList([
+                        DefaultDisplayable(IList(['Error saving logs $key'])),
+                        ErrorTrace(
+                          ex,
+                          Some(st),
+                        ),
+                      ]),
                     ),
                   ),
             ),
       );
     }
+
+    await Future.wait(setFuts);
+
+    final dates = prefs.keys
+        .where((e) => e.startsWith(logsPrefix))
+        .map((e) => (e, dateTimeFromKey(e)));
+    final cutoff = timestamp.subtract(const Duration(days: 30));
+    final deleteFuts = <Future<void>>[];
+    for (final (key, date) in dates) {
+      if (date.isBefore(cutoff)) {
+        deleteFuts.add(
+          prefs.remove(key).catchError(
+                (Object ex, StackTrace st) =>
+                    ref.read(logsPod.notifier).logError(
+                          LogTopic.persistence,
+                          CompoundDisplayable(
+                            IList([
+                              DefaultDisplayable(
+                                  IList(['Error deleting logs $key'])),
+                              ErrorTrace(
+                                ex,
+                                Some(st),
+                              ),
+                            ]),
+                          ),
+                        ),
+              ),
+        );
+      }
+    }
+
+    await Future.wait(deleteFuts);
 
     return ();
   }

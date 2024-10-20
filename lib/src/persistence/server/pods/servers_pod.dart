@@ -49,10 +49,14 @@ final class Servers extends _$Servers
     for (final e in errors) {
       logger.logError(
         LogTopic.parsing,
-        DefaultDisplayable([
-          'Could not parse server',
-          ...e.toDisplay(),
-        ]),
+        CompoundDisplayable(
+          IList([
+            const DefaultDisplayable(
+              IListConst(['Could not parse server']),
+            ),
+            e,
+          ]),
+        ),
       );
     }
 
