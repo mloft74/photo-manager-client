@@ -31,8 +31,7 @@ class ManagePhotoBody extends ConsumerWidget {
     return Column(
       children: [
         Expanded(
-          child: Align(
-            alignment: Alignment.bottomCenter,
+          child: Center(
             child: switch (res) {
               Some(:final value) => CachedNetworkImage(imageUrl: value),
               None() => const Text(

@@ -28,10 +28,7 @@ class UploadPhoto extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ImageDisplay(),
-              ),
+              child: ImageDisplay(),
             ),
             SizedBox(
               width: double.infinity,

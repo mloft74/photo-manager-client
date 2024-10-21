@@ -20,7 +20,7 @@ class ImageDisplay extends ConsumerWidget {
 
     final candidates = state.statuses.entries.toIList();
     if (candidates.isEmpty) {
-      return const Text('Select an image');
+      return const Center(child: Text('Select an image'));
     }
 
     return GridView.builder(
