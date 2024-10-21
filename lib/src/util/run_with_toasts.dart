@@ -1,10 +1,8 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_manager_client/src/app_logs_view/widgets/today_logs.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/show_error_logged_snackbar.dart';
-import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/pods/logs_pod.dart';
 import 'package:photo_manager_client/src/pods/models/log_level.dart';
 import 'package:photo_manager_client/src/pods/models/log_topic.dart';

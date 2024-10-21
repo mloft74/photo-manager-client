@@ -66,7 +66,6 @@ class UploadCandidates extends _$UploadCandidates {
     // Not discarded.
     // ignore: discarded_futures
     _ops = _ops.add(candidate, _upload(candidate));
-    print('[$from] current number of ops: ${_ops.length}, started: $candidate');
 
     return ();
   }
@@ -86,16 +85,16 @@ class UploadCandidates extends _$UploadCandidates {
 
     state = state
         .mapStatuses((s) => s.add(candidate, UploadCandidateStatus.uploading));
-    //final upload = maybeUpload.expect('Should have checked for None earlier');
-    //final res = await upload(candidate);
-    await Future<void>.delayed(const Duration(seconds: 2));
-    final res = Result<(), UploadPhotoError>.ok(());
+    final upload = maybeUpload.expect('Should have checked for None earlier');
+    final res = await upload(candidate);
 
     switch (res) {
       case Ok():
         ref.read(logsPod.notifier).logInfo(
               LogTopic.photoUpload,
-              const DefaultDisplayable(IListConst(['Logging test'])),
+              DefaultDisplayable(
+                IList(['Successfully uploaded $candidate']),
+              ),
             );
         state = state.mapStatuses(
           (s) => s.add(candidate, UploadCandidateStatus.uploaded),
@@ -103,7 +102,14 @@ class UploadCandidates extends _$UploadCandidates {
       case Err(:final error):
         ref.read(logsPod.notifier).logError(
               LogTopic.photoUpload,
-              error,
+              CompoundDisplayable(
+                IList([
+                  DefaultDisplayable(
+                    IList(['Failed to upload $candidate']),
+                  ),
+                  error,
+                ]),
+              ),
             );
         state = state
             .mapStatuses((s) => s.add(candidate, UploadCandidateStatus.error));
@@ -111,8 +117,6 @@ class UploadCandidates extends _$UploadCandidates {
 
     _ops = _ops.remove(candidate);
     _startUpload('_upload');
-
-    print('number of ops at end: ${_ops.length}, in: $candidate');
 
     return ();
   }

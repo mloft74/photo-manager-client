@@ -28,6 +28,8 @@ class SelectPhotoButton extends ConsumerWidget {
   unawaited(
     ref.read(uploadCandidatesPod.notifier).updateStatuses(() async {
       final pickRes = await FilePicker.platform.pickFiles(
+        allowCompression: false,
+        compressionQuality: 0,
         type: FileType.image,
         allowMultiple: true,
       );
