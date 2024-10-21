@@ -3,20 +3,11 @@ import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/pods/logs_pod.dart';
 import 'package:photo_manager_client/src/pods/models/log_topic.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/models/upload_candidates_state.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'upload_candidates_pod.g.dart';
-
-// TODO(mloft74): Add some kind of flag for loading images from the picker
-typedef UploadCandidatesState = IMap<String, UploadCandidateStatus>;
-
-enum UploadCandidateStatus {
-  pending,
-  uploading,
-  uploaded,
-  error,
-}
 
 const _maxConcurrentUploads = 4;
 
@@ -24,21 +15,35 @@ const _maxConcurrentUploads = 4;
 class UploadCandidates extends _$UploadCandidates {
   @override
   UploadCandidatesState build() {
-    return const IMapConst({});
+    return const UploadCandidatesState(
+      loading: false,
+      statuses: IMapConst({}),
+    );
   }
 
-  () updateState(UploadCandidatesState newState) {
-    state = newState;
+  Future<()> updateStatuses(
+    FutureOr<UploadCandidateStatuses?> Function() fn,
+  ) async {
+    state = state.copyWith(loading: true);
+
+    final res = fn();
+    final newStatuses = res is UploadCandidateStatuses? ? res : await res;
+    if (newStatuses == null) {
+      state = state.copyWith(loading: false);
+    } else {
+      state = UploadCandidatesState(loading: false, statuses: newStatuses);
+    }
+
     return ();
   }
 
   IList<String> _candidates = const IListConst([]);
   () upload() {
-    if (_candidates.isNotEmpty || _ops.isNotEmpty || state.isEmpty) {
+    if (_candidates.isNotEmpty || _ops.isNotEmpty || state.statuses.isEmpty) {
       return ();
     }
 
-    _candidates = IList(state.keys.toList().reversedView);
+    _candidates = IList(state.statuses.keys.toList().reversedView);
     _ops = const IMapConst({});
 
     for (var i = 0; i < _maxConcurrentUploads; ++i) {
@@ -79,7 +84,8 @@ class UploadCandidates extends _$UploadCandidates {
       return ();
     }
 
-    state = state.add(candidate, UploadCandidateStatus.uploading);
+    state = state
+        .mapStatuses((s) => s.add(candidate, UploadCandidateStatus.uploading));
     //final upload = maybeUpload.expect('Should have checked for None earlier');
     //final res = await upload(candidate);
     await Future<void>.delayed(const Duration(seconds: 2));
@@ -91,13 +97,16 @@ class UploadCandidates extends _$UploadCandidates {
               LogTopic.photoUpload,
               const DefaultDisplayable(IListConst(['Logging test'])),
             );
-        state = state.add(candidate, UploadCandidateStatus.uploaded);
+        state = state.mapStatuses(
+          (s) => s.add(candidate, UploadCandidateStatus.uploaded),
+        );
       case Err(:final error):
         ref.read(logsPod.notifier).logError(
               LogTopic.photoUpload,
               error,
             );
-        state = state.add(candidate, UploadCandidateStatus.error);
+        state = state
+            .mapStatuses((s) => s.add(candidate, UploadCandidateStatus.error));
     }
 
     _ops = _ops.remove(candidate);

@@ -19,7 +19,7 @@ class UploadButton extends ConsumerWidget {
     final candidates = ref.watch(uploadCandidatesPod);
 
     return FilledButton.icon(
-      onPressed: candidates.isEmpty
+      onPressed: candidates.statuses.isEmpty
           ? null
           : () {
               unawaited(

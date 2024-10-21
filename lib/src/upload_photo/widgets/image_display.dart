@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/models/upload_candidates_state.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_candidates_pod.dart';
 
 class ImageDisplay extends ConsumerWidget {
@@ -10,7 +12,13 @@ class ImageDisplay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final candidates = ref.watch(uploadCandidatesPod).entries.toList();
+    final state = ref.watch(uploadCandidatesPod);
+
+    if (state.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final candidates = state.statuses.entries.toIList();
     if (candidates.isEmpty) {
       return const Text('Select an image');
     }
