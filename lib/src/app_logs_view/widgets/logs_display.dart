@@ -19,6 +19,20 @@ final class LogsDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PhotoManagerScaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          await Clipboard.setData(
+            ClipboardData(text: logs.map((l) => l.toLogMessage()).join('\n')),
+          );
+          messenger
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(content: Text('Copied logs to clipboard')),
+            );
+        },
+        child: const Icon(Icons.copy),
+      ),
       bottomAppBar: const PhotoManagerBottomAppBar(
         leading: BackButton(),
         titleText: 'Viewing Logs',
@@ -31,11 +45,16 @@ final class LogsDisplay extends StatelessWidget {
           final msg = '<${log.topic}> ${log.log.join('\n')}';
           return Card(
             child: ListTile(
-              onTap: () {
-                // TODO(mloft74): Add snackbar display saying message was copied to clipboard
-                unawaited(
-                  Clipboard.setData(ClipboardData(text: log.toLogMessage())),
+              onTap: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                await Clipboard.setData(
+                  ClipboardData(text: log.toLogMessage()),
                 );
+                messenger
+                  ..clearSnackBars()
+                  ..showSnackBar(
+                    const SnackBar(content: Text('Copied entry to clipboard')),
+                  );
               },
               isThreeLine: true,
               title: Text(msg),
