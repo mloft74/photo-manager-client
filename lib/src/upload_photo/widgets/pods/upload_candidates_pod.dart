@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
@@ -10,6 +12,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'upload_candidates_pod.g.dart';
 
 const _maxConcurrentUploads = 4;
+
+enum UploadError implements Displayable {
+  noCandidates,
+  uploadInProgress,
+  ;
+
+  @override
+  Iterable<String> toDisplay() => [name];
+}
 
 @riverpod
 class UploadCandidates extends _$UploadCandidates {
@@ -38,13 +49,22 @@ class UploadCandidates extends _$UploadCandidates {
   }
 
   IList<String> _candidates = const IListConst([]);
-  () upload() {
-    if (_candidates.isNotEmpty || _ops.isNotEmpty || state.statuses.isEmpty) {
-      return ();
+  var _completer = Completer<()>();
+  // This function and related functions are a mess, but I'm not fixing it right now.
+  Future<Result<IMap<String, Result<(), UploadPhotoError>>, UploadError>>
+      upload() async {
+    if (state.statuses.isEmpty) {
+      return const Err(UploadError.noCandidates);
     }
+    if (_ops.isNotEmpty || _candidates.isNotEmpty) {
+      return const Err(UploadError.uploadInProgress);
+    }
+
+    _completer = Completer();
 
     _candidates = IList(state.statuses.keys.toList().reversedView);
     _ops = const IMapConst({});
+    _results = const IMapConst({});
 
     for (var i = 0; i < _maxConcurrentUploads; ++i) {
       if (_candidates.isEmpty) {
@@ -53,7 +73,9 @@ class UploadCandidates extends _$UploadCandidates {
       _startUpload('upload');
     }
 
-    return ();
+    await _completer.future;
+
+    return Ok(_results);
   }
 
   () _startUpload(String from) {
@@ -71,6 +93,7 @@ class UploadCandidates extends _$UploadCandidates {
   }
 
   IMap<String, Future<()>> _ops = const IMapConst({});
+  IMap<String, Result<(), UploadPhotoError>> _results = const IMapConst({});
   Future<()> _upload(String candidate) async {
     final maybeUpload = ref.read(uploadPhotoPod);
     if (maybeUpload.isNone) {
@@ -88,6 +111,10 @@ class UploadCandidates extends _$UploadCandidates {
     final upload = maybeUpload.expect('Should have checked for None earlier');
     final res = await upload(candidate);
 
+    _ops = _ops.remove(candidate);
+    _startUpload('_upload');
+
+    _results = _results.add(candidate, res);
     switch (res) {
       case Ok():
         ref.read(logsPod.notifier).logInfo(
@@ -115,8 +142,9 @@ class UploadCandidates extends _$UploadCandidates {
             .mapStatuses((s) => s.add(candidate, UploadCandidateStatus.error));
     }
 
-    _ops = _ops.remove(candidate);
-    _startUpload('_upload');
+    if (_ops.isEmpty) {
+      _completer.complete(());
+    }
 
     return ();
   }

@@ -6,10 +6,6 @@ import 'package:photo_manager_client/src/upload_photo/widgets/upload_button.dart
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-enum UploadPhotoResponse {
-  photoUploaded,
-}
-
 class UploadPhoto extends StatelessWidget {
   const UploadPhoto({super.key});
 

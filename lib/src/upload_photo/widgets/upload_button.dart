@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/extensions/show_error_logged_snackbar.dart';
+import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_candidates_pod.dart';
 
 class UploadButton extends ConsumerWidget {
@@ -37,7 +40,33 @@ Future<()> _onButtonPressed({
   final messenger = ScaffoldMessenger.of(context);
   final navigator = Navigator.of(context);
 
-  ref.read(uploadCandidatesPod.notifier).upload();
+  messenger.showSnackBar(const SnackBar(content: Text('Starting uploads')));
+
+  final res = await ref.read(uploadCandidatesPod.notifier).upload();
+
+  switch (res) {
+    case Err(:final error):
+      messenger.clearSnackBars();
+      final msg = switch (error) {
+        UploadError.noCandidates => 'No photos to upload',
+        UploadError.uploadInProgress => 'Upload already in progress',
+      };
+      messenger.showSnackBar(SnackBar(content: Text(msg)));
+      return ();
+    case Ok(value: final statuses):
+      if (statuses.values.any((r) => r.isOk)) {
+        await ref.read(paginatedPhotosPod.notifier).reset();
+      }
+
+      messenger.clearSnackBars();
+      if (statuses.values.any((r) => r.isErr)) {
+        messenger.showErrorLoggedSnackbar();
+      } else {
+        messenger
+            .showSnackBar(const SnackBar(content: Text('Finished uploads')));
+        navigator.pop();
+      }
+  }
 
   return ();
 }

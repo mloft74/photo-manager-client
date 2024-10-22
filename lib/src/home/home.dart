@@ -59,13 +59,9 @@ class Home extends ConsumerWidget {
           ),
           if (selectedServer.isSome)
             IconButton(
-              onPressed: () async {
-                final response = await const UploadPhoto()
-                    .pushMaterialRoute<UploadPhotoResponse>(context);
-                if (response
-                    case Some(value: UploadPhotoResponse.photoUploaded)) {
-                  await ref.read(paginatedPhotosPod.notifier).reset();
-                }
+              onPressed: () {
+                const UploadPhoto()
+                    .pushMaterialRouteUnawaited(context);
               },
               icon: const Icon(Icons.add),
             ),

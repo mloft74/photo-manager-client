@@ -32,6 +32,7 @@ class SelectPhotoButton extends ConsumerWidget {
         compressionQuality: 0,
         type: FileType.image,
         allowMultiple: true,
+        readSequential: true,
       );
       if (pickRes == null) {
         return null;
