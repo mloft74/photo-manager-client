@@ -126,6 +126,16 @@ class UploadCandidates extends _$UploadCandidates {
         state = state.mapStatuses(
           (s) => s.add(candidate, UploadCandidateStatus.uploaded),
         );
+      case Err(error: ImageAlreadyExists()):
+        ref.read(logsPod.notifier).logInfo(
+              LogTopic.photoUpload,
+              DefaultDisplayable(
+                IList(['Candidate $candidate already exists on server']),
+              ),
+            );
+        state = state.mapStatuses(
+          (s) => s.add(candidate, UploadCandidateStatus.imageAlreadyExists),
+        );
       case Err(:final error):
         ref.read(logsPod.notifier).logError(
               LogTopic.photoUpload,

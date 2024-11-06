@@ -35,7 +35,7 @@ Future<UploadPhotoResult> _uploadPhoto(
       final bodyString = await response.stream.bytesToString();
       final body = jsonDecode(bodyString);
       return switch (body) {
-        {'error': 'ImageAlreadyExists'} => const Err(ImageAlreadyExists()),
+        {'error': 'imageAlreadyExists'} => const Err(ImageAlreadyExists()),
         _ => Err(UnknownBody(bodyString)),
       };
     }

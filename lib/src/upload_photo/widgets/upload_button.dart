@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
+import 'package:photo_manager_client/src/extensions/partition_extension.dart';
 import 'package:photo_manager_client/src/extensions/show_error_logged_snackbar.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/models/upload_candidates_state.dart';
 import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_candidates_pod.dart';
+import 'package:photo_manager_client/src/upload_photo/widgets/pods/upload_photo_pod.dart';
 
 class UploadButton extends ConsumerWidget {
   const UploadButton({
@@ -17,7 +20,10 @@ class UploadButton extends ConsumerWidget {
     final candidates = ref.watch(uploadCandidatesPod);
 
     return FilledButton.icon(
-      onPressed: candidates.statuses.isEmpty
+      onPressed: candidates.statuses.isEmpty ||
+              candidates.statuses.any(
+                (path, status) => status == UploadCandidateStatus.error,
+              )
           ? null
           : () {
               unawaited(
@@ -59,12 +65,29 @@ Future<()> _onButtonPressed({
       }
 
       messenger.clearSnackBars();
-      if (statuses.values.any((r) => r.isErr)) {
+      final errs = statuses.values.whereErr();
+      final (pass: exists, fail: innerErr) = errs.partition(
+        (e) => switch (e) {
+          ImageAlreadyExists() => true,
+          UnknownBody() || ErrorOccurred() || TimedOut() => false,
+        },
+      );
+      if (innerErr.isNotEmpty) {
         messenger.showErrorLoggedSnackbar();
       } else {
-        messenger
-            .showSnackBar(const SnackBar(content: Text('Finished uploads')));
-        navigator.pop();
+        if (exists.isNotEmpty) {
+          messenger.showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Finished uploads, some already existed on the server',
+              ),
+            ),
+          );
+        } else {
+          messenger
+              .showSnackBar(const SnackBar(content: Text('Finished uploads')));
+          navigator.pop();
+        }
       }
   }
 

@@ -35,6 +35,10 @@ class ImageDisplay extends ConsumerWidget {
               'Uploading'
             ),
           UploadCandidateStatus.uploaded => (Colors.green.shade800, 'Uploaded'),
+          UploadCandidateStatus.imageAlreadyExists => (
+              Colors.orange.shade800,
+              'Already exists',
+            ),
           UploadCandidateStatus.error => (
               Colors.red.shade800,
               'Error',

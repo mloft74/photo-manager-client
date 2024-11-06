@@ -7,6 +7,7 @@ enum UploadCandidateStatus {
   pending,
   uploading,
   uploaded,
+  imageAlreadyExists,
   error,
 }
 
