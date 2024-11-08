@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -91,7 +92,7 @@ typedef FetchPhotosPagePodOption = Option<FetchPhotosPageFn>;
 
 @riverpod
 Option<FetchPhotosPageFn> fetchPhotosPage(
-  FetchPhotosPageRef ref,
+  Ref ref,
 ) {
   final client = ref.watch(httpClientPod);
   final server = ref.watch(selectedServerPod);

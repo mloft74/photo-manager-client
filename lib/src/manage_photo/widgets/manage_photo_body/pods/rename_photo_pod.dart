@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -55,7 +56,7 @@ typedef RenamePhotoFn = Future<RenamePhotoResult> Function({
 
 @riverpod
 Option<RenamePhotoFn> renamePhoto(
-  RenamePhotoRef ref,
+  Ref ref,
 ) {
   final client = ref.watch(httpClientPod);
   final server = ref.watch(selectedServerPod);

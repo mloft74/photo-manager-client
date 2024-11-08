@@ -1,4 +1,5 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/server.dart';
@@ -101,7 +102,7 @@ final class Servers extends _$Servers
 }
 
 Future<SaveServerResult> _handleSave(
-  AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
+  Ref ref,
   Server server,
 ) async {
   final db = ref.read(dbPod);
@@ -139,7 +140,7 @@ Future<Result<(), ErrorTrace<Object>>> _insertServer(
 }
 
 Future<UpdateServerResult> _handleUpdate(
-  AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
+  Ref ref,
   Server server,
 ) async {
   final db = ref.read(dbPod);
@@ -179,7 +180,7 @@ Future<Result<(), ErrorTrace<Object>>> _updateServer(
 }
 
 Future<RemoveServerResult> _handleRemove(
-  AutoDisposeAsyncNotifierProviderRef<ServersState> ref,
+  Ref ref,
   Server server,
 ) async {
   final db = ref.read(dbPod);
