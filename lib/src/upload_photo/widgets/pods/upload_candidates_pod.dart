@@ -70,7 +70,7 @@ class UploadCandidates extends _$UploadCandidates {
       if (_candidates.isEmpty) {
         break;
       }
-      _startUpload('upload');
+      _startUpload();
     }
 
     await _completer.future;
@@ -78,7 +78,7 @@ class UploadCandidates extends _$UploadCandidates {
     return Ok(_results);
   }
 
-  () _startUpload(String from) {
+  () _startUpload() {
     if (_candidates.isEmpty) {
       return ();
     }
@@ -112,7 +112,7 @@ class UploadCandidates extends _$UploadCandidates {
     final res = await upload(candidate);
 
     _ops = _ops.remove(candidate);
-    _startUpload('_upload');
+    _startUpload();
 
     _results = _results.add(candidate, res);
     final fileName = candidate.split('/').last;

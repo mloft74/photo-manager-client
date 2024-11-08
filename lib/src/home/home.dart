@@ -60,21 +60,16 @@ class Home extends ConsumerWidget {
           if (selectedServer.isSome)
             IconButton(
               onPressed: () {
-                const UploadPhoto()
-                    .pushMaterialRouteUnawaited(context);
+                const UploadPhoto().pushMaterialRouteUnawaited(context);
               },
               icon: const Icon(Icons.add),
             ),
         ],
       ),
-      child: Builder(
-        builder: (context) {
-          return switch (selectedServer) {
-            None() => const ServerNotSelected(),
-            Some() => const PhotoView(),
-          };
-        },
-      ),
+      child: switch (selectedServer) {
+        None() => const ServerNotSelected(),
+        Some() => const PhotoView(),
+      },
     );
   }
 }
