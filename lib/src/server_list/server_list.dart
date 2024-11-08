@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/consts.dart';
@@ -52,12 +53,13 @@ class ServerList extends ConsumerWidget {
             );
           }
 
+          final values = servers.values.sortedBy((element) => element.name);
           return ListView.builder(
             padding: edgeInsetsForRoutePadding,
             reverse: true,
-            itemCount: servers.length,
+            itemCount: values.length,
             itemBuilder: (context, index) {
-              final item = servers[index];
+              final item = values[index];
               return ServerListItem(
                 server: item,
                 key: ValueKey(item),

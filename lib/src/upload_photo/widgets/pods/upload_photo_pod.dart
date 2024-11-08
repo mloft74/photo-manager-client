@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
@@ -11,7 +12,7 @@ import 'package:photo_manager_client/src/errors/error_trace.dart';
 import 'package:photo_manager_client/src/http/errors/displayable_impls.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'upload_photo_pod.freezed.dart';
@@ -35,7 +36,7 @@ Future<UploadPhotoResult> _uploadPhoto(
       final bodyString = await response.stream.bytesToString();
       final body = jsonDecode(bodyString);
       return switch (body) {
-        {'error': 'ImageAlreadyExists'} => const Err(ImageAlreadyExists()),
+        {'error': 'imageAlreadyExists'} => const Err(ImageAlreadyExists()),
         _ => Err(UnknownBody(bodyString)),
       };
     }
@@ -50,13 +51,14 @@ typedef UploadPhotoFn = Future<Result<(), UploadPhotoError>> Function(
   String imagePath,
 );
 
+/// Returns [None] if no server is selected.
 @riverpod
-Result<UploadPhotoFn, CurrentServerResultError> uploadPhoto(
-  UploadPhotoRef ref,
+Option<UploadPhotoFn> uploadPhoto(
+  Ref ref,
 ) {
   final client = ref.watch(httpClientPod);
-  final serverRes = ref.watch(currentServerResultPod);
-  return serverRes.map(
+  final server = ref.watch(selectedServerPod);
+  return server.map(
     (value) =>
         (imagePath) async => await _uploadPhoto(client, value, imagePath),
   );

@@ -6,13 +6,6 @@ import 'package:photo_manager_client/src/upload_photo/widgets/upload_button.dart
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
-// TODO(mloft74): implement picking directory
-// TODO(mloft74): implement picking multiple photos
-
-enum UploadPhotoResponse {
-  photoUploaded,
-}
-
 class UploadPhoto extends StatelessWidget {
   const UploadPhoto({super.key});
 
@@ -28,10 +21,7 @@ class UploadPhoto extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ImageDisplay(),
-              ),
+              child: ImageDisplay(),
             ),
             SizedBox(
               width: double.infinity,

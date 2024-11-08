@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager_client/src/consts.dart';
-import 'package:photo_manager_client/src/settings/widgets/server_settings.dart';
+import 'package:photo_manager_client/src/settings/widgets/app_logs_tile.dart';
+import 'package:photo_manager_client/src/settings/widgets/server_settings_tile.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_bottom_app_bar.dart';
 import 'package:photo_manager_client/src/widgets/photo_manager_scaffold.dart';
 
@@ -18,7 +19,8 @@ class Settings extends StatelessWidget {
         padding: edgeInsetsForRoutePadding,
         reverse: true,
         children: const [
-          ServerSettings(),
+          ServerSettingsTile(),
+          AppLogsTile(),
         ],
       ),
     );

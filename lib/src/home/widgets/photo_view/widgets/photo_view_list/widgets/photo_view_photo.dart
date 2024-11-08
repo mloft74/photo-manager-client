@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:photo_manager_client/src/consts.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
-import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/home/pods/paginated_photos_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/manage_photo.dart';
@@ -23,7 +23,7 @@ class PhotoViewPhoto extends ConsumerWidget {
       photoUrlPod(fileName: image.fileName),
     );
     return url.mapOrElse(
-      orElse: (error) => Text(error.toDisplayJoined()),
+      orElse: () => const Text('No server selected'),
       map: (value) => InkWell(
         onTap: () async {
           final response = await ManagePhoto(initialImage: image)
@@ -40,6 +40,8 @@ class PhotoViewPhoto extends ConsumerWidget {
         },
         child: CachedNetworkImage(
           imageUrl: value,
+          width: maxGridImageWith * 1.0,
+          memCacheWidth: maxGridImageWith,
           progressIndicatorBuilder: (context, url, progress) {
             return CircularProgressIndicator(
               value: progress.progress,

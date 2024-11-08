@@ -93,18 +93,18 @@ class PaginatedPhotos extends _$PaginatedPhotos {
   }
 
   Future<PaginatedPhotosState> _fetchPhotosPageSafe(
-    FetchPhotosPagePodResult podRes,
+    Option<FetchPhotosPageFn> podRes,
     PhotosState stateData,
   ) async {
     switch (podRes) {
-      case Ok(value: final fetchPhotosPage):
+      case Some(value: final fetchPhotosPage):
         final res = await fetchPhotosPage(_cursor);
         return _stateFromResult(
           res,
           stateData,
         );
-      case Err(:final error):
-        return Err(CurrentServerError(error));
+      case None():
+        return const Err(NoServer());
     }
   }
 

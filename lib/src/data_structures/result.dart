@@ -314,6 +314,12 @@ extension MatchingResult<T extends Object> on Result<T, T> {
       };
 }
 
+extension IterableResultExtension<T extends Object, E extends Object>
+    on Iterable<Result<T, E>> {
+  Iterable<T> whereOk() => where((r) => r.isOk).map((r) => r.unwrap());
+  Iterable<E> whereErr() => where((r) => r.isErr).map((r) => r.unwrapErr());
+}
+
 /// This is a separate function to reduce the code size of the methods.
 Never _unwrapFailed(String msg, Object error) {
   throw StateError('$msg: $error');

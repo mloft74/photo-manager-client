@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
 import 'package:photo_manager_client/src/domain/hosted_image.dart';
-import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/manage_photo_image_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/pods/rename_photo_pod.dart';
 import 'package:photo_manager_client/src/manage_photo/widgets/manage_photo_body/widgets/rename_photo_dialog.dart';
+import 'package:photo_manager_client/src/pods/logs_pod.dart';
+import 'package:photo_manager_client/src/pods/models/log_topic.dart';
 import 'package:photo_manager_client/src/pods/photo_url_pod.dart';
 import 'package:photo_manager_client/src/util/run_with_toasts.dart';
 
@@ -30,12 +31,11 @@ class ManagePhotoBody extends ConsumerWidget {
     return Column(
       children: [
         Expanded(
-          child: Align(
-            alignment: Alignment.bottomCenter,
+          child: Center(
             child: switch (res) {
-              Ok(:final value) => CachedNetworkImage(imageUrl: value),
-              Err(:final error) => Text(
-                  error.toDisplayJoined(),
+              Some(:final value) => CachedNetworkImage(imageUrl: value),
+              None() => const Text(
+                  'No server selected',
                   textAlign: TextAlign.center,
                 ),
             },
@@ -95,15 +95,19 @@ Future<Result<(), ()>> _renamePhoto(
 }) async {
   final renamePhotoRes = ref.read(renamePhotoPod);
   switch (renamePhotoRes) {
-    case Err(:final error):
-      messenger.showSnackBar(SnackBar(content: Text(error.toDisplayJoined())));
+    case None():
+      messenger
+          .showSnackBar(const SnackBar(content: Text('No server selected')));
       return const Err(());
-    case Ok(value: final renamePhoto):
+    case Some(value: final renamePhoto):
+  final logs = ref.read(logsPod.notifier);
       final res = await runWithToasts(
         messenger: messenger,
+        logs: logs,
         op: () => renamePhoto(oldName: oldName, newName: newName),
         startingMsg: 'Renaming $oldName to $newName',
         finishedMsg: 'Renamed $oldName to $newName',
+        topic: LogTopic.photoManagement,
       );
 
       return switch (res) {

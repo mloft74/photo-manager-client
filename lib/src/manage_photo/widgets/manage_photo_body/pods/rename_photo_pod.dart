@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager_client/src/data_structures/option.dart';
 import 'package:photo_manager_client/src/data_structures/result.dart';
@@ -10,8 +11,7 @@ import 'package:photo_manager_client/src/extensions/response_extension.dart';
 import 'package:photo_manager_client/src/http/errors/basic_http_error.dart';
 import 'package:photo_manager_client/src/http/pods/http_client_pod.dart';
 import 'package:photo_manager_client/src/http/timeout.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_result_pod.dart'
-    hide ErrorOccurred;
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'rename_photo_pod.g.dart';
@@ -55,11 +55,11 @@ typedef RenamePhotoFn = Future<RenamePhotoResult> Function({
 });
 
 @riverpod
-Result<RenamePhotoFn, CurrentServerResultError> renamePhoto(
-  RenamePhotoRef ref,
+Option<RenamePhotoFn> renamePhoto(
+  Ref ref,
 ) {
   final client = ref.watch(httpClientPod);
-  final server = ref.watch(currentServerResultPod);
+  final server = ref.watch(selectedServerPod);
   return server.map(
     (value) => ({
       required oldName,

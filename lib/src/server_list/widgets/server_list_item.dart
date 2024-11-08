@@ -6,13 +6,11 @@ import 'package:photo_manager_client/src/domain/server.dart';
 import 'package:photo_manager_client/src/errors/displayable.dart';
 import 'package:photo_manager_client/src/extensions/widget_extension.dart';
 import 'package:photo_manager_client/src/manage_server/manage_server.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/current_server_pod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/remove_server_pod.dart';
-import 'package:photo_manager_client/src/persistence/server/pods/set_current_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/selected_server_pod.dart';
+import 'package:photo_manager_client/src/persistence/server/pods/servers_pod.dart';
 import 'package:photo_manager_client/src/server_list/widgets/server_list_item/widgets/delete_server_dialog.dart';
-import 'package:photo_manager_client/src/widgets/async_value_builder.dart';
 
-class ServerListItem extends ConsumerStatefulWidget {
+class ServerListItem extends ConsumerWidget {
   final Server server;
 
   const ServerListItem({
@@ -21,87 +19,69 @@ class ServerListItem extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ServerListItem> createState() => _ServerListItemState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedServer = ref.watch(selectedServerPod);
 
-class _ServerListItemState extends ConsumerState<ServerListItem> {
-  var _removingServer = false;
+    final selected = selectedServer.isSomeAnd((value) => value == server);
+    return Dismissible(
+      key: ValueKey(server),
+      background: ColoredBox(
+        color: Theme.of(context).colorScheme.error,
+      ),
+      confirmDismiss: (direction) async {
+        final response = await showDialog<DeleteServerResponse>(
+          context: context,
+          builder: (context) => DeleteServerDialog(server),
+        ).toFutureOption();
+        final shouldDelete = response
+            .andThen(
+              (value) => value == DeleteServerResponse.delete
+                  ? const Some(())
+                  : const None<()>(),
+            )
+            .isSome;
+        return shouldDelete;
+      },
+      onDismissed: (direction) async {
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-  @override
-  Widget build(BuildContext context) {
-    final currentServer = ref.watch(currentServerPod);
-
-    return _removingServer
-        ? const SizedBox.shrink()
-        : AsyncValueBuilder(
-            asyncValue: currentServer,
-            builder: (context, value) {
-              final selected =
-                  value.isSomeAnd((value) => value == widget.server);
-              return Dismissible(
-                key: ValueKey(widget.server),
-                background: ColoredBox(
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                confirmDismiss: (direction) async {
-                  final response = await showDialog<DeleteServerResponse>(
-                    context: context,
-                    builder: (context) => DeleteServerDialog(widget.server),
-                  ).toFutureOption();
-                  final shouldDelete = response
-                      .andThen(
-                        (value) => value == DeleteServerResponse.delete
-                            ? const Some(())
-                            : const None<()>(),
-                      )
-                      .isSome;
-                  return shouldDelete;
-                },
-                onDismissed: (direction) async {
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  setState(() {
-                    _removingServer = true;
-                  });
-
-                  final res = await ref.read(removeServerPod)(widget.server);
-                  if (res case Err(:final error)) {
-                    scaffoldMessenger.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Error removing ${widget.server.name}:\n${error.toDisplayJoined()}',
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: ListTile(
-                  selected: selected,
-                  onTap: () async {
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    final res =
-                        await ref.read(setCurrentServerPod)(widget.server);
-                    if (res case Err(:final error)) {
-                      scaffoldMessenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Error selecting ${widget.server.name}:\n${error.toDisplayJoined()}',
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  title: Text(widget.server.name),
-                  subtitle: Text('${widget.server.uri}'),
-                  trailing: IconButton(
-                    onPressed: () {
-                      ManageServer(server: widget.server)
-                          .pushMaterialRouteUnawaited(context);
-                    },
-                    icon: const Icon(Icons.edit),
-                  ),
-                ),
-              );
-            },
+        final res = await ref.read(serversPod.notifier).removeServer(server);
+        if (res case Err(:final error)) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error removing ${server.name}:\n${error.toDisplayJoined()}',
+              ),
+            ),
           );
+        }
+      },
+      child: ListTile(
+        selected: selected,
+        onTap: () async {
+          final scaffoldMessenger = ScaffoldMessenger.of(context);
+          final res = await ref
+              .read(selectedServerPod.notifier)
+              .setServer(Some(server));
+          if (res case Err(:final error)) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Error selecting ${server.name}:\n${error.toDisplayJoined()}',
+                ),
+              ),
+            );
+          }
+        },
+        title: Text(server.name),
+        subtitle: Text('${server.uri}'),
+        trailing: IconButton(
+          onPressed: () {
+            ManageServer(server: server).pushMaterialRouteUnawaited(context);
+          },
+          icon: const Icon(Icons.edit),
+        ),
+      ),
+    );
   }
 }
