@@ -115,12 +115,13 @@ class UploadCandidates extends _$UploadCandidates {
     _startUpload('_upload');
 
     _results = _results.add(candidate, res);
+    final fileName = candidate.split('/').last;
     switch (res) {
       case Ok():
         ref.read(logsPod.notifier).logInfo(
               LogTopic.photoUpload,
               DefaultDisplayable(
-                IList(['Successfully uploaded $candidate']),
+                IList(['Successfully uploaded $fileName']),
               ),
             );
         state = state.mapStatuses(
@@ -130,7 +131,7 @@ class UploadCandidates extends _$UploadCandidates {
         ref.read(logsPod.notifier).logInfo(
               LogTopic.photoUpload,
               DefaultDisplayable(
-                IList(['Candidate $candidate already exists on server']),
+                IList(['Candidate $fileName already exists on server']),
               ),
             );
         state = state.mapStatuses(
@@ -142,7 +143,7 @@ class UploadCandidates extends _$UploadCandidates {
               CompoundDisplayable(
                 IList([
                   DefaultDisplayable(
-                    IList(['Failed to upload $candidate']),
+                    IList(['Failed to upload $fileName']),
                   ),
                   error,
                 ]),
